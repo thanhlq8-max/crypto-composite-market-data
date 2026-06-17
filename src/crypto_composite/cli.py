@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+import argparse
+from typing import Iterable
+
+from crypto_composite.pipeline import (
+    DEFAULT_ASSET,
+    DEFAULT_DEPTH,
+    DEFAULT_LIMIT,
+    DEFAULT_MARKET_TYPES,
+    DEFAULT_TIMEFRAMES,
+    DEFAULT_VENUES,
+    run_composite,
+)
+
+
+def parse_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _join(values: Iterable[str]) -> str:
+    return ",".join(values)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="crypto-composite",
+        description="Build public multi-exchange crypto market-data composite artifacts.",
+    )
+    sub = parser.add_subparsers(dest="cmd", required=True)
+
+    run = sub.add_parser("run", help="Fetch public data and write composite artifacts.")
+    run.add_argument("--asset", default=DEFAULT_ASSET)
+    run.add_argument("--venues", default=_join(DEFAULT_VENUES))
+    run.add_argument("--market-types", default=_join(DEFAULT_MARKET_TYPES))
+    run.add_argument("--timeframes", default=_join(DEFAULT_TIMEFRAMES))
+    run.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
+    run.add_argument("--depth", type=int, default=DEFAULT_DEPTH)
+    run.add_argument("--out-dir", default="artifacts")
+    run.add_argument("--bucket-size", type=float, default=None)
+
+    args = parser.parse_args()
+    if args.cmd == "run":
+        result = run_composite(
+            asset=args.asset,
+            venues=parse_csv(args.venues),
+            market_types=parse_csv(args.market_types),
+            timeframes=parse_csv(args.timeframes),
+            limit=args.limit,
+            depth=args.depth,
+            out_dir=args.out_dir,
+            bucket_size=args.bucket_size,
+        )
+        summary = result["summary"]
+        print(
+            "STATUS: OK "
+            f"asset={summary['asset']} "
+            f"timeframes={','.join(summary['timeframes'])} "
+            f"out_dir={args.out_dir}"
+        )
+
+
+if __name__ == "__main__":
+    main()
