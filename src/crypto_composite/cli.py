@@ -13,6 +13,7 @@ from crypto_composite.pipeline import (
     run_composite,
 )
 from crypto_composite.universe import run_universe
+from crypto_composite.dashboard import DEFAULT_DASHBOARD_HOST, DEFAULT_DASHBOARD_PORT, serve_dashboard
 
 
 def parse_csv(value: str) -> list[str]:
@@ -50,6 +51,11 @@ def main() -> None:
     universe.add_argument("--out-dir", default="artifacts")
     universe.add_argument("--bucket-size", type=float, default=None)
 
+    dashboard = sub.add_parser("dashboard", help="Serve a read-only local artifact dashboard API.")
+    dashboard.add_argument("--artifact-root", default="artifacts", help="Directory containing JSON artifacts.")
+    dashboard.add_argument("--host", default=DEFAULT_DASHBOARD_HOST)
+    dashboard.add_argument("--port", type=int, default=DEFAULT_DASHBOARD_PORT)
+
     args = parser.parse_args()
     if args.cmd == "run":
         result = run_composite(
@@ -86,6 +92,8 @@ def main() -> None:
             f"timeframes={','.join(summary['timeframes'])} "
             f"out_dir={args.out_dir}"
         )
+    if args.cmd == "dashboard":
+        serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
 
 
 if __name__ == "__main__":

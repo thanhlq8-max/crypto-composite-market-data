@@ -1,0 +1,9 @@
+{
+  "assets": ["BTC-USDT", "ETH-USDT", "SOL-USDT"],
+  "venues": ["binance", "okx", "bybit"],
+  "market_types": ["spot_usdt", "perp_usdt"],
+  "timeframes": ["15m", "1h"],
+  "limit": 300,
+  "depth": 100,
+  "out_dir": "artifacts-universe"
+}

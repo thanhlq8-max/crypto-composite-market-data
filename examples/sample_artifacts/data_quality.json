@@ -1,0 +1,14 @@
+{
+  "15m": {
+    "composite_ohlcv": {
+      "status": "COMPOSITE_DATA_OK",
+      "coverage_ratio": 1.0,
+      "max_price_dispersion_pct": 0.04
+    },
+    "composite_orderbook_ladder": {
+      "status": "COMPOSITE_BOOK_OK",
+      "book_count": 6,
+      "expected_book_count": 6
+    }
+  }
+}

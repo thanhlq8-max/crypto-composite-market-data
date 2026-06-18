@@ -81,7 +81,7 @@ artifacts/data_quality.json
 artifacts/run_summary.json
 ```
 
-## Supported scope in v0.1
+## Supported scope
 
 | Area | Supported |
 |---|---|
@@ -163,6 +163,28 @@ crypto-composite universe   --assets BTC-USDT,ETH-USDT,SOL-USDT   --venues binan
 
 This writes per-asset artifacts plus `universe_summary.json`. See `docs/MULTI_SYMBOL_UNIVERSE.md`.
 
+## Local dashboard API
+
+Serve a read-only local artifact API:
+
+```bash
+crypto-composite dashboard --artifact-root artifacts-universe --host 127.0.0.1 --port 8765
+```
+
+Endpoints:
+
+```text
+/api/health
+/api/artifacts
+/api/artifact?path=<relative-json-path>
+```
+
+See `docs/DASHBOARD_API.md`.
+
+## Packaging
+
+See `docs/PACKAGING.md` for TestPyPI/PyPI release preparation.
+
 ## Development roadmap
 
 See:
@@ -170,6 +192,8 @@ See:
 - `docs/ROADMAP.md`
 - `docs/USEFUL_OUTPUTS.md`
 - `docs/DASHBOARD_PLAN.md`
+- `docs/DASHBOARD_API.md`
+- `docs/PACKAGING.md`
 
 ## License
 

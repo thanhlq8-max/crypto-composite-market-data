@@ -53,3 +53,36 @@ def test_cli_run_parses_arguments_and_prints_status(monkeypatch, capsys) -> None
         }
     ]
     assert capsys.readouterr().out.strip() == "STATUS: OK asset=ETH-USDT timeframes=15m,1h out_dir=tmp-artifacts"
+
+
+def test_cli_dashboard_invokes_server(monkeypatch) -> None:
+    calls: list[dict] = []
+
+    def fake_serve_dashboard(**kwargs) -> None:
+        calls.append(kwargs)
+
+    monkeypatch.setattr(cli, "serve_dashboard", fake_serve_dashboard)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "crypto-composite",
+            "dashboard",
+            "--artifact-root",
+            "examples/sample_artifacts",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8765",
+        ],
+    )
+
+    cli.main()
+
+    assert calls == [
+        {
+            "artifact_root": "examples/sample_artifacts",
+            "host": "127.0.0.1",
+            "port": 8765,
+        }
+    ]
