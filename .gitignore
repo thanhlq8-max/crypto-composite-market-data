@@ -1,16 +1,21 @@
-__pycache__/
+﻿__pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .venv/
 venv/
+
 build/
 dist/
 *.egg-info/
 artifacts/
+artifacts-universe/
+exports/
+
 .env
 .DS_Store
+
 # Local patch and release artifacts
 *.patch
 *.diff

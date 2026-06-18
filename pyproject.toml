@@ -4,32 +4,50 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crypto-composite-market-data"
-version = "0.3.3"
+version = "0.3.4"
 description = "Public multi-exchange crypto market-data composite toolkit."
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [{ name = "thanhlq8-max" }]
 license = "Apache-2.0"
-keywords = ["crypto", "market-data", "orderbook", "ohlcv", "binance", "okx", "bybit"]
+authors = [
+  { name = "thanhlq8-max" }
+]
+keywords = [
+  "crypto",
+  "market-data",
+  "ohlcv",
+  "orderbook",
+  "binance",
+  "okx",
+  "bybit",
+  "data-engineering"
+]
 classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Topic :: Database",
   "Topic :: Scientific/Engineering :: Information Analysis",
-  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 dependencies = [
-  "requests>=2.31",
+  "requests>=2.31"
 ]
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-]
+[project.urls]
+Homepage = "https://github.com/thanhlq8-max/crypto-composite-market-data"
+Repository = "https://github.com/thanhlq8-max/crypto-composite-market-data"
+Issues = "https://github.com/thanhlq8-max/crypto-composite-market-data/issues"
 
 [project.scripts]
 crypto-composite = "crypto_composite.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

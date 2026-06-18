@@ -1,4 +1,4 @@
-name: Publish to TestPyPI
+﻿name: Publish to TestPyPI
 
 on:
   workflow_dispatch:
@@ -11,6 +11,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v6

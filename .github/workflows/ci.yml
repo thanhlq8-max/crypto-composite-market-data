@@ -1,8 +1,10 @@
-name: CI
+﻿name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
   test:
@@ -12,6 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -32,20 +35,21 @@ jobs:
           python -m pip install -r requirements-dev.txt
           python -m pip install -e .
 
-      - name: Compile source
-        run: python -m compileall src
-
-      - name: Run unit tests
-        run: python -m pytest -q
-
       - name: Check CLI entrypoints
         run: |
           crypto-composite --help
           python -m crypto_composite.cli --help
 
-  package:
+      - name: Compile source
+        run: python -m compileall src
+
+      - name: Run tests
+        run: python -m pytest -q
+
+  build-package:
     name: build-package
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v6

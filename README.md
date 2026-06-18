@@ -1,19 +1,21 @@
-# crypto-composite-market-data
+﻿# crypto-composite-market-data
 
 [![CI](https://github.com/thanhlq8-max/crypto-composite-market-data/actions/workflows/ci.yml/badge.svg)](https://github.com/thanhlq8-max/crypto-composite-market-data/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/crypto-composite-market-data.svg)](https://pypi.org/project/crypto-composite-market-data/)
 [![Python](https://img.shields.io/pypi/pyversions/crypto-composite-market-data.svg)](https://pypi.org/project/crypto-composite-market-data/)
 [![License](https://img.shields.io/github/license/thanhlq8-max/crypto-composite-market-data.svg)](LICENSE)
 
-> Note: PyPI/Shields badges can take a few minutes to refresh after a new release. The package is available at [PyPI](https://pypi.org/project/crypto-composite-market-data/).
-
 Public multi-exchange crypto market-data composite toolkit.
 
 `crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX and Bybit endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
 
+> Note: PyPI/Shields badges can take a few minutes to refresh after a new release.
+
 ## Why this exists
 
-Public crypto market data is fragmented. A single exchange can be stale, unavailable, noisy, rate-limited, or structurally different from the broader venue set. This project helps developers and researchers answer practical data-quality questions before using market data downstream:
+Public crypto market data is fragmented. A single exchange can be stale, unavailable, noisy, rate-limited, or structurally different from the broader venue set.
+
+This project helps developers and researchers answer practical data-quality questions before using market data downstream:
 
 - Which venues returned usable data?
 - Is composite OHLCV coverage complete or partial?
@@ -52,7 +54,7 @@ Public crypto market data is fragmented. A single exchange can be stale, unavail
 
 ## Install
 
-From PyPI after production release:
+From PyPI:
 
 ```bash
 pip install crypto-composite-market-data
@@ -95,14 +97,14 @@ Inspect the generated files:
 
 ```text
 artifacts-universe/
-├── BTC-USDT/
-│   ├── composite_ohlcv_15m.json
-│   ├── composite_orderbook_ladder_15m.json
-│   ├── data_quality.json
-│   └── run_summary.json
-├── ETH-USDT/
-├── SOL-USDT/
-└── universe_summary.json
+â”œâ”€â”€ BTC-USDT/
+â”‚   â”œâ”€â”€ composite_ohlcv_15m.json
+â”‚   â”œâ”€â”€ composite_orderbook_ladder_15m.json
+â”‚   â”œâ”€â”€ data_quality.json
+â”‚   â””â”€â”€ run_summary.json
+â”œâ”€â”€ ETH-USDT/
+â”œâ”€â”€ SOL-USDT/
+â””â”€â”€ universe_summary.json
 ```
 
 Serve the read-only local artifact API:
@@ -203,7 +205,7 @@ artifacts-universe/<ASSET>/...
 artifacts-universe/universe_summary.json
 ```
 
-See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md) and [docs/OUTPUT_ARTIFACTS.md](docs/OUTPUT_ARTIFACTS.md).
+See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md).
 
 ## Supported scope
 
@@ -291,7 +293,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## Limitations
 
-Public exchange APIs can rate-limit, return incomplete data, or temporarily fail. The orderbook ladder is a public snapshot bucket proxy; it is not a private, full-depth, consolidated matching-engine book.
+Public exchange APIs can rate-limit, return incomplete data, or temporarily fail.
+
+The orderbook ladder is a public snapshot bucket proxy; it is not a private, full-depth, consolidated matching-engine book.
 
 This project is data infrastructure. Any downstream research or visualization must preserve the no-signal, no-execution, no-financial-advice boundary unless explicitly implemented in a separate project with its own validation and legal review.
 
