@@ -95,17 +95,18 @@ crypto-composite universe \
 
 Inspect the generated files:
 
+Inspect the generated files:
+
 ```text
 artifacts-universe/
-â”œâ”€â”€ BTC-USDT/
-â”‚   â”œâ”€â”€ composite_ohlcv_15m.json
-â”‚   â”œâ”€â”€ composite_orderbook_ladder_15m.json
-â”‚   â”œâ”€â”€ data_quality.json
-â”‚   â””â”€â”€ run_summary.json
-â”œâ”€â”€ ETH-USDT/
-â”œâ”€â”€ SOL-USDT/
-â””â”€â”€ universe_summary.json
-```
+|-- BTC-USDT/
+|   |-- composite_ohlcv_15m.json
+|   |-- composite_orderbook_ladder_15m.json
+|   |-- data_quality.json
+|   `-- run_summary.json
+|-- ETH-USDT/
+|-- SOL-USDT/
+`-- universe_summary.json
 
 Serve the read-only local artifact API:
 
