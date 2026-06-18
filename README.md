@@ -152,6 +152,25 @@ Recommended GitHub repository settings:
 
 The repository already includes `README.md`, `.gitignore` and `LICENSE`. See [docs/PUBLISH_GITHUB_UI.md](docs/PUBLISH_GITHUB_UI.md) for the UI-based publishing checklist.
 
+
+## Multi-symbol universe mode
+
+Run an explicit asset universe without producing rankings or trading signals:
+
+```bash
+crypto-composite universe   --assets BTC-USDT,ETH-USDT,SOL-USDT   --venues binance,okx,bybit   --market-types spot_usdt,perp_usdt   --timeframes 15m,1h   --out-dir artifacts-universe
+```
+
+This writes per-asset artifacts plus `universe_summary.json`. See `docs/MULTI_SYMBOL_UNIVERSE.md`.
+
+## Development roadmap
+
+See:
+
+- `docs/ROADMAP.md`
+- `docs/USEFUL_OUTPUTS.md`
+- `docs/DASHBOARD_PLAN.md`
+
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).

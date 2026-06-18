@@ -1,5 +1,5 @@
 from __future__ import annotations
-from crypto_composite.connectors.base import ExchangeConnector
+from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
 from crypto_composite.schemas import *
 from crypto_composite.utils import quote_volume, now_ms
 
@@ -12,7 +12,8 @@ class BybitConnector(ExchangeConnector):
     def _cat(self, market_type): return "linear" if market_type=="perp_usdt" else "spot"
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
-        data=self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":_INTERVAL[timeframe],"limit":limit}).get("result",{}).get("list",[])
+        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        data=self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":limit}).get("result",{}).get("list",[])
         out=[]
         for x in reversed(data):
             ts,op,hi,lo,cl,vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
@@ -30,8 +31,9 @@ class BybitConnector(ExchangeConnector):
 
     def fetch_orderbook(self, symbol, market_type, depth):
         data=self._get(self.base+"/v5/market/orderbook", {"category":self._cat(market_type),"symbol":symbol,"limit":min(depth,500)}).get("result",{})
-        bids=[(float(x[0]),float(x[1])) for x in data.get("b",[])]
-        asks=[(float(x[0]),float(x[1])) for x in data.get("a",[])]
+        bids = parse_book_levels(data.get("b", []))
+        asks = parse_book_levels(data.get("a", []))
+        require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
         bb,ba=bids[0][0], asks[0][0]
         return OrderBookSnapshot(self.venue, market_type, symbol, int(data.get("ts",now_ms())), bids, asks, bb, ba, (bb+ba)/2, ba-bb, min(len(bids),len(asks)), 0.8)
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from crypto_composite.connectors.base import ExchangeConnector
+from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
 from crypto_composite.schemas import *
 from crypto_composite.utils import quote_volume, now_ms
 
@@ -13,7 +13,8 @@ class BinanceConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         path = "/fapi/v1/klines" if market_type == "perp_usdt" else "/api/v3/klines"
-        data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":_INTERVAL[timeframe], "limit":limit})
+        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":interval, "limit":limit})
         out=[]
         for x in data:
             op,hi,lo,cl,vol = map(float, [x[1],x[2],x[3],x[4],x[5]])
@@ -36,8 +37,9 @@ class BinanceConnector(ExchangeConnector):
     def fetch_orderbook(self, symbol, market_type, depth):
         path = "/fapi/v1/depth" if market_type == "perp_usdt" else "/api/v3/depth"
         data = self._get(self._base(market_type)+path, {"symbol":symbol, "limit":min(depth,1000)})
-        bids=[(float(p),float(q)) for p,q in data["bids"]]
-        asks=[(float(p),float(q)) for p,q in data["asks"]]
+        bids = parse_book_levels(data.get("bids", []))
+        asks = parse_book_levels(data.get("asks", []))
+        require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
         bb,ba=bids[0][0], asks[0][0]
         return OrderBookSnapshot(self.venue, market_type, symbol, now_ms(), bids, asks, bb, ba, (bb+ba)/2, ba-bb, min(len(bids),len(asks)), 0.9)
 

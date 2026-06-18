@@ -1,5 +1,5 @@
 from __future__ import annotations
-from crypto_composite.connectors.base import ExchangeConnector
+from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
 from crypto_composite.schemas import *
 from crypto_composite.utils import quote_volume, now_ms
 
@@ -12,7 +12,8 @@ class OKXConnector(ExchangeConnector):
     def _inst_type(self, market_type): return "SWAP" if market_type=="perp_usdt" else "SPOT"
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
-        data = self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":_BAR[timeframe],"limit":limit}).get("data",[])
+        bar = require_timeframe(timeframe, _BAR, venue=self.venue)
+        data = self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":limit}).get("data",[])
         out=[]
         for x in reversed(data):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
@@ -29,9 +30,11 @@ class OKXConnector(ExchangeConnector):
         return out
 
     def fetch_orderbook(self, symbol, market_type, depth):
-        data = self._get(self.base+"/api/v5/market/books", {"instId":symbol,"sz":min(depth,400)}).get("data",[{}])[0]
-        bids=[(float(x[0]),float(x[1])) for x in data.get("bids",[])]
-        asks=[(float(x[0]),float(x[1])) for x in data.get("asks",[])]
+        items = self._get(self.base+"/api/v5/market/books", {"instId":symbol,"sz":min(depth,400)}).get("data",[])
+        data = items[0] if items else {}
+        bids = parse_book_levels(data.get("bids", []))
+        asks = parse_book_levels(data.get("asks", []))
+        require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
         bb,ba=bids[0][0], asks[0][0]
         return OrderBookSnapshot(self.venue, market_type, symbol, int(data.get("ts",now_ms())), bids, asks, bb, ba, (bb+ba)/2, ba-bb, min(len(bids),len(asks)), 0.85)
 

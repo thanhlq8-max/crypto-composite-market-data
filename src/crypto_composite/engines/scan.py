@@ -1,15 +1,30 @@
 from __future__ import annotations
+
 from crypto_composite.symbol_map import resolve_symbol
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.connectors.bybit import BybitConnector
-from crypto_composite.connectors.base import ConnectorFetchError
 from crypto_composite.schemas import DataQualityReport
 from crypto_composite.utils import now_ms
 
 CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector}
 
+
+class ScanInputError(ValueError):
+    pass
+
+
+def _normalize_venues(venues: list[str]) -> list[str]:
+    normalized = [v.strip().lower() for v in venues if v.strip()]
+    unsupported = [v for v in normalized if v not in CONNECTORS]
+    if unsupported:
+        supported = ",".join(sorted(CONNECTORS))
+        raise ScanInputError(f"VENUE_UNSUPPORTED venues={unsupported!r} supported={supported}")
+    return normalized
+
+
 def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str, limit: int, depth: int = 100) -> dict:
+    venues = _normalize_venues(venues)
     out = {"asset": asset, "generated_at_ms": now_ms(), "phase": "PHASE_1_DATA_FOUNDATION",
            "venues": venues, "timeframe": timeframe, "market_types": market_types,
            "data": {"ohlcv": [], "trades": [], "orderbooks": [], "funding": [], "open_interest": []},
@@ -41,7 +56,7 @@ def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str,
         if venue_had_ok: venues_ok.add(venue)
         else: venues_failed.add(venue)
     qualities = []
-    for k, records in out["data"].items():
+    for records in out["data"].values():
         for r in records:
             qualities.append(getattr(r, "data_quality", 0.0))
     overall = sum(qualities)/len(qualities) if qualities else 0.0

@@ -12,6 +12,7 @@ from crypto_composite.pipeline import (
     DEFAULT_VENUES,
     run_composite,
 )
+from crypto_composite.universe import run_universe
 
 
 def parse_csv(value: str) -> list[str]:
@@ -39,6 +40,16 @@ def main() -> None:
     run.add_argument("--out-dir", default="artifacts")
     run.add_argument("--bucket-size", type=float, default=None)
 
+    universe = sub.add_parser("universe", help="Run composite artifacts for an explicit multi-asset universe.")
+    universe.add_argument("--assets", required=True, help="Comma-separated BASE-USDT assets, for example BTC-USDT,ETH-USDT,SOL-USDT.")
+    universe.add_argument("--venues", default=_join(DEFAULT_VENUES))
+    universe.add_argument("--market-types", default=_join(DEFAULT_MARKET_TYPES))
+    universe.add_argument("--timeframes", default=_join(DEFAULT_TIMEFRAMES))
+    universe.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
+    universe.add_argument("--depth", type=int, default=DEFAULT_DEPTH)
+    universe.add_argument("--out-dir", default="artifacts")
+    universe.add_argument("--bucket-size", type=float, default=None)
+
     args = parser.parse_args()
     if args.cmd == "run":
         result = run_composite(
@@ -55,6 +66,23 @@ def main() -> None:
         print(
             "STATUS: OK "
             f"asset={summary['asset']} "
+            f"timeframes={','.join(summary['timeframes'])} "
+            f"out_dir={args.out_dir}"
+        )
+    if args.cmd == "universe":
+        summary = run_universe(
+            assets=parse_csv(args.assets),
+            venues=parse_csv(args.venues),
+            market_types=parse_csv(args.market_types),
+            timeframes=parse_csv(args.timeframes),
+            limit=args.limit,
+            depth=args.depth,
+            out_dir=args.out_dir,
+            bucket_size=args.bucket_size,
+        )
+        print(
+            "STATUS: OK "
+            f"assets={summary['asset_count']} "
             f"timeframes={','.join(summary['timeframes'])} "
             f"out_dir={args.out_dir}"
         )
