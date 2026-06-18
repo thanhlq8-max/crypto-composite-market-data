@@ -8,11 +8,15 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 
 DEFAULT_DASHBOARD_HOST = "127.0.0.1"
-DEFAULT_DASHBOARD_PORT = 8765
+DEFAULT_DASHBOARD_PORT = 18080
 
 
 class DashboardInputError(ValueError):
     """Raised when dashboard artifact input is invalid."""
+
+
+class DashboardBindError(OSError):
+    """Raised when the local dashboard server cannot bind to the requested socket."""
 
 
 def _safe_root(path: str | Path) -> Path:
@@ -123,7 +127,15 @@ def serve_dashboard(
 ) -> None:
     """Serve a read-only local dashboard API over stdlib HTTP."""
     handler = make_dashboard_handler(artifact_root)
-    server = ThreadingHTTPServer((host, port), handler)
+    try:
+        server = ThreadingHTTPServer((host, port), handler)
+    except OSError as exc:
+        raise DashboardBindError(
+            "DASHBOARD_BIND_FAILED:"
+            f"host={host}:port={port}:"
+            "try a different local port, for example --port 18081 or --port 19080"
+        ) from exc
+
     print(f"STATUS: OK dashboard=http://{host}:{port} artifact_root={Path(artifact_root).resolve()}")
     try:
         server.serve_forever()

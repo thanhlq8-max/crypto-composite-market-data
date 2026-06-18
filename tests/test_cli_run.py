@@ -73,7 +73,7 @@ def test_cli_dashboard_invokes_server(monkeypatch) -> None:
             "--host",
             "127.0.0.1",
             "--port",
-            "8765",
+            "18080",
         ],
     )
 
@@ -83,6 +83,6 @@ def test_cli_dashboard_invokes_server(monkeypatch) -> None:
         {
             "artifact_root": "examples/sample_artifacts",
             "host": "127.0.0.1",
-            "port": 8765,
+            "port": 18080,
         }
     ]

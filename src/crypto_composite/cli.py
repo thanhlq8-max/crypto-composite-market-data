@@ -13,7 +13,12 @@ from crypto_composite.pipeline import (
     run_composite,
 )
 from crypto_composite.universe import run_universe
-from crypto_composite.dashboard import DEFAULT_DASHBOARD_HOST, DEFAULT_DASHBOARD_PORT, serve_dashboard
+from crypto_composite.dashboard import (
+    DEFAULT_DASHBOARD_HOST,
+    DEFAULT_DASHBOARD_PORT,
+    DashboardBindError,
+    serve_dashboard,
+)
 
 
 def parse_csv(value: str) -> list[str]:
@@ -93,7 +98,10 @@ def main() -> None:
             f"out_dir={args.out_dir}"
         )
     if args.cmd == "dashboard":
-        serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
+        try:
+            serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
+        except DashboardBindError as exc:
+            parser.exit(2, f"ERROR: {exc}\n")
 
 
 if __name__ == "__main__":

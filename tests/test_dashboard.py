@@ -5,7 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from crypto_composite.dashboard import DashboardInputError, build_artifact_index, load_json_artifact, _safe_json_path
+from crypto_composite.dashboard import (
+    DashboardBindError,
+    DashboardInputError,
+    build_artifact_index,
+    load_json_artifact,
+    serve_dashboard,
+    _safe_json_path,
+)
 
 
 def test_build_artifact_index_lists_json_files(tmp_path: Path) -> None:
@@ -42,3 +49,15 @@ def test_safe_json_path_rejects_non_json_file(tmp_path: Path) -> None:
 
     with pytest.raises(DashboardInputError, match="ARTIFACT_PATH_NOT_JSON"):
         _safe_json_path(tmp_path, "note.txt")
+
+
+def test_serve_dashboard_reports_bind_failure(monkeypatch, tmp_path: Path) -> None:
+    import crypto_composite.dashboard as dashboard_module
+
+    def raise_permission_error(*args, **kwargs):
+        raise PermissionError(10013, "forbidden")
+
+    monkeypatch.setattr(dashboard_module, "ThreadingHTTPServer", raise_permission_error)
+
+    with pytest.raises(DashboardBindError, match="DASHBOARD_BIND_FAILED"):
+        serve_dashboard(tmp_path, host="127.0.0.1", port=8765)

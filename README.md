@@ -168,7 +168,7 @@ This writes per-asset artifacts plus `universe_summary.json`. See `docs/MULTI_SY
 Serve a read-only local artifact API:
 
 ```bash
-crypto-composite dashboard --artifact-root artifacts-universe --host 127.0.0.1 --port 8765
+crypto-composite dashboard --artifact-root artifacts-universe --host 127.0.0.1 --port 18080
 ```
 
 Endpoints:
