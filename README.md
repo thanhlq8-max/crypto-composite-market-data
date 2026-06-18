@@ -5,6 +5,8 @@
 [![Python](https://img.shields.io/pypi/pyversions/crypto-composite-market-data.svg)](https://pypi.org/project/crypto-composite-market-data/)
 [![License](https://img.shields.io/github/license/thanhlq8-max/crypto-composite-market-data.svg)](LICENSE)
 
+> Note: PyPI/Shields badges can take a few minutes to refresh after a new release. The package is available at [PyPI](https://pypi.org/project/crypto-composite-market-data/).
+
 Public multi-exchange crypto market-data composite toolkit.
 
 `crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX and Bybit endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
@@ -285,7 +287,7 @@ Useful first contributions:
 - Build a small static frontend on top of the read-only dashboard API.
 - Add schema validation for output artifacts.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and the GitHub issue templates.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), the GitHub issue templates, and [docs/GOOD_FIRST_ISSUES.md](docs/GOOD_FIRST_ISSUES.md).
 
 ## Limitations
 
@@ -307,6 +309,9 @@ See:
 - [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md)
 - [docs/PACKAGING.md](docs/PACKAGING.md)
 - [docs/COMMUNITY_GROWTH.md](docs/COMMUNITY_GROWTH.md)
+- [docs/ADOPTION_PLAYBOOK.md](docs/ADOPTION_PLAYBOOK.md)
+- [docs/CLAUDE_FOR_OSS_READINESS.md](docs/CLAUDE_FOR_OSS_READINESS.md)
+- [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 
 ## License
 
