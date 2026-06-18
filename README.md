@@ -95,8 +95,6 @@ crypto-composite universe \
 
 Inspect the generated files:
 
-Inspect the generated files:
-
 ```text
 artifacts-universe/
 |-- BTC-USDT/
