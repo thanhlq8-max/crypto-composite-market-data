@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import json
 from typing import Iterable
 
+from crypto_composite.artifact_validator import validate_artifact_root
+from crypto_composite.dashboard import (
+    DEFAULT_DASHBOARD_HOST,
+    DEFAULT_DASHBOARD_PORT,
+    DashboardBindError,
+    serve_dashboard,
+)
 from crypto_composite.pipeline import (
     DEFAULT_ASSET,
     DEFAULT_DEPTH,
@@ -13,12 +21,6 @@ from crypto_composite.pipeline import (
     run_composite,
 )
 from crypto_composite.universe import run_universe
-from crypto_composite.dashboard import (
-    DEFAULT_DASHBOARD_HOST,
-    DEFAULT_DASHBOARD_PORT,
-    DashboardBindError,
-    serve_dashboard,
-)
 
 
 def parse_csv(value: str) -> list[str]:
@@ -47,7 +49,11 @@ def main() -> None:
     run.add_argument("--bucket-size", type=float, default=None)
 
     universe = sub.add_parser("universe", help="Run composite artifacts for an explicit multi-asset universe.")
-    universe.add_argument("--assets", required=True, help="Comma-separated BASE-USDT assets, for example BTC-USDT,ETH-USDT,SOL-USDT.")
+    universe.add_argument(
+        "--assets",
+        required=True,
+        help="Comma-separated BASE-USDT assets, for example BTC-USDT,ETH-USDT,SOL-USDT.",
+    )
     universe.add_argument("--venues", default=_join(DEFAULT_VENUES))
     universe.add_argument("--market-types", default=_join(DEFAULT_MARKET_TYPES))
     universe.add_argument("--timeframes", default=_join(DEFAULT_TIMEFRAMES))
@@ -60,6 +66,9 @@ def main() -> None:
     dashboard.add_argument("--artifact-root", default="artifacts", help="Directory containing JSON artifacts.")
     dashboard.add_argument("--host", default=DEFAULT_DASHBOARD_HOST)
     dashboard.add_argument("--port", type=int, default=DEFAULT_DASHBOARD_PORT)
+
+    validate = sub.add_parser("validate-artifacts", help="Validate generated JSON artifact structure.")
+    validate.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
 
     args = parser.parse_args()
     if args.cmd == "run":
@@ -102,6 +111,11 @@ def main() -> None:
             serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
         except DashboardBindError as exc:
             parser.exit(2, f"ERROR: {exc}\n")
+    if args.cmd == "validate-artifacts":
+        validation = validate_artifact_root(args.artifact_root)
+        print(json.dumps(validation, indent=2, sort_keys=True))
+        if validation["status"] == "ERROR":
+            parser.exit(1)
 
 
 if __name__ == "__main__":
