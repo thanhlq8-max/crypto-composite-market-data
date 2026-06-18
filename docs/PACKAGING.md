@@ -16,11 +16,11 @@ python -m pytest -q
 python -m build
 ```
 
-4. Create a GitHub release tag:
+4. Create a GitHub release tag after verification:
 
 ```bash
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.3.2
+git push origin v0.3.2
 ```
 
 5. Run the manual `Publish to TestPyPI` workflow from GitHub Actions.
@@ -49,3 +49,15 @@ Before a production PyPI release:
 - README and release notes match the package version.
 - Examples are illustrative or reproducible without private credentials.
 - No live API tests are required for CI.
+
+
+## Production PyPI
+
+After TestPyPI verification, configure PyPI trusted publishing with:
+
+- Owner: `thanhlq8-max`
+- Repository: `crypto-composite-market-data`
+- Workflow: `publish-pypi.yml`
+- Environment: `pypi`
+
+Then run the manual `Publish to PyPI` workflow from GitHub Actions. See `docs/PYPI_PRODUCTION.md`.

@@ -57,3 +57,13 @@ Goal: make adoption easier.
 - PyPI release after CI and packaging checks remain stable.
 - Installation docs for `pip install crypto-composite-market-data`.
 - Release notes with migration notes.
+
+## v0.7 — Community-ready contribution surface
+
+Goal: make the repository easy for external users and contributors to engage with.
+
+- Issue templates for bugs, feature requests, and data-source requests.
+- Pull request template with validation and boundary checks.
+- Good-first-issue backlog for connectors, exports, docs, and dashboard API.
+- Community growth documentation focused on data-quality and reproducible artifacts.
+- External examples and tutorials that avoid trading-signal claims.

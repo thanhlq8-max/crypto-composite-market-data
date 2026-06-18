@@ -1,32 +1,24 @@
 {
   "asset_count": 2,
-  "assets": ["BTC-USDT", "ETH-USDT"],
-  "venues": ["binance", "okx", "bybit"],
-  "market_types": ["spot_usdt", "perp_usdt"],
-  "timeframes": ["15m", "1h"],
-  "errors": [],
-  "asset_results": {
-    "BTC-USDT": {
-      "artifact_dir": "BTC-USDT",
-      "data_quality_by_timeframe": {
-        "15m": {
-          "ohlcv_status": "COMPOSITE_DATA_OK",
-          "orderbook_status": "COMPOSITE_BOOK_OK"
-        }
-      }
-    },
-    "ETH-USDT": {
-      "artifact_dir": "ETH-USDT",
-      "data_quality_by_timeframe": {
-        "15m": {
-          "ohlcv_status": "COMPOSITE_DATA_PARTIAL",
-          "orderbook_status": "COMPOSITE_BOOK_PARTIAL"
-        }
-      }
-    }
-  },
-  "limitations": [
-    "Illustrative sample only.",
-    "No trading recommendations are generated."
+  "assets": [
+    "BTC-USDT",
+    "ETH-USDT"
+  ],
+  "venues": [
+    "binance",
+    "okx",
+    "bybit"
+  ],
+  "market_types": [
+    "spot_usdt",
+    "perp_usdt"
+  ],
+  "timeframes": [
+    "15m"
+  ],
+  "artifact_root": "examples/sample_artifacts",
+  "boundaries": [
+    "Illustrative sample artifacts only.",
+    "No trading signals, order execution, position sizing, or financial advice."
   ]
 }
