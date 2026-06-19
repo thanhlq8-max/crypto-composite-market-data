@@ -105,6 +105,7 @@ artifacts-universe/
 |-- ETH-USDT/
 |-- SOL-USDT/
 `-- universe_summary.json
+```
 
 Serve the read-only local artifact API:
 
@@ -259,6 +260,19 @@ COMPOSITE_BOOK_PARTIAL
 COMPOSITE_BOOK_WEAK
 ```
 
+
+## Static HTML report
+
+Generate a shareable artifact-quality report:
+
+```bash
+crypto-composite report --artifact-root artifacts-universe --out-file report.html
+```
+
+The report summarizes quality score, venue coverage, composite OHLCV status, orderbook status, price dispersion, validator warnings/errors, and JSON artifact links. It is an inspection page only; it is not a trading signal, prediction, execution instruction, or financial-advice document.
+
+See [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md).
+
 ## Local dashboard API
 
 Serve a read-only local artifact API:
@@ -310,6 +324,7 @@ See:
 - [docs/USEFUL_OUTPUTS.md](docs/USEFUL_OUTPUTS.md)
 - [docs/DASHBOARD_PLAN.md](docs/DASHBOARD_PLAN.md)
 - [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md)
+- [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md)
 - [docs/PACKAGING.md](docs/PACKAGING.md)
 - [docs/COMMUNITY_GROWTH.md](docs/COMMUNITY_GROWTH.md)
 - [docs/ADOPTION_PLAYBOOK.md](docs/ADOPTION_PLAYBOOK.md)
