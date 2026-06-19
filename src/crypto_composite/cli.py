@@ -4,6 +4,7 @@ import argparse
 import json
 from typing import Iterable
 
+from crypto_composite.artifact_quality import score_artifact_root, write_quality_score
 from crypto_composite.artifact_validator import validate_artifact_root
 from crypto_composite.dashboard import (
     DEFAULT_DASHBOARD_HOST,
@@ -70,6 +71,10 @@ def main() -> None:
     validate = sub.add_parser("validate-artifacts", help="Validate generated JSON artifact structure.")
     validate.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
 
+    score = sub.add_parser("score-artifacts", help="Score generated artifact data quality.")
+    score.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
+    score.add_argument("--write", action="store_true", help="Write quality_score.json into the artifact root.")
+
     args = parser.parse_args()
     if args.cmd == "run":
         result = run_composite(
@@ -89,7 +94,7 @@ def main() -> None:
             f"timeframes={','.join(summary['timeframes'])} "
             f"out_dir={args.out_dir}"
         )
-    if args.cmd == "universe":
+    elif args.cmd == "universe":
         summary = run_universe(
             assets=parse_csv(args.assets),
             venues=parse_csv(args.venues),
@@ -106,15 +111,20 @@ def main() -> None:
             f"timeframes={','.join(summary['timeframes'])} "
             f"out_dir={args.out_dir}"
         )
-    if args.cmd == "dashboard":
+    elif args.cmd == "dashboard":
         try:
             serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
         except DashboardBindError as exc:
             parser.exit(2, f"ERROR: {exc}\n")
-    if args.cmd == "validate-artifacts":
+    elif args.cmd == "validate-artifacts":
         validation = validate_artifact_root(args.artifact_root)
         print(json.dumps(validation, indent=2, sort_keys=True))
         if validation["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "score-artifacts":
+        quality = write_quality_score(args.artifact_root) if args.write else score_artifact_root(args.artifact_root)
+        print(json.dumps(quality, indent=2, sort_keys=True))
+        if quality["status"] == "ERROR":
             parser.exit(1)
 
 

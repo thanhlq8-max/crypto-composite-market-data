@@ -1,4 +1,4 @@
-﻿# crypto-composite-market-data
+# crypto-composite-market-data
 
 [![CI](https://github.com/thanhlq8-max/crypto-composite-market-data/actions/workflows/ci.yml/badge.svg)](https://github.com/thanhlq8-max/crypto-composite-market-data/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/crypto-composite-market-data.svg)](https://pypi.org/project/crypto-composite-market-data/)
@@ -319,3 +319,14 @@ See:
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
+## Artifact quality scoring
+
+After generating artifacts, compute a compact quality score:
+
+```bash
+crypto-composite score-artifacts --artifact-root artifacts-universe --write
+```
+
+This writes `quality_score.json` with a reproducible A-F grade based on venue coverage, composite OHLCV coverage, price dispersion, orderbook coverage and existing data-quality status. The score is for artifact inspection only; it is not a trading signal or prediction score.
+
+See [docs/ARTIFACT_QUALITY_SCORE.md](docs/ARTIFACT_QUALITY_SCORE.md).
