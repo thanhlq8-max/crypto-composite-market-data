@@ -1,0 +1,68 @@
+name: Downstream use case
+description: Share a verifiable workflow that uses the package or its generated artifacts.
+title: "[Downstream use]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a real external workflow. Do not include credentials, private account data, personal data, or unverified adoption claims.
+  - type: input
+    id: reference
+    attributes:
+      label: Public reference or permission to quote
+      description: Provide a public project, post, or artifact URL, or state explicitly that the maintainer may quote this report with attribution.
+      placeholder: "https://github.com/example/project or: You may quote this report with attribution."
+    validations:
+      required: true
+  - type: input
+    id: user_or_project
+    attributes:
+      label: External user or project
+      description: Identify the person, team, or public project using the package or artifacts.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "For example: 0.6.0"
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Concrete workflow
+      description: Describe how the package or generated artifacts fit into the downstream workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: artifact_or_feature
+    attributes:
+      label: Artifact or feature used
+      description: Identify the commands, APIs, or artifact files used by the workflow.
+      placeholder: "For example: validate-artifacts and composite_ohlcv_15m.json"
+    validations:
+      required: true
+  - type: textarea
+    id: observed_outcome
+    attributes:
+      label: Observed value or limitation
+      description: State a concrete outcome, limitation, or integration finding without trading-performance claims.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Reproduction or verification details
+      description: Provide public commands, files, or links that let maintainers verify the workflow when available.
+  - type: checkboxes
+    id: evidence_boundary
+    attributes:
+      label: Evidence and scope confirmation
+      options:
+        - label: The reference and workflow details are public, or I grant the maintainer permission to quote this report with attribution.
+          required: true
+        - label: This report contains no credentials, private account data, personal data, or confidential artifacts.
+          required: true
+        - label: This report describes public market-data infrastructure and makes no trading-performance, profitability, or financial-advice claim.
+          required: true

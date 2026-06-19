@@ -1,0 +1,27 @@
+{
+  "spot_usdt": {
+    "asset": "BTC-USDT",
+    "market_type": "spot_usdt",
+    "generated_at_ms": 1700000000000,
+    "reference_price": 101.0,
+    "bucket_size": 1.0,
+    "expected_venues": [
+      "binance",
+      "okx",
+      "bybit"
+    ],
+    "venue_count": 3,
+    "coverage": 1.0,
+    "bid_levels": [],
+    "ask_levels": [],
+    "top_bid_wall": null,
+    "top_ask_wall": null,
+    "bid_depth_total": 3000.0,
+    "ask_depth_total": 2900.0,
+    "depth_imbalance": 0.0169,
+    "status": "COMPOSITE_BOOK_OK",
+    "notes": [
+      "Illustrative synthetic sample; not live market data."
+    ]
+  }
+}

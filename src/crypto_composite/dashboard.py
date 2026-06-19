@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 
+from crypto_composite.dashboard_frontend import render_dashboard_html
+
 
 DEFAULT_DASHBOARD_HOST = "127.0.0.1"
 DEFAULT_DASHBOARD_PORT = 18080
@@ -55,9 +57,16 @@ def build_artifact_index(artifact_root: str | Path) -> dict[str, Any]:
     """
     root = _safe_root(artifact_root)
     json_files = sorted(path for path in root.rglob("*.json") if path.is_file())
-    artifacts = [str(path.relative_to(root)).replace("\\", "/") for path in json_files]
+    artifacts = [
+        {
+            "path": str(path.relative_to(root)).replace("\\", "/"),
+            "size_bytes": path.stat().st_size,
+        }
+        for path in json_files
+    ]
+    artifact_paths = {item["path"] for item in artifacts}
     well_known = {
-        name: name in artifacts
+        name: name in artifact_paths
         for name in [
             "run_summary.json",
             "data_quality.json",
@@ -92,10 +101,24 @@ def make_dashboard_handler(artifact_root: str | Path):
             self.end_headers()
             self.wfile.write(body)
 
+        def _write_html(self, status: int, html: str) -> None:
+            body = html.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.end_headers()
+            self.wfile.write(body)
+
         def do_GET(self) -> None:  # noqa: N802 - BaseHTTPRequestHandler API
             parsed = urlparse(self.path)
             try:
-                if parsed.path == "/" or parsed.path == "/api/health":
+                if parsed.path == "/":
+                    self._write_html(200, render_dashboard_html())
+                    return
+                if parsed.path == "/api/health":
                     self._write_json(200, {"status": "OK", "service": "crypto-composite-dashboard"})
                     return
                 if parsed.path == "/api/artifacts":

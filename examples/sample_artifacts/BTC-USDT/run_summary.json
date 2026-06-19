@@ -1,0 +1,36 @@
+{
+  "asset": "BTC-USDT",
+  "venues": [
+    "binance",
+    "okx",
+    "bybit"
+  ],
+  "market_types": [
+    "spot_usdt"
+  ],
+  "timeframes": [
+    "15m"
+  ],
+  "outputs": {
+    "raw_scan_by_timeframe": [],
+    "composite_ohlcv_by_timeframe": [
+      "composite_ohlcv_15m.json"
+    ],
+    "composite_orderbook_ladder_by_timeframe": [
+      "composite_orderbook_ladder_15m.json"
+    ],
+    "combined_composite_ohlcv": "composite_ohlcv.json",
+    "combined_composite_orderbook_ladder": "composite_orderbook_ladder.json",
+    "data_quality": "data_quality.json"
+  },
+  "data_quality_by_timeframe": {
+    "15m": {
+      "status": "OK",
+      "overall_quality": 0.95
+    }
+  },
+  "limitations": [
+    "Illustrative synthetic sample; not live market data.",
+    "No trading signal, execution instruction, or profitability claim is generated."
+  ]
+}

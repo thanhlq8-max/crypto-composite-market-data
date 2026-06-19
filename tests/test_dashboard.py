@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import threading
+from http.server import ThreadingHTTPServer
 from pathlib import Path
+from urllib.request import urlopen
 
 import pytest
 
@@ -12,7 +15,9 @@ from crypto_composite.dashboard import (
     load_json_artifact,
     serve_dashboard,
     _safe_json_path,
+    make_dashboard_handler,
 )
+from crypto_composite.dashboard_frontend import render_dashboard_html
 
 
 def test_build_artifact_index_lists_json_files(tmp_path: Path) -> None:
@@ -25,7 +30,52 @@ def test_build_artifact_index_lists_json_files(tmp_path: Path) -> None:
 
     assert index["artifact_count"] == 2
     assert index["well_known"]["run_summary.json"] is True
-    assert "nested/data_quality.json" in index["artifacts"]
+    assert index["artifacts"] == [
+        {
+            "path": "nested/data_quality.json",
+            "size_bytes": (tmp_path / "nested" / "data_quality.json").stat().st_size,
+        },
+        {
+            "path": "run_summary.json",
+            "size_bytes": (tmp_path / "run_summary.json").stat().st_size,
+        },
+    ]
+
+
+def test_render_dashboard_html_reads_object_artifact_contract() -> None:
+    html = render_dashboard_html()
+
+    assert "Crypto Composite Data Health" in html
+    assert 'getJson("/api/artifacts")' in html
+    assert "item.path" in html
+    assert "item.size_bytes" in html
+    assert ">Buy<" not in html
+    assert ">Sell<" not in html
+
+
+def test_dashboard_http_root_serves_html_and_api_serves_objects(tmp_path: Path) -> None:
+    artifact = tmp_path / "data_quality.json"
+    artifact.write_text('{"15m":{"status":"OK"}}', encoding="utf-8")
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_dashboard_handler(tmp_path))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    host, port = server.server_address
+
+    try:
+        with urlopen(f"http://{host}:{port}/", timeout=5) as response:
+            html = response.read().decode("utf-8")
+            assert response.status == 200
+            assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+            assert "Crypto Composite Data Health" in html
+
+        with urlopen(f"http://{host}:{port}/api/artifacts", timeout=5) as response:
+            payload = json.loads(response.read())
+            assert response.status == 200
+            assert payload["artifacts"] == [{"path": "data_quality.json", "size_bytes": artifact.stat().st_size}]
+    finally:
+        server.shutdown()
+        thread.join(timeout=5)
+        server.server_close()
 
 
 def test_load_json_artifact_reads_payload(tmp_path: Path) -> None:

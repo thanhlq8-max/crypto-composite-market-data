@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from crypto_composite import cli
-from crypto_composite.artifact_report import write_static_report
+from crypto_composite.artifact_report import assert_no_forbidden_report_terms, write_static_report
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -15,48 +15,83 @@ def _write_json(path: Path, payload: dict) -> None:
 
 
 def _write_single_asset(root: Path, asset: str = "BTC-USDT", quality: float = 0.90) -> None:
-    _write_json(root / "run_summary.json", {"asset": asset, "timeframes": ["15m"]})
+    quality_report = {
+        "asset": asset,
+        "venues_requested": ["binance", "okx", "bybit"],
+        "venues_ok": ["binance", "okx", "bybit"],
+        "venues_failed": [],
+        "market_types": ["spot_usdt", "perp_usdt"],
+        "timeframe": "15m",
+        "missing_sources": [],
+        "overall_quality": quality,
+        "status": "OK",
+    }
+    ohlcv_context = {
+        "asset": asset,
+        "timeframe": "15m",
+        "generated_at_ms": 1000,
+        "expected_venues": ["binance", "okx", "bybit"],
+        "bars_by_market_type": {},
+        "coverage_by_market_type": {"spot_usdt": 1.0, "perp_usdt": 1.0},
+        "status_by_market_type": {
+            "spot_usdt": "COMPOSITE_DATA_OK",
+            "perp_usdt": "COMPOSITE_DATA_OK",
+        },
+        "latest_by_market_type": {
+            "spot_usdt": {"price_dispersion_pct": 0.02},
+            "perp_usdt": {"price_dispersion_pct": 0.03},
+        },
+        "notes": [],
+    }
+
+    def ladder(market_type: str) -> dict:
+        return {
+            "asset": asset,
+            "market_type": market_type,
+            "generated_at_ms": 1000,
+            "reference_price": 100.0,
+            "bucket_size": 1.0,
+            "expected_venues": ["binance", "okx", "bybit"],
+            "venue_count": 3,
+            "coverage": 1.0,
+            "bid_levels": [],
+            "ask_levels": [],
+            "top_bid_wall": None,
+            "top_ask_wall": None,
+            "bid_depth_total": 0.0,
+            "ask_depth_total": 0.0,
+            "depth_imbalance": 0.0,
+            "status": "COMPOSITE_BOOK_OK",
+            "notes": [],
+        }
+
+    ladder_document = {"spot_usdt": ladder("spot_usdt"), "perp_usdt": ladder("perp_usdt")}
     _write_json(
-        root / "data_quality.json",
+        root / "run_summary.json",
         {
-            "15m": {
-                "asset": asset,
-                "venues_requested": ["binance", "okx", "bybit"],
-                "venues_ok": ["binance", "okx", "bybit"],
-                "venues_failed": [],
-                "missing_sources": [],
-                "overall_quality": quality,
-                "status": "OK",
-            }
+            "asset": asset,
+            "venues": ["binance", "okx", "bybit"],
+            "market_types": ["spot_usdt", "perp_usdt"],
+            "timeframes": ["15m"],
+            "outputs": {},
+            "data_quality_by_timeframe": {"15m": quality_report},
+            "limitations": [],
         },
     )
-    _write_json(
-        root / "composite_ohlcv.json",
-        {
-            "15m": {
-                "coverage_by_market_type": {"spot_usdt": 1.0, "perp_usdt": 1.0},
-                "status_by_market_type": {
-                    "spot_usdt": "COMPOSITE_DATA_OK",
-                    "perp_usdt": "COMPOSITE_DATA_OK",
-                },
-                "latest_by_market_type": {
-                    "spot_usdt": {"price_dispersion_pct": 0.02},
-                    "perp_usdt": {"price_dispersion_pct": 0.03},
-                },
-            }
-        },
-    )
-    _write_json(
-        root / "composite_orderbook_ladder.json",
-        {
-            "15m": {
-                "spot_usdt": {"coverage": 1.0, "status": "COMPOSITE_BOOK_OK"},
-                "perp_usdt": {"coverage": 1.0, "status": "COMPOSITE_BOOK_OK"},
-            }
-        },
-    )
-    _write_json(root / "composite_ohlcv_15m.json", {"asset": asset})
-    _write_json(root / "composite_orderbook_ladder_15m.json", {"asset": asset})
+    _write_json(root / "data_quality.json", {"15m": quality_report})
+    _write_json(root / "composite_ohlcv.json", {"15m": ohlcv_context})
+    _write_json(root / "composite_orderbook_ladder.json", {"15m": ladder_document})
+    _write_json(root / "composite_ohlcv_15m.json", ohlcv_context)
+    _write_json(root / "composite_orderbook_ladder_15m.json", ladder_document)
+
+
+def test_report_wording_guard_ignores_forbidden_tokens_inside_schema_fields() -> None:
+    assert_no_forbidden_report_terms('<span data-field="outputs">outputs</span>')
+
+
+def test_report_wording_guard_rejects_standalone_tp() -> None:
+    with pytest.raises(ValueError, match="FORBIDDEN_REPORT_TERM: TP"):
+        assert_no_forbidden_report_terms("<p>TP</p>")
 
 
 def test_write_static_report_creates_html(tmp_path: Path) -> None:

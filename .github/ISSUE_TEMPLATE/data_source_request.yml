@@ -1,0 +1,52 @@
+name: Public data-source request
+description: Propose a public market-data venue or endpoint.
+title: "[Data source]: "
+labels:
+  - enhancement
+body:
+  - type: input
+    id: venue
+    attributes:
+      label: Venue or provider
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Official public API documentation
+      description: Link directly to the relevant public REST documentation.
+    validations:
+      required: true
+  - type: checkboxes
+    id: datasets
+    attributes:
+      label: Requested public datasets
+      options:
+        - label: OHLCV
+        - label: Recent trades
+        - label: Orderbook snapshot
+        - label: Funding
+        - label: Open interest
+    validations:
+      required: true
+  - type: textarea
+    id: markets
+    attributes:
+      label: Market types and symbol examples
+      description: Identify supported public market types and representative symbols.
+    validations:
+      required: true
+  - type: textarea
+    id: caveats
+    attributes:
+      label: Rate limits and known caveats
+      description: Include documented limits, pagination, timestamp, or availability constraints.
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Public-only confirmation
+      options:
+        - label: The requested integration requires no credentials, private account endpoint, order placement, or user data.
+          required: true
+        - label: Tests can use mocked responses and do not require live-network CI calls.
+          required: true
