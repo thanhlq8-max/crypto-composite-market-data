@@ -12,14 +12,112 @@
         "bybit"
       ],
       "venue_count": 3,
-      "coverage": 1.0,
-      "bid_levels": [],
-      "ask_levels": [],
-      "top_bid_wall": null,
-      "top_ask_wall": null,
-      "bid_depth_total": 2500.0,
-      "ask_depth_total": 2450.0,
-      "depth_imbalance": 0.0101,
+      "coverage": 1,
+      "bid_levels": [
+        {
+          "side": "bid",
+          "price_low": 50,
+          "price_high": 50.5,
+          "price_mid": 50.25,
+          "depth_quote": 800,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 280,
+            "bybit": 260,
+            "okx": 260
+          },
+          "hhi": 0.33375,
+          "persistence": 0.66,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0
+        },
+        {
+          "side": "bid",
+          "price_low": 49.5,
+          "price_high": 50,
+          "price_mid": 49.75,
+          "depth_quote": 80,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "binance": 80
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9
+        }
+      ],
+      "ask_levels": [
+        {
+          "side": "ask",
+          "price_low": 50.5,
+          "price_high": 51,
+          "price_mid": 50.75,
+          "depth_quote": 780,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 260,
+            "bybit": 260,
+            "okx": 260
+          },
+          "hhi": 0.333333,
+          "persistence": 0.64,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0.025
+        },
+        {
+          "side": "ask",
+          "price_low": 51,
+          "price_high": 51.5,
+          "price_mid": 51.25,
+          "depth_quote": 70,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "bybit": 70
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9125
+        }
+      ],
+      "top_bid_wall": {
+        "side": "bid",
+        "price_low": 50,
+        "price_high": 50.5,
+        "price_mid": 50.25,
+        "depth_quote": 800,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 280,
+          "bybit": 260,
+          "okx": 260
+        },
+        "hhi": 0.33375,
+        "persistence": 0.66,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0
+      },
+      "top_ask_wall": {
+        "side": "ask",
+        "price_low": 50.5,
+        "price_high": 51,
+        "price_mid": 50.75,
+        "depth_quote": 780,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 260,
+          "bybit": 260,
+          "okx": 260
+        },
+        "hhi": 0.333333,
+        "persistence": 0.64,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0.025
+      },
+      "bid_depth_total": 880,
+      "ask_depth_total": 850,
+      "depth_imbalance": 0.017341,
       "status": "COMPOSITE_BOOK_OK",
       "notes": [
         "Illustrative synthetic sample; not live market data."

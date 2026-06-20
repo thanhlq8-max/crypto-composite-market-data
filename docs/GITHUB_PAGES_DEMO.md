@@ -1,6 +1,6 @@
-# GitHub Pages synthetic artifact demo
+# GitHub Pages synthetic Dashboard V2 demo
 
-The repository contains a manual GitHub Pages workflow that builds the static artifact report from checked-in synthetic fixtures.
+The repository contains a manual GitHub Pages workflow that builds a static Dashboard V2 export from checked-in synthetic fixtures.
 
 The workflow does not call exchange APIs, does not use live market data, and does not run automatically on push.
 
@@ -15,7 +15,7 @@ It performs these steps:
 1. installs the package from the checked-out source;
 2. copies `examples/sample_artifacts` into the Pages staging directory;
 3. validates and scores the copied artifact tree;
-4. generates `_site/index.html` with the static report command;
+4. generates `_site/index.html` with `dashboard-export`;
 5. uploads one Pages artifact; and
 6. deploys it to the protected `github-pages` environment.
 
@@ -27,7 +27,7 @@ Repository admin access is required.
 
 1. Open **Settings > Pages**.
 2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Open **Actions > Deploy synthetic artifact report to GitHub Pages**.
+3. Open **Actions > Deploy synthetic Dashboard V2 to GitHub Pages**.
 4. Select **Run workflow** on the reviewed branch.
 5. Wait for both `build-static-demo` and `deploy-static-demo` to pass.
 6. Open the URL reported by the `github-pages` deployment environment.
@@ -44,15 +44,17 @@ mkdir .pages-preview
 cp -R examples/sample_artifacts .pages-preview/artifacts
 crypto-composite validate-artifacts --artifact-root .pages-preview/artifacts
 crypto-composite score-artifacts --artifact-root .pages-preview/artifacts --write
-crypto-composite report \
+crypto-composite dashboard-export \
   --artifact-root .pages-preview/artifacts \
+  --artifact-base-url artifacts \
   --out-file .pages-preview/index.html
 ```
 
 Verify that:
 
 - validation exits successfully;
-- `index.html` identifies the report as artifact inspection only;
+- `index.html` identifies the dashboard as observed public-data context only;
+- the BTC-USDT and ETH-USDT synthetic ladders render concentration and vacuum zones;
 - BTC-USDT and ETH-USDT are present;
 - JSON artifact links resolve inside `.pages-preview/artifacts`; and
 - no page claims live market conditions, trading signals, rankings, or profitability.

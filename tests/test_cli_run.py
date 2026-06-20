@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 
 from crypto_composite import cli
@@ -86,3 +87,38 @@ def test_cli_dashboard_invokes_server(monkeypatch) -> None:
             "port": 18080,
         }
     ]
+
+
+def test_cli_dashboard_export_invokes_writer(monkeypatch, capsys) -> None:
+    calls: list[dict] = []
+
+    def fake_write_dashboard_export(**kwargs) -> dict:
+        calls.append(kwargs)
+        return {"status": "OK", "dashboard_path": "site/index.html"}
+
+    monkeypatch.setattr(cli, "write_dashboard_export", fake_write_dashboard_export)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "crypto-composite",
+            "dashboard-export",
+            "--artifact-root",
+            "examples/sample_artifacts",
+            "--out-file",
+            "site/index.html",
+            "--artifact-base-url",
+            "artifacts",
+        ],
+    )
+
+    cli.main()
+
+    assert calls == [
+        {
+            "artifact_root": "examples/sample_artifacts",
+            "out_file": "site/index.html",
+            "artifact_base_url": "artifacts",
+        }
+    ]
+    assert json.loads(capsys.readouterr().out)["status"] == "OK"

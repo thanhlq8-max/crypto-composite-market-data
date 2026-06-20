@@ -29,7 +29,7 @@ Raw downloads are operational signals, not proof of unique users, organizations,
 - [x] Publish a dashboard screenshot rendered from synthetic sample artifacts.
 - [x] Prepare a repository-hosted technical guide about composite data-quality checks.
 - [x] Add a structured downstream-use evidence intake form.
-- [x] Prepare a manual GitHub Pages workflow for the synthetic artifact report.
+- [x] Prepare a manual GitHub Pages workflow for the synthetic Dashboard V2 demo.
 - [ ] Publish or adapt the tutorial or technical guide on an independent public channel.
 - Ask for feedback on artifact fields, connector coverage, and export formats.
 - Resolve stale owner-created issues so the backlog reflects real work.

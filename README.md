@@ -302,7 +302,19 @@ Endpoints:
 /
 /api/health
 /api/artifacts
+/api/dashboard-snapshot
 /api/artifact?path=<relative-json-path>
+```
+
+Dashboard V2 adds asset/timeframe/market filters, composite price and public-depth charts, observed liquidity concentration and vacuum zones, evidence-grade labels, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
+
+Export the same dashboard as static HTML for GitHub Pages or offline sharing:
+
+```bash
+crypto-composite dashboard-export \
+  --artifact-root artifacts-universe \
+  --out-file site/index.html \
+  --artifact-base-url artifacts
 ```
 
 See [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md).

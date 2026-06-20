@@ -2,7 +2,7 @@
 
 This tracker separates official program requirements from internal adoption goals.
 
-Last verified: **2026-06-19**.
+Last verified: **2026-06-20**.
 
 Official sources:
 
@@ -43,19 +43,19 @@ Claims for this track must be backed by public, verifiable evidence. Stars, down
 
 ## Verified repository evidence
 
-Snapshot captured on 2026-06-19:
+Snapshot captured on 2026-06-20:
 
 | Evidence | Current value | Interpretation |
 |---|---:|---|
 | Public GitHub repository | Yes | Required base condition met |
 | License | Apache-2.0 | Open-source license present |
-| GitHub stars | 0 | Maintainer Track threshold not met |
+| GitHub stars | 1 | Maintainer Track threshold not met |
 | Forks | 0 | No external fork evidence yet |
 | External issues | 0 | Existing issues were opened by the repository owner |
 | External PRs | 0 | No external contribution evidence yet |
-| GitHub releases | 9 | Latest release is `v0.6.0` |
-| PyPI version | `0.6.0` | Aligned with the latest GitHub release |
-| PyPI recent downloads | 333 | Raw download count; not proof of unique users or downstream dependence |
+| GitHub releases | 10 | Latest release is `v0.7.0` |
+| PyPI version | `0.7.0` | Aligned with the latest GitHub release |
+| PyPI recent downloads | 745 | Raw download count; not proof of unique users or downstream dependence |
 | Latest CI on `main` | Passing | Python 3.11-3.13 tests and package build passed |
 | Recent maintainer activity | Yes | Commits and releases occurred within three months |
 
@@ -86,7 +86,8 @@ Snapshot captured on 2026-06-19:
 - [x] Repository-hosted dashboard screenshot rendered from the synthetic fixture.
 - [x] Repository-hosted technical guide for coverage, dispersion, and public book concentration.
 - [x] Structured GitHub Issue Form for downstream-use evidence intake.
-- [x] Manual GitHub Pages workflow for a reproducible synthetic artifact report.
+- [x] Manual GitHub Pages workflow for a reproducible synthetic Dashboard V2 demo.
+- [x] Dashboard V2 static export path for a public, no-backend demo.
 - [ ] First verified external user or downstream project.
 - [ ] First external issue.
 - [ ] First external pull request.

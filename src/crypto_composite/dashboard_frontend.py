@@ -1,236 +1,299 @@
 from __future__ import annotations
 
+import json
+from typing import Any
 
-def render_dashboard_html() -> str:
-    return """<!doctype html>
+
+def _embedded_json(value: Any) -> str:
+    return json.dumps(value, separators=(",", ":"), sort_keys=True).replace("<", "\\u003c")
+
+
+def render_dashboard_html(
+    embedded_snapshot: dict[str, Any] | None = None,
+    embedded_index: dict[str, Any] | None = None,
+    artifact_base_url: str | None = None,
+) -> str:
+    html = r"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Crypto Composite Data Health</title>
+  <title>Observed Market Structure</title>
   <style>
     :root {
       color-scheme: dark;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #07111f;
-      color: #e6edf7;
+      background: #071019; color: #e7edf5;
+      --surface: rgba(13, 27, 41, .92); --line: rgba(148, 163, 184, .18);
+      --muted: #8fa1b5; --cyan: #57d8cc; --blue: #72a7ff; --amber: #f4bf67;
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 12% 4%, rgba(41, 121, 255, 0.18), transparent 28rem),
-        radial-gradient(circle at 88% 2%, rgba(20, 184, 166, 0.12), transparent 24rem),
-        #07111f;
-    }
-    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 64px; }
-    header { display: grid; gap: 14px; margin-bottom: 28px; }
-    h1 { margin: 0; max-width: 760px; font-size: clamp(2.2rem, 6vw, 4.6rem); line-height: 0.98; letter-spacing: -0.055em; }
-    h2 { margin: 0; font-size: 1.05rem; letter-spacing: -0.01em; }
-    p { margin: 0; color: #9fb0c7; line-height: 1.6; }
-    .eyebrow { color: #6ee7d8; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
-    .header-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-    .badge { display: inline-flex; align-items: center; gap: 7px; width: fit-content; padding: 7px 11px; border: 1px solid #304158; border-radius: 999px; color: #b8c5d8; background: rgba(10, 22, 38, 0.8); font-size: 0.78rem; font-weight: 750; }
-    .badge::before { width: 7px; height: 7px; border-radius: 50%; background: #64748b; content: ""; }
-    .badge.ok { color: #a7f3d0; border-color: rgba(52, 211, 153, 0.35); }
-    .badge.ok::before { background: #34d399; box-shadow: 0 0 12px #34d399; }
-    .badge.error { color: #fecaca; border-color: rgba(248, 113, 113, 0.4); }
-    .badge.error::before { background: #f87171; }
-    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
-    .card, .panel { border: 1px solid rgba(148, 163, 184, 0.18); background: rgba(10, 22, 38, 0.78); box-shadow: 0 20px 70px rgba(0, 0, 0, 0.18); backdrop-filter: blur(16px); }
-    .card { min-height: 120px; padding: 18px; border-radius: 16px; }
-    .card span { color: #8395ad; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-    .card strong { display: block; margin-top: 14px; font-size: 1.8rem; font-variant-numeric: tabular-nums; }
-    .panel { margin-top: 14px; padding: 20px; border-radius: 18px; overflow: hidden; }
-    .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-    .panel-head p { font-size: 0.82rem; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 8% 0, #123153 0, transparent 30rem), radial-gradient(circle at 92% 8%, #103b3b 0, transparent 28rem), #071019; }
+    main { width: min(1280px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 60px; }
+    header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; margin-bottom: 22px; }
+    h1 { margin: 5px 0 10px; font-size: clamp(2rem, 5vw, 4.2rem); line-height: .98; letter-spacing: -.055em; }
+    h2 { margin: 0; font-size: 1rem; letter-spacing: -.01em; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .eyebrow { color: var(--cyan); font-size: .72rem; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; color: #b8c7d9; background: #0a1724; font-size: .76rem; font-weight: 750; }
+    .badge::before { width: 7px; height: 7px; border-radius: 50%; background: #6b7d91; content: ""; }
+    .badge.ok::before { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    .badge.error::before { background: #ff8290; }
+    .filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    label { display: grid; gap: 5px; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    select, button { border: 1px solid #31475d; border-radius: 9px; color: #e4edf7; background: #102236; font: inherit; }
+    select { min-width: 136px; padding: 9px 32px 9px 10px; }
+    button { padding: 7px 10px; cursor: pointer; font-size: .76rem; font-weight: 750; }
+    button:hover { border-color: #6482a0; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin: 18px 0; }
+    .card, .panel, .flow-item { border: 1px solid var(--line); background: var(--surface); box-shadow: 0 20px 60px rgba(0, 0, 0, .2); }
+    .card { min-height: 116px; padding: 17px; border-radius: 15px; }
+    .card span, .metric-label { color: var(--muted); font-size: .69rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .card strong { display: block; margin-top: 13px; font-size: 1.65rem; font-variant-numeric: tabular-nums; }
+    .card small { display: block; margin-top: 5px; color: #8498ae; }
+    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-bottom: 11px; }
+    .flow-item { position: relative; min-height: 112px; padding: 16px 17px; border-radius: 14px; overflow: hidden; }
+    .flow-item::after { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--blue); content: ""; }
+    .flow-item:nth-child(2)::after { background: var(--cyan); } .flow-item:nth-child(3)::after { background: var(--amber); }
+    .flow-item strong { display: block; margin: 10px 0 4px; font-size: .95rem; }
+    .flow-item p { font-size: .81rem; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr); gap: 11px; }
+    .panel { min-width: 0; padding: 18px; border-radius: 16px; overflow: hidden; }
+    .panel.full { grid-column: 1 / -1; }
+    .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .panel-head p { font-size: .77rem; }
+    svg { display: block; width: 100%; min-height: 250px; overflow: visible; }
+    .axis { fill: #8194a9; font-size: 10px; } .gridline { stroke: rgba(148, 163, 184, .13); stroke-width: 1; }
     .table-wrap { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    th, td { padding: 12px 10px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); text-align: left; vertical-align: middle; }
-    th { color: #8395ad; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    td { color: #d7e1ef; }
-    td.path { min-width: 280px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; }
-    button { border: 1px solid #334761; border-radius: 9px; padding: 7px 10px; color: #dbeafe; background: #13243a; cursor: pointer; font: inherit; font-size: 0.78rem; font-weight: 700; }
-    button:hover { border-color: #5b7ca5; background: #19304e; }
-    pre { min-height: 150px; max-height: 480px; margin: 0; padding: 16px; overflow: auto; border-radius: 12px; color: #b9d8ff; background: #050c16; font-size: 0.78rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
-    .empty { padding: 18px 10px; color: #8395ad; text-align: center; }
-    .boundary { margin-top: 18px; padding: 14px 16px; border-left: 3px solid #2dd4bf; color: #9fb0c7; background: rgba(20, 184, 166, 0.07); font-size: 0.82rem; }
-    @media (max-width: 820px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } main { padding-top: 30px; } }
-    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } .panel { padding: 14px; } }
+    table { width: 100%; border-collapse: collapse; font-size: .81rem; }
+    th, td { padding: 11px 9px; border-bottom: 1px solid rgba(148, 163, 184, .12); text-align: left; vertical-align: middle; }
+    th { color: var(--muted); font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; }
+    td { color: #d8e2ee; font-variant-numeric: tabular-nums; }
+    .pill { display: inline-flex; padding: 4px 7px; border: 1px solid #3a526a; border-radius: 999px; font-size: .65rem; font-weight: 850; letter-spacing: .04em; }
+    .pill.corroborated { color: #9bf0e4; border-color: #276c68; } .pill.concentrated { color: #ffd58c; border-color: #72552c; } .pill.limited { color: #c9d3df; }
+    .empty { padding: 18px 8px; color: var(--muted); text-align: center; }
+    .callout { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--amber); color: #b7c4d2; background: rgba(244, 191, 103, .07); font-size: .78rem; line-height: 1.5; }
+    details { margin-top: 11px; } summary { color: #c9d8e7; cursor: pointer; font-size: .82rem; font-weight: 750; }
+    pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
+    .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } }
+    @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
+    @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <p class="eyebrow">Read-only artifact inspection</p>
-    <h1>Crypto Composite Data Health</h1>
-    <p>Inspect generated JSON coverage, validation context, and artifact files from the local dashboard API.</p>
-    <div class="header-row"><span id="service-state" class="badge">Connecting</span></div>
+    <div>
+      <p class="eyebrow">Dashboard V2 / evidence-grade snapshots</p>
+      <h1>Observed Market Structure</h1>
+      <p>Composite price, public depth, and practical zones derived from generated artifacts.</p>
+      <span id="service-state" class="badge">Connecting</span>
+    </div>
+    <div class="filters" aria-label="Dashboard filters">
+      <label>Asset<select id="asset-select"></select></label>
+      <label>Timeframe<select id="timeframe-select"></select></label>
+      <label>Market<select id="market-select"></select></label>
+    </div>
   </header>
 
-  <section class="grid" aria-label="Artifact summary">
-    <article class="card"><span>Artifacts</span><strong id="artifact-count">-</strong></article>
-    <article class="card"><span>Total size</span><strong id="total-size">-</strong></article>
-    <article class="card"><span>Quality files</span><strong id="quality-count">-</strong></article>
-    <article class="card"><span>Known roots</span><strong id="known-count">-</strong></article>
+  <section class="cards" aria-label="Current composite context">
+    <article class="card"><span>Reference price</span><strong id="reference-price">-</strong><small id="price-status">No context</small></article>
+    <article class="card"><span>Venue coverage</span><strong id="coverage">-</strong><small id="coverage-status">No context</small></article>
+    <article class="card"><span>Price dispersion</span><strong id="dispersion">-</strong><small>Latest composite bar</small></article>
+    <article class="card"><span>Artifact freshness</span><strong id="freshness">-</strong><small id="generated-at">No timestamp</small></article>
   </section>
 
-  <section class="panel">
-    <div class="panel-head"><h2>Data quality</h2><p>Reported by generated data_quality.json files</p></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Artifact</th><th>Timeframe</th><th>Status</th><th>Overall quality</th><th>Venue coverage</th></tr></thead>
-        <tbody id="quality-body"><tr><td class="empty" colspan="5">Loading data-quality artifacts...</td></tr></tbody>
-      </table>
-    </div>
+  <section class="flow" aria-label="Observed evidence sequence">
+    <article class="flow-item"><span class="metric-label">Past observation</span><strong id="past-title">Unavailable</strong><p id="past-detail">At least two composite bars are required.</p></article>
+    <article class="flow-item"><span class="metric-label">Current observation</span><strong id="now-title">Unavailable</strong><p id="now-detail">No orderbook context loaded.</p></article>
+    <article class="flow-item"><span class="metric-label">Next evidence check</span><strong>Refresh, then compare</strong><p>Check whether zone venue breadth, concentration, and depth persist in a later generated snapshot.</p></article>
   </section>
 
-  <section class="panel">
-    <div class="panel-head"><h2>Artifact manifest</h2><p>JSON files exposed by /api/artifacts</p></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Path</th><th>Size</th><th>Inspect</th></tr></thead>
-        <tbody id="artifact-body"><tr><td class="empty" colspan="3">Loading artifact index...</td></tr></tbody>
-      </table>
-    </div>
+  <section class="layout">
+    <article class="panel">
+      <div class="panel-head"><div><h2>Composite price context</h2><p>Close series with observed orderbook bands</p></div><p id="price-chart-note"></p></div>
+      <svg id="price-chart" viewBox="0 0 760 280" role="img" aria-label="Composite close chart"></svg>
+    </article>
+    <article class="panel">
+      <div class="panel-head"><div><h2>Public depth profile</h2><p>Quote depth by observed price bucket</p></div><p id="depth-imbalance"></p></div>
+      <svg id="depth-chart" viewBox="0 0 520 280" role="img" aria-label="Public depth profile"></svg>
+    </article>
+
+    <article class="panel full">
+      <div class="panel-head"><div><h2>Observed zones</h2><p>Practical filtering: concentration and maximum-vacuum bucket per side</p></div><p id="zone-count"></p></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Zone</th><th>Range</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th></tr></thead>
+        <tbody id="zone-body"><tr><td class="empty" colspan="8">Loading observed zones...</td></tr></tbody>
+      </table></div>
+      <p class="callout" id="zone-note">Zone evidence describes the current public snapshot. It does not establish support, resistance, hidden liquidity, or future reaction.</p>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head"><div><h2>Spot / perpetual context</h2><p>Observed composite-close band</p></div></div>
+      <div id="dislocation" class="empty">Both spot and perpetual composite bars are required.</div>
+    </article>
+    <article class="panel">
+      <div class="panel-head"><div><h2>Methodology</h2><p>Source-backed interpretation limits</p></div></div>
+      <p id="methodology">Loading methodology...</p>
+      <details><summary>Evidence-grade definitions</summary><pre id="evidence-method"></pre></details>
+    </article>
+
+    <article class="panel full">
+      <div class="panel-head"><div><h2>Artifact manifest</h2><p>Read-only JSON source inspection</p></div><p id="artifact-summary"></p></div>
+      <details><summary>Open artifact browser</summary>
+        <div class="table-wrap"><table><thead><tr><th>Path</th><th>Size</th><th>Inspect</th></tr></thead><tbody id="artifact-body"></tbody></table></div>
+        <pre id="inspector">No artifact selected.</pre>
+      </details>
+    </article>
   </section>
 
-  <section class="panel">
-    <div class="panel-head"><h2>JSON inspector</h2><p id="inspector-path">Select an artifact</p></div>
-    <pre id="inspector">No artifact selected.</pre>
-  </section>
-
-  <p class="boundary">Data-quality inspection only. No trading signals, asset rankings, order execution, position sizing, predictions, or financial advice.</p>
+  <p class="boundary">Observed public-data context only. No trading signal, prediction, asset recommendation, position sizing, order execution, or financial advice. Persistence and spoof-risk fields are artifact proxies, not proof of intent.</p>
 </main>
 <script>
-  const serviceState = document.getElementById("service-state");
-  const artifactCount = document.getElementById("artifact-count");
-  const totalSize = document.getElementById("total-size");
-  const qualityCount = document.getElementById("quality-count");
-  const knownCount = document.getElementById("known-count");
-  const artifactBody = document.getElementById("artifact-body");
-  const qualityBody = document.getElementById("quality-body");
-  const inspector = document.getElementById("inspector");
-  const inspectorPath = document.getElementById("inspector-path");
+  const embeddedSnapshot = __EMBEDDED_SNAPSHOT__;
+  const embeddedIndex = __EMBEDDED_INDEX__;
+  const staticArtifactBase = __ARTIFACT_BASE_URL__;
+  const byId = (id) => document.getElementById(id);
+  const state = { snapshot: null, index: null };
+  const assetSelect = byId("asset-select");
+  const timeframeSelect = byId("timeframe-select");
+  const marketSelect = byId("market-select");
+  const NS = "http://www.w3.org/2000/svg";
 
-  function formatBytes(value) {
-    if (!Number.isFinite(value) || value < 0) return "unknown";
-    if (value < 1024) return `${value} B`;
-    if (value < 1048576) return `${(value / 1024).toFixed(1)} KiB`;
-    return `${(value / 1048576).toFixed(1)} MiB`;
+  function numeric(value) {
+    if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+    const number = Number(value);
+    return Number.isFinite(number) ? number : null;
   }
-
-  function addCell(row, value, className) {
-    const cell = document.createElement("td");
-    cell.textContent = String(value);
-    if (className) cell.className = className;
-    row.appendChild(cell);
-    return cell;
+  function fmt(value, digits = 2) {
+    const number = numeric(value);
+    if (number === null) return "unavailable";
+    return new Intl.NumberFormat(undefined, { maximumFractionDigits: digits }).format(number);
   }
-
+  function pct(value, digits = 2) { const number = numeric(value); return number === null ? "unavailable" : `${fmt(number * 100, digits)}%`; }
+  function price(value) { const number = numeric(value); return number === null ? "unavailable" : fmt(number, Math.abs(number) < 10 ? 5 : 2); }
+  function bytes(value) { const n = numeric(value); return n === null ? "unknown" : n < 1024 ? `${n} B` : n < 1048576 ? `${fmt(n / 1024, 1)} KiB` : `${fmt(n / 1048576, 1)} MiB`; }
+  function svg(tag, attrs = {}, text = "") { const node = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value); if (text) node.textContent = text; return node; }
   async function getJson(url) {
+    if (url === "/api/dashboard-snapshot" && embeddedSnapshot) return embeddedSnapshot;
+    if (url === "/api/artifacts" && embeddedIndex) return embeddedIndex;
+    if (url === "/api/health" && embeddedSnapshot) return { status: "OK", service: "crypto-composite-dashboard-export" };
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     return response.json();
   }
-
-  async function inspectArtifact(path) {
-    inspectorPath.textContent = path;
-    inspector.textContent = "Loading...";
+  function options(select, values, selected) { select.replaceChildren(); for (const value of values) { const option = document.createElement("option"); option.value = value; option.textContent = value; option.selected = value === selected; select.appendChild(option); } }
+  function context() {
+    const asset = (state.snapshot?.assets || []).find((item) => String(item.asset) === assetSelect.value);
+    const timeframe = asset?.timeframes?.find((item) => item.timeframe === timeframeSelect.value);
+    const market = timeframe?.markets?.find((item) => item.market_type === marketSelect.value);
+    return { asset, timeframe, market };
+  }
+  function syncFilters(level) {
+    const assets = state.snapshot?.assets || [];
+    const assetValue = level === "asset" ? assetSelect.value : (assetSelect.value || String(assets[0]?.asset || ""));
+    options(assetSelect, assets.map((item) => String(item.asset)), assetValue);
+    const asset = assets.find((item) => String(item.asset) === assetSelect.value) || assets[0];
+    const timeframes = asset?.timeframes || [];
+    const timeframeValue = level === "timeframe" ? timeframeSelect.value : (timeframeSelect.value || timeframes[0]?.timeframe || "");
+    options(timeframeSelect, timeframes.map((item) => item.timeframe), timeframeValue);
+    const timeframe = timeframes.find((item) => item.timeframe === timeframeSelect.value) || timeframes[0];
+    const markets = timeframe?.markets || [];
+    options(marketSelect, markets.map((item) => item.market_type), marketSelect.value || markets[0]?.market_type || "");
+  }
+  function renderCards(market) {
+    const latest = market?.latest_bar || {};
+    const book = market?.orderbook || {};
+    const generated = numeric(market?.generated_at_ms);
+    byId("reference-price").textContent = price(book.reference_price ?? latest.close);
+    byId("price-status").textContent = market?.ohlcv_status || "OHLCV unavailable";
+    byId("coverage").textContent = pct(book.coverage ?? latest.coverage, 0);
+    byId("coverage-status").textContent = book.status || "Orderbook unavailable";
+    byId("dispersion").textContent = numeric(latest.price_dispersion_pct) === null ? "unavailable" : `${fmt(latest.price_dispersion_pct, 4)}%`;
+    if (generated !== null) {
+      const age = Date.now() - generated;
+      byId("freshness").textContent = age < 0 ? "clock mismatch" : age < 60000 ? `${Math.floor(age / 1000)}s` : age < 3600000 ? `${Math.floor(age / 60000)}m` : age < 86400000 ? `${Math.floor(age / 3600000)}h` : `${Math.floor(age / 86400000)}d`;
+      byId("generated-at").textContent = new Date(generated).toLocaleString();
+    } else { byId("freshness").textContent = "unavailable"; byId("generated-at").textContent = "No timestamp"; }
+  }
+  function renderFlow(market) {
+    const bars = market?.bars || [];
+    if (bars.length >= 2) {
+      const prior = numeric(bars[bars.length - 2].close); const current = numeric(bars[bars.length - 1].close);
+      const change = prior !== null && current !== null && prior !== 0 ? (current - prior) / prior * 100 : null;
+      byId("past-title").textContent = change !== null ? `Composite close ${change >= 0 ? "+" : ""}${fmt(change, 3)}%` : "Change unavailable";
+      byId("past-detail").textContent = `Observed across the last ${market.latest_bar?.timeframe || "selected"} interval; no forward inference.`;
+    } else { byId("past-title").textContent = "History unavailable"; byId("past-detail").textContent = "At least two composite bars are required."; }
+    const zones = market?.observed_zones || [];
+    const corroborated = zones.filter((zone) => zone.evidence_grade === "CORROBORATED").length;
+    byId("now-title").textContent = `${zones.length} practical zone${zones.length === 1 ? "" : "s"}`;
+    byId("now-detail").textContent = `${corroborated} corroborated by multi-venue depth without a single-venue majority.`;
+  }
+  function renderPriceChart(market) {
+    const chart = byId("price-chart"); chart.replaceChildren();
+    const bars = market?.bars || []; const zones = market?.observed_zones || [];
+    if (!bars.length) { chart.appendChild(svg("text", { x: 380, y: 140, "text-anchor": "middle", class: "axis" }, "No composite bars")); return; }
+    const closes = bars.map((bar) => numeric(bar.close)).filter((value) => value !== null);
+    const zoneValues = zones.flatMap((zone) => [numeric(zone.price_low), numeric(zone.price_high)]).filter((value) => value !== null);
+    if (!closes.length) { chart.appendChild(svg("text", { x: 380, y: 140, "text-anchor": "middle", class: "axis" }, "Composite closes unavailable")); return; }
+    let min = Math.min(...closes, ...zoneValues), max = Math.max(...closes, ...zoneValues); if (min === max) { min *= .999; max *= 1.001; }
+    const pad = (max - min) * .08; min -= pad; max += pad;
+    const x = (i) => 54 + i * 670 / Math.max(bars.length - 1, 1); const y = (value) => 230 - (value - min) / (max - min) * 190;
+    for (let i = 0; i <= 4; i++) { const yy = 40 + i * 47.5; chart.appendChild(svg("line", { x1: 54, x2: 724, y1: yy, y2: yy, class: "gridline" })); chart.appendChild(svg("text", { x: 48, y: yy + 4, "text-anchor": "end", class: "axis" }, price(max - i * (max - min) / 4))); }
+    for (const zone of zones) { const low = numeric(zone.price_low), high = numeric(zone.price_high); if (low === null || high === null) continue; const top = y(high), bottom = y(low); const color = zone.side === "bid" ? "#72a7ff" : "#f4bf67"; chart.appendChild(svg("rect", { x: 54, y: Math.min(top, bottom), width: 670, height: Math.max(Math.abs(bottom - top), 2), fill: color, opacity: .11 })); }
+    const points = closes.map((value, i) => `${x(i)},${y(value)}`).join(" ");
+    chart.appendChild(svg("polyline", { points, fill: "none", stroke: "#57d8cc", "stroke-width": 2.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    chart.appendChild(svg("circle", { cx: x(closes.length - 1), cy: y(closes[closes.length - 1]), r: 4, fill: "#57d8cc" }));
+    byId("price-chart-note").textContent = `${bars.length} bar${bars.length === 1 ? "" : "s"}`;
+  }
+  function renderDepthChart(market) {
+    const chart = byId("depth-chart"); chart.replaceChildren(); const book = market?.orderbook;
+    const levels = [...(book?.bid_levels || []), ...(book?.ask_levels || [])]
+      .filter((level) => numeric(level.depth_quote) > 0 && numeric(level.price_mid) !== null)
+      .sort((a, b) => numeric(b.price_mid) - numeric(a.price_mid)).slice(0, 16);
+    if (!levels.length) { chart.appendChild(svg("text", { x: 260, y: 140, "text-anchor": "middle", class: "axis" }, "No ladder levels")); byId("depth-imbalance").textContent = ""; return; }
+    const maxDepth = Math.max(...levels.map((level) => numeric(level.depth_quote))); const row = 238 / levels.length;
+    chart.appendChild(svg("line", { x1: 260, x2: 260, y1: 18, y2: 262, class: "gridline" }));
+    levels.forEach((level, index) => { const width = numeric(level.depth_quote) / maxDepth * 190; const yy = 18 + index * row; const bid = level.side === "bid"; chart.appendChild(svg("rect", { x: bid ? 252 - width : 268, y: yy, width, height: Math.max(row - 3, 2), rx: 2, fill: bid ? "#72a7ff" : "#f4bf67", opacity: .72 })); chart.appendChild(svg("text", { x: 260, y: yy + row - 5, "text-anchor": "middle", class: "axis" }, price(level.price_mid))); });
+    byId("depth-imbalance").textContent = numeric(book.depth_imbalance) === null ? "" : `imbalance ${fmt(book.depth_imbalance, 3)}`;
+  }
+  function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
+  function renderZones(market) {
+    const body = byId("zone-body"); body.replaceChildren(); const zones = market?.observed_zones || []; byId("zone-count").textContent = `${zones.length} shown`;
+    if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 8; body.appendChild(row); return; }
+    for (const zone of zones) { const row = document.createElement("tr"); addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); body.appendChild(row); }
+  }
+  function renderDislocation(timeframe) {
+    const node = byId("dislocation"); node.replaceChildren(); const band = timeframe?.spot_perp_dislocation;
+    if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
+    node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
+  }
+  function renderCurrent() { const { timeframe, market } = context(); renderCards(market); renderFlow(market); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
+  async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
+  function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
+  async function load() {
     try {
-      const payload = await getJson(`/api/artifact?path=${encodeURIComponent(path)}`);
-      inspector.textContent = JSON.stringify(payload, null, 2);
-    } catch (error) {
-      inspector.textContent = `Artifact read failed: ${error.message}`;
-    }
+      const [health, snapshot, index] = await Promise.all([getJson("/api/health"), getJson("/api/dashboard-snapshot"), getJson("/api/artifacts")]);
+      if (health.status !== "OK") throw new Error("dashboard health is not OK"); state.snapshot = snapshot; state.index = index;
+      if (!snapshot.assets?.length) throw new Error("no composite artifact contexts found");
+      byId("service-state").textContent = "Observed artifact context loaded"; byId("service-state").className = "badge ok";
+      syncFilters(); renderCurrent(); renderManifest();
+      byId("methodology").textContent = `${snapshot.methodology.zone_selection} ${snapshot.methodology.snapshot_limit} ${snapshot.methodology.cross_venue_limit}`;
+      byId("evidence-method").textContent = Object.entries(snapshot.methodology.evidence_grades).map(([grade, definition]) => `${grade}: ${definition}`).join("\n\n");
+    } catch (error) { byId("service-state").textContent = "Dashboard unavailable"; byId("service-state").className = "badge error"; byId("methodology").textContent = error.message; }
   }
-
-  function renderArtifacts(items) {
-    artifactBody.replaceChildren();
-    if (!items.length) {
-      const row = document.createElement("tr");
-      const cell = addCell(row, "No JSON artifacts found.", "empty");
-      cell.colSpan = 3;
-      artifactBody.appendChild(row);
-      return;
-    }
-    for (const item of items) {
-      const row = document.createElement("tr");
-      addCell(row, item.path, "path");
-      addCell(row, formatBytes(item.size_bytes));
-      const actionCell = document.createElement("td");
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = "View JSON";
-      button.addEventListener("click", () => inspectArtifact(item.path));
-      actionCell.appendChild(button);
-      row.appendChild(actionCell);
-      artifactBody.appendChild(row);
-    }
-  }
-
-  async function renderQuality(items) {
-    qualityBody.replaceChildren();
-    let rows = 0;
-    for (const item of items) {
-      try {
-        const payload = await getJson(`/api/artifact?path=${encodeURIComponent(item.path)}`);
-        if (!payload || typeof payload !== "object" || Array.isArray(payload)) continue;
-        for (const [timeframe, report] of Object.entries(payload)) {
-          if (!report || typeof report !== "object" || Array.isArray(report)) continue;
-          const requested = Array.isArray(report.venues_requested) ? report.venues_requested.length : 0;
-          const available = Array.isArray(report.venues_ok) ? report.venues_ok.length : 0;
-          const coverage = requested ? `${available}/${requested}` : "unknown";
-          const row = document.createElement("tr");
-          addCell(row, item.path, "path");
-          addCell(row, timeframe);
-          addCell(row, report.status ?? "unknown");
-          addCell(row, report.overall_quality ?? "unknown");
-          addCell(row, coverage);
-          qualityBody.appendChild(row);
-          rows += 1;
-        }
-      } catch (error) {
-        const row = document.createElement("tr");
-        const cell = addCell(row, `${item.path}: ${error.message}`, "empty");
-        cell.colSpan = 5;
-        qualityBody.appendChild(row);
-        rows += 1;
-      }
-    }
-    if (!rows) {
-      const row = document.createElement("tr");
-      const cell = addCell(row, "No readable data-quality rows found.", "empty");
-      cell.colSpan = 5;
-      qualityBody.appendChild(row);
-    }
-  }
-
-  async function loadDashboard() {
-    try {
-      const [health, index] = await Promise.all([getJson("/api/health"), getJson("/api/artifacts")]);
-      if (health.status !== "OK") throw new Error("dashboard health is not OK");
-      const items = Array.isArray(index.artifacts) ? index.artifacts : [];
-      serviceState.textContent = "Service healthy";
-      serviceState.className = "badge ok";
-      artifactCount.textContent = String(index.artifact_count ?? items.length);
-      totalSize.textContent = formatBytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0));
-      const qualityItems = items.filter((item) => item.path === "data_quality.json" || item.path.endsWith("/data_quality.json"));
-      qualityCount.textContent = String(qualityItems.length);
-      const known = index.well_known && typeof index.well_known === "object" ? Object.values(index.well_known).filter(Boolean).length : 0;
-      knownCount.textContent = String(known);
-      renderArtifacts(items);
-      await renderQuality(qualityItems);
-    } catch (error) {
-      serviceState.textContent = "Service error";
-      serviceState.className = "badge error";
-      inspector.textContent = `Dashboard load failed: ${error.message}`;
-    }
-  }
-
-  loadDashboard();
+  assetSelect.addEventListener("change", () => { syncFilters("asset"); renderCurrent(); });
+  timeframeSelect.addEventListener("change", () => { syncFilters("timeframe"); renderCurrent(); });
+  marketSelect.addEventListener("change", renderCurrent);
+  load();
 </script>
 </body>
 </html>
 """
+    return (
+        html.replace("__EMBEDDED_SNAPSHOT__", _embedded_json(embedded_snapshot))
+        .replace("__EMBEDDED_INDEX__", _embedded_json(embedded_index))
+        .replace("__ARTIFACT_BASE_URL__", _embedded_json(artifact_base_url))
+    )

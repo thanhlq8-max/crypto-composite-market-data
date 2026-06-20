@@ -12,6 +12,7 @@ from crypto_composite.dashboard import (
     DEFAULT_DASHBOARD_PORT,
     DashboardBindError,
     serve_dashboard,
+    write_dashboard_export,
 )
 from crypto_composite.pipeline import (
     DEFAULT_ASSET,
@@ -69,6 +70,14 @@ def main() -> None:
     dashboard.add_argument("--host", default=DEFAULT_DASHBOARD_HOST)
     dashboard.add_argument("--port", type=int, default=DEFAULT_DASHBOARD_PORT)
 
+    dashboard_export = sub.add_parser("dashboard-export", help="Write Dashboard V2 as static HTML.")
+    dashboard_export.add_argument("--artifact-root", required=True, help="Directory containing JSON artifacts.")
+    dashboard_export.add_argument("--out-file", required=True, help="Static Dashboard V2 HTML file to write.")
+    dashboard_export.add_argument(
+        "--artifact-base-url",
+        help="Optional relative URL containing JSON artifacts for the static inspector.",
+    )
+
     validate = sub.add_parser("validate-artifacts", help="Validate generated JSON artifact structure.")
     validate.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
 
@@ -121,6 +130,15 @@ def main() -> None:
             serve_dashboard(artifact_root=args.artifact_root, host=args.host, port=args.port)
         except DashboardBindError as exc:
             parser.exit(2, f"ERROR: {exc}\n")
+    elif args.cmd == "dashboard-export":
+        export_result = write_dashboard_export(
+            artifact_root=args.artifact_root,
+            out_file=args.out_file,
+            artifact_base_url=args.artifact_base_url,
+        )
+        print(json.dumps(export_result, indent=2, sort_keys=True))
+        if export_result["status"] == "ERROR":
+            parser.exit(1)
     elif args.cmd == "validate-artifacts":
         validation = validate_artifact_root(args.artifact_root)
         print(json.dumps(validation, indent=2, sort_keys=True))
