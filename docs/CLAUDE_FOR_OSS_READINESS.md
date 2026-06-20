@@ -53,10 +53,11 @@ Snapshot captured on 2026-06-20:
 | Forks | 0 | No external fork evidence yet |
 | External issues | 0 | Existing issues were opened by the repository owner |
 | External PRs | 0 | No external contribution evidence yet |
-| GitHub releases | 10 | Latest release is `v0.7.0` |
-| PyPI version | `0.7.0` | Aligned with the latest GitHub release |
+| GitHub releases | 11 | Latest release is `v0.8.0` |
+| PyPI version | `0.8.0` | Aligned with the latest GitHub release |
 | PyPI recent downloads | 745 | Raw download count; not proof of unique users or downstream dependence |
 | Latest CI on `main` | Passing | Python 3.11-3.13 tests and package build passed |
+| Public Dashboard V2 | Live | GitHub Pages returns the static synthetic demo and public JSON artifacts |
 | Recent maintainer activity | Yes | Commits and releases occurred within three months |
 
 ## Application evidence still required
