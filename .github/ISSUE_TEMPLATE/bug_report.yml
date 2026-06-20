@@ -1,0 +1,56 @@
+name: Bug report
+description: Report reproducible incorrect behavior in the package, CLI, artifacts, or documentation.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include API keys, wallet keys, cookies, private account data, or other secrets.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the observed behavior and why it is incorrect.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide the smallest command or code sample that reproduces the problem.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "For example: 0.6.0"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python and operating system
+      placeholder: "For example: Python 3.12 on Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized output or artifact details
+      description: Include only the relevant error and remove secrets or personal data.
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: This report concerns public market-data infrastructure and does not request trading signals, execution, private account APIs, or financial advice.
+          required: true

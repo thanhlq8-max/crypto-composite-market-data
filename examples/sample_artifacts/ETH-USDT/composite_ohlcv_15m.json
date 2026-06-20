@@ -1,0 +1,71 @@
+{
+  "asset": "ETH-USDT",
+  "timeframe": "15m",
+  "generated_at_ms": 1700000000000,
+  "expected_venues": [
+    "binance",
+    "okx",
+    "bybit"
+  ],
+  "bars_by_market_type": {
+    "spot_usdt": [
+      {
+        "asset": "ETH-USDT",
+        "timeframe": "15m",
+        "market_type": "spot_usdt",
+        "timestamp_ms": 1700000000000,
+        "open": 50.0,
+        "high": 51.0,
+        "low": 49.0,
+        "close": 50.5,
+        "median_close": 50.5,
+        "vwap_close": 50.5,
+        "volume_base_total": 60.0,
+        "volume_quote_total": 3030.0,
+        "venue_count": 3,
+        "venue_weights": {
+          "binance": 0.34,
+          "okx": 0.33,
+          "bybit": 0.33
+        },
+        "coverage": 1.0,
+        "price_dispersion_pct": 0.06,
+        "data_quality": 0.9
+      }
+    ]
+  },
+  "latest_by_market_type": {
+    "spot_usdt": {
+      "asset": "ETH-USDT",
+      "timeframe": "15m",
+      "market_type": "spot_usdt",
+      "timestamp_ms": 1700000000000,
+      "open": 50.0,
+      "high": 51.0,
+      "low": 49.0,
+      "close": 50.5,
+      "median_close": 50.5,
+      "vwap_close": 50.5,
+      "volume_base_total": 60.0,
+      "volume_quote_total": 3030.0,
+      "venue_count": 3,
+      "venue_weights": {
+        "binance": 0.34,
+        "okx": 0.33,
+        "bybit": 0.33
+      },
+      "coverage": 1.0,
+      "price_dispersion_pct": 0.06,
+      "data_quality": 0.9
+    }
+  },
+  "status_by_market_type": {
+    "spot_usdt": "COMPOSITE_DATA_OK"
+  },
+  "coverage_by_market_type": {
+    "spot_usdt": 1.0
+  },
+  "notes": [
+    "Illustrative synthetic sample; not live market data."
+  ]
+}

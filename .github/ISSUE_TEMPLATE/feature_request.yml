@@ -1,0 +1,39 @@
+name: Feature request
+description: Propose a bounded improvement to public market-data infrastructure.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Describe the concrete data, artifact, packaging, documentation, or inspection problem.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Requested outcome
+      description: State the observable result without prescribing unrelated refactors.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence
+      description: List commands, tests, files, or outputs that would prove completion.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Existing workaround
+      description: Describe any current workaround, if one exists.
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: The request does not add trading signals, order execution, private account APIs, position sizing, profitability claims, or financial advice.
+          required: true

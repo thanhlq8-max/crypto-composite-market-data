@@ -48,11 +48,8 @@ python -m build
 ## Good first contributions
 
 - Add mocked parser tests for an existing connector.
-- Improve Windows setup documentation.
-- Add sample artifacts for a documented example.
 - Add CSV export for composite OHLCV.
-- Add artifact schema validation tests.
-- Improve dashboard API docs.
+- Add a DuckDB export example without a mandatory runtime dependency.
 
 ## Connector contribution checklist
 

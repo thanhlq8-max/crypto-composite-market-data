@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from html import escape
 from pathlib import Path
 from typing import Any
@@ -240,7 +241,11 @@ def _render_html(artifact_root: Path, report_file: Path, quality: dict[str, Any]
 
 def assert_no_forbidden_report_terms(html: str) -> None:
     upper = html.upper()
-    matched = [term for term in _FORBIDDEN_REPORT_TERMS if term in upper]
+    matched = [
+        term
+        for term in _FORBIDDEN_REPORT_TERMS
+        if re.search(rf"(?<![A-Z0-9_]){re.escape(term)}(?![A-Z0-9_])", upper)
+    ]
     if matched:
         raise ValueError(f"FORBIDDEN_REPORT_TERM: {', '.join(matched)}")
 

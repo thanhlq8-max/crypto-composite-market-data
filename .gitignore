@@ -12,6 +12,7 @@ dist/
 artifacts/
 artifacts-universe/
 exports/
+.pages-preview/
 
 .env
 .DS_Store

@@ -1,5 +1,4 @@
 {
-  "asset_count": 2,
   "assets": [
     "BTC-USDT",
     "ETH-USDT"
@@ -10,15 +9,58 @@
     "bybit"
   ],
   "market_types": [
-    "spot_usdt",
-    "perp_usdt"
+    "spot_usdt"
   ],
   "timeframes": [
     "15m"
   ],
-  "artifact_root": "examples/sample_artifacts",
-  "boundaries": [
-    "Illustrative sample artifacts only.",
+  "asset_count": 2,
+  "asset_results": {
+    "BTC-USDT": {
+      "artifact_dir": "BTC-USDT",
+      "timeframes": [
+        "15m"
+      ],
+      "data_quality_by_timeframe": {
+        "15m": {
+          "status": "OK",
+          "overall_quality": 0.95
+        }
+      },
+      "outputs": {
+        "combined_composite_ohlcv": "composite_ohlcv.json",
+        "combined_composite_orderbook_ladder": "composite_orderbook_ladder.json",
+        "data_quality": "data_quality.json"
+      }
+    },
+    "ETH-USDT": {
+      "artifact_dir": "ETH-USDT",
+      "timeframes": [
+        "15m"
+      ],
+      "data_quality_by_timeframe": {
+        "15m": {
+          "status": "OK",
+          "overall_quality": 0.9
+        }
+      },
+      "outputs": {
+        "combined_composite_ohlcv": "composite_ohlcv.json",
+        "combined_composite_orderbook_ladder": "composite_orderbook_ladder.json",
+        "data_quality": "data_quality.json"
+      }
+    }
+  },
+  "errors": [],
+  "outputs": {
+    "universe_summary": "universe_summary.json",
+    "per_asset_artifacts": {
+      "BTC-USDT": "BTC-USDT",
+      "ETH-USDT": "ETH-USDT"
+    }
+  },
+  "limitations": [
+    "Illustrative synthetic sample; not live market data.",
     "No trading signals, order execution, position sizing, or financial advice."
   ]
 }

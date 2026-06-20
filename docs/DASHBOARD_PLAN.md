@@ -2,14 +2,16 @@
 
 The dashboard should visualize artifact quality and public market-data structure. It should not become a trading terminal.
 
-## Recommended architecture
+## Implemented architecture
 
 ```text
-FastAPI app
-├── artifact reader
-├── JSON API endpoints
-└── static frontend
+Python stdlib ThreadingHTTPServer
+|-- safe artifact reader
+|-- JSON API endpoints
+`-- same-origin static frontend
 ```
+
+The current frontend covers service health, data-quality rows, artifact paths and sizes, and read-only JSON inspection. Future panels must continue to use the existing public artifact contract and wording guard.
 
 ## Candidate API endpoints
 

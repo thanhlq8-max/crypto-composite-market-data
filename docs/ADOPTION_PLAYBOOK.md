@@ -30,8 +30,8 @@ This project should grow as a reusable market-data infrastructure package, not a
 ## 30-day adoption plan
 
 1. Keep the PyPI package install path working.
-2. Add one short demo GIF or screenshot for the dashboard API output.
-3. Publish one technical post explaining why composite public market data needs quality checks.
+2. Keep the [repository-hosted dashboard screenshot](assets/dashboard-overview.png) aligned with the synthetic sample artifacts.
+3. Adapt [Why composite public market data](WHY_COMPOSITE_MARKET_DATA.md) for an independent public technical channel.
 4. Open 5 beginner-friendly issues from `docs/GOOD_FIRST_ISSUES.md`.
 5. Ask users to share generated `data_quality.json` and `universe_summary.json` examples.
 

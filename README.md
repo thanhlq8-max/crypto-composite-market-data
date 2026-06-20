@@ -9,6 +9,10 @@ Public multi-exchange crypto market-data composite toolkit.
 
 `crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX and Bybit endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
 
+![Read-only artifact dashboard showing synthetic BTC-USDT and ETH-USDT data-quality coverage](https://raw.githubusercontent.com/thanhlq8-max/crypto-composite-market-data/main/docs/assets/dashboard-overview.png)
+
+The dashboard screenshot uses the checked-in synthetic sample artifacts; it does not show live market data or trading signals.
+
 > Note: PyPI/Shields badges can take a few minutes to refresh after a new release.
 
 ## Why this exists
@@ -23,6 +27,8 @@ This project helps developers and researchers answer practical data-quality ques
 - Is orderbook depth concentrated in one venue?
 - Which assets in a universe have enough public data to inspect?
 - Which JSON artifacts were generated and where are they?
+
+See [Why composite public market data](docs/WHY_COMPOSITE_MARKET_DATA.md) for the exact coverage, dispersion, and public orderbook concentration semantics.
 
 ## Who it is for
 
@@ -118,6 +124,7 @@ crypto-composite dashboard \
 Open:
 
 ```text
+http://127.0.0.1:18080/
 http://127.0.0.1:18080/api/health
 http://127.0.0.1:18080/api/artifacts
 ```
@@ -178,6 +185,14 @@ A `universe_summary.json` artifact summarizes multi-symbol runs without producin
 ```
 
 Sample illustrative artifacts are available under [examples/sample_artifacts](examples/sample_artifacts/).
+
+Consume the checked-in fixture through the public validation and quality APIs:
+
+```bash
+python examples/inspect_quality.py --artifact-root examples/sample_artifacts
+```
+
+See [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md) for the offline downstream example.
 
 ## Output artifacts
 
@@ -284,6 +299,7 @@ crypto-composite dashboard --artifact-root artifacts-universe --host 127.0.0.1 -
 Endpoints:
 
 ```text
+/
 /api/health
 /api/artifacts
 /api/artifact?path=<relative-json-path>
@@ -298,11 +314,10 @@ Useful first contributions:
 - Add a new public exchange connector.
 - Improve mocked connector parser coverage.
 - Add CSV or DuckDB artifact export.
-- Improve Windows setup documentation.
-- Build a small static frontend on top of the read-only dashboard API.
-- Add schema validation for output artifacts.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), the GitHub issue templates, and [docs/GOOD_FIRST_ISSUES.md](docs/GOOD_FIRST_ISSUES.md).
+
+External users can select **Downstream use case** in the [GitHub issue chooser](https://github.com/thanhlq8-max/crypto-composite-market-data/issues/new/choose) to report a verifiable integration without making trading-performance claims.
 
 ## Limitations
 
@@ -325,6 +340,9 @@ See:
 - [docs/DASHBOARD_PLAN.md](docs/DASHBOARD_PLAN.md)
 - [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md)
 - [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md)
+- [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
+- [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
+- [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)
 - [docs/PACKAGING.md](docs/PACKAGING.md)
 - [docs/COMMUNITY_GROWTH.md](docs/COMMUNITY_GROWTH.md)
 - [docs/ADOPTION_PLAYBOOK.md](docs/ADOPTION_PLAYBOOK.md)
