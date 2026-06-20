@@ -1,6 +1,6 @@
 # Dashboard UI and API
 
-The local dashboard is a read-only artifact browser built on Python's standard-library HTTP server. It serves a static frontend and JSON endpoints from the same local origin.
+The local dashboard is a read-only observed-market-structure viewer built on Python's standard-library HTTP server. It serves a static frontend and JSON endpoints from the same local origin.
 
 ## Start
 
@@ -9,6 +9,19 @@ crypto-composite dashboard --artifact-root artifacts-universe --host 127.0.0.1 -
 ```
 
 Open `http://127.0.0.1:18080/` for the frontend.
+
+## Static export
+
+Embed the Dashboard V2 analytical snapshot and artifact index into a static HTML file:
+
+```bash
+crypto-composite dashboard-export \
+  --artifact-root artifacts-universe \
+  --out-file site/index.html \
+  --artifact-base-url artifacts
+```
+
+The dashboard cards, charts, filters, zones, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
 
 ## Screenshot
 
@@ -20,9 +33,10 @@ This screenshot is rendered from `examples/sample_artifacts`. The values are det
 
 | Endpoint | Purpose |
 |---|---|
-| `/` | Static artifact health and data-quality frontend |
+| `/` | Dashboard V2 observed-market-structure frontend |
 | `/api/health` | Service health check |
 | `/api/artifacts` | List JSON artifact paths and byte sizes |
+| `/api/dashboard-snapshot` | Build an artifact-derived view of composite bars, public depth, observed zones, and methodology |
 | `/api/artifact?path=<relative-json-path>` | Read one JSON artifact by relative path |
 
 ## Health contract
@@ -70,18 +84,40 @@ The object-list contract replaces the earlier string-list response. Consumers mu
 
 The frontend reads the API at runtime and displays:
 
-- service health;
-- artifact count and total size;
-- well-known root-file coverage;
-- timeframe status, overall quality, and venue coverage from `data_quality.json` files;
+- asset, timeframe, and market-type filters;
+- composite reference price, venue coverage, dispersion, and artifact freshness;
+- observed past/current/next-evidence-check context;
+- a composite close chart with observed public-depth bands;
+- a public orderbook depth profile;
+- practical concentration and maximum-vacuum zones;
+- spot/perpetual composite-close dislocation context;
 - artifact paths and sizes; and
 - a read-only JSON inspector.
 
 Dynamic artifact values are inserted as text, not executable HTML.
 
+## Observed zone contract
+
+The snapshot endpoint selects at most four practical buckets per market type:
+
+- the existing `top_bid_wall` and `top_ask_wall` depth buckets;
+- the maximum `vacuum_score` bucket on each side, excluding an exact duplicate of the selected wall.
+
+Evidence grades evaluate source corroboration only:
+
+| Grade | Exact rule |
+|---|---|
+| `CORROBORATED` | `COMPOSITE_BOOK_OK`, at least two contributing venues, and no venue supplies more than half of the bucket depth |
+| `CONCENTRATED` | One venue supplies more than half of observed bucket depth |
+| `LIMITED` | Book status is partial/weak or fewer than two venues contribute |
+
+These grades do not estimate future price reaction. `persistence` and `spoof_risk_proxy` remain engine proxies. A single artifact snapshot cannot establish a zone lifecycle.
+
+The spot/perpetual dislocation band uses the two latest composite closes. It is an observed difference, not a convergence forecast. Exact cross-venue disagreement bounds are not created because the current composite artifact exposes dispersion but not per-venue price bounds.
+
 ## Boundary
 
-The dashboard does not produce trading signals, asset rankings, entry or exit instructions, order execution, position sizing, predictions, or financial advice. It only exposes generated data artifacts and data-quality context.
+The dashboard does not produce trading signals, asset rankings, entry or exit instructions, order execution, position sizing, predictions, or financial advice. It does not claim hidden liquidity, market-maker intent, or future reaction. It only exposes generated public-data artifacts and evidence quality.
 
 ## Troubleshooting
 

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 
+from crypto_composite.dashboard_analytics import build_dashboard_snapshot
 from crypto_composite.dashboard_frontend import render_dashboard_html
 
 
@@ -87,6 +88,43 @@ def build_artifact_index(artifact_root: str | Path) -> dict[str, Any]:
     }
 
 
+def write_dashboard_export(
+    artifact_root: str | Path,
+    out_file: str | Path,
+    artifact_base_url: str | None = None,
+) -> dict[str, Any]:
+    """Write Dashboard V2 as static HTML with embedded analytical data."""
+    try:
+        root = _safe_root(artifact_root)
+        snapshot = build_dashboard_snapshot(root)
+        if not snapshot["assets"]:
+            raise DashboardInputError("DASHBOARD_SNAPSHOT_EMPTY")
+        index = build_artifact_index(root)
+        index["artifact_root"] = "."
+        target = Path(out_file).expanduser().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            render_dashboard_html(
+                embedded_snapshot=snapshot,
+                embedded_index=index,
+                artifact_base_url=artifact_base_url,
+            ),
+            encoding="utf-8",
+        )
+        return {
+            "status": "OK",
+            "dashboard_path": str(target),
+            "asset_count": len(snapshot["assets"]),
+            "artifact_count": index["artifact_count"],
+        }
+    except (DashboardInputError, json.JSONDecodeError) as exc:
+        return {
+            "status": "ERROR",
+            "dashboard_path": str(Path(out_file).expanduser().resolve()),
+            "error": str(exc),
+        }
+
+
 def make_dashboard_handler(artifact_root: str | Path):
     root = _safe_root(artifact_root)
 
@@ -123,6 +161,9 @@ def make_dashboard_handler(artifact_root: str | Path):
                     return
                 if parsed.path == "/api/artifacts":
                     self._write_json(200, build_artifact_index(root))
+                    return
+                if parsed.path == "/api/dashboard-snapshot":
+                    self._write_json(200, build_dashboard_snapshot(root))
                     return
                 if parsed.path == "/api/artifact":
                     query = parse_qs(parsed.query)

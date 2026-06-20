@@ -11,26 +11,27 @@ Python stdlib ThreadingHTTPServer
 `-- same-origin static frontend
 ```
 
-The current frontend covers service health, data-quality rows, artifact paths and sizes, and read-only JSON inspection. Future panels must continue to use the existing public artifact contract and wording guard.
+Dashboard V2 covers composite price context, public depth, practical observed zones, source corroboration, spot/perpetual dislocation, artifact paths, and read-only JSON inspection. Future panels must continue to use the existing public artifact contract and wording guard.
 
-## Candidate API endpoints
+## Implemented analytical endpoint
 
 ```text
-/api/universe-summary
-/api/assets
-/api/assets/{asset}/timeframes
-/api/assets/{asset}/{timeframe}/composite-ohlcv
-/api/assets/{asset}/{timeframe}/orderbook-ladder
-/api/assets/{asset}/{timeframe}/data-quality
+/api/dashboard-snapshot
 ```
 
-## First dashboard panels
+The endpoint joins existing combined OHLCV, orderbook ladder, quality, run-summary, and universe-summary artifacts. It does not mutate artifacts or pipeline behavior.
 
-1. Universe health.
-2. Venue coverage by asset.
-3. Composite OHLCV latest status.
-4. Orderbook ladder coverage and depth imbalance.
-5. Artifact manifest / file browser.
+## Dashboard V2 panels
+
+1. Asset/timeframe/market filters and current composite metrics.
+2. Past observation, current observation, and next evidence check.
+3. Composite close chart with observed zone bands.
+4. Public-depth profile.
+5. Practical observed-zone table with evidence grades.
+6. Spot/perpetual dislocation context.
+7. Methodology and artifact manifest.
+
+The layout adapts the LFX-2 readability principles of time-layered context, practical-zone filtering, conditional monitoring, and explicit confidence/risk. Trading-specific MM, retail-positioning, route, entry, and prediction semantics are intentionally excluded.
 
 ## Wording guard
 
