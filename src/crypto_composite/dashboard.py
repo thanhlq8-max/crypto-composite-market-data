@@ -93,7 +93,7 @@ def write_dashboard_export(
     out_file: str | Path,
     artifact_base_url: str | None = None,
 ) -> dict[str, Any]:
-    """Write Dashboard V2 as static HTML with embedded analytical data."""
+    """Write Dashboard V3 as static HTML with embedded analytical data."""
     try:
         root = _safe_root(artifact_root)
         snapshot = build_dashboard_snapshot(root)

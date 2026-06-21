@@ -1,6 +1,6 @@
-# GitHub Pages synthetic Dashboard V2 demo
+# GitHub Pages synthetic Dashboard V3 demo
 
-The repository contains a manual GitHub Pages workflow that builds a static Dashboard V2 export from checked-in synthetic fixtures.
+The repository contains a manual GitHub Pages workflow that builds a static Dashboard V3 export from checked-in synthetic fixtures.
 
 The workflow does not call exchange APIs, does not use live market data, and does not run automatically on push.
 
@@ -27,7 +27,7 @@ Repository admin access is required.
 
 1. Open **Settings > Pages**.
 2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Open **Actions > Deploy synthetic Dashboard V2 to GitHub Pages**.
+3. Open **Actions > Deploy synthetic Dashboard V3 to GitHub Pages**.
 4. Select **Run workflow** on the reviewed branch.
 5. Wait for both `build-static-demo` and `deploy-static-demo` to pass.
 6. Open the URL reported by the `github-pages` deployment environment.

@@ -12,7 +12,7 @@ Open `http://127.0.0.1:18080/` for the frontend.
 
 ## Static export
 
-Embed the Dashboard V2 analytical snapshot and artifact index into a static HTML file:
+Embed the Dashboard V3 analytical snapshot and artifact index into a static HTML file:
 
 ```bash
 crypto-composite dashboard-export \
@@ -22,6 +22,8 @@ crypto-composite dashboard-export \
 ```
 
 The dashboard cards, charts, filters, zones, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
+
+When `data_quality.json` contains a timeframe-level `note`, the dashboard displays that note verbatim near the load status. This keeps synthetic, reviewed, or otherwise qualified sources visibly labeled without inferring a source type.
 
 ## Screenshot
 
@@ -33,7 +35,7 @@ This screenshot is rendered from `examples/sample_artifacts`. The values are det
 
 | Endpoint | Purpose |
 |---|---|
-| `/` | Dashboard V2 observed-market-structure frontend |
+| `/` | Dashboard V3 observed-market-structure frontend |
 | `/api/health` | Service health check |
 | `/api/artifacts` | List JSON artifact paths and byte sizes |
 | `/api/dashboard-snapshot` | Build an artifact-derived view of composite bars, public depth, observed zones, and methodology |
@@ -86,15 +88,26 @@ The frontend reads the API at runtime and displays:
 
 - asset, timeframe, and market-type filters;
 - composite reference price, venue coverage, dispersion, and artifact freshness;
-- observed past/current/next-evidence-check context;
+- DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
-- practical concentration and maximum-vacuum zones;
+- practical concentration and maximum-vacuum zones with exact reference relation and distance;
 - spot/perpetual composite-close dislocation context;
 - artifact paths and sizes; and
 - a read-only JSON inspector.
 
 Dynamic artifact values are inserted as text, not executable HTML.
+
+## Practical monitoring brief contract
+
+Each market context includes `monitoring_brief` with four evidence-only sections:
+
+- `past`: available bar count and the observed close change between the two latest composite bars;
+- `now`: latest composite metrics, public-book totals, depth imbalance, and the nearest bid/ask concentration ranges;
+- `next_evidence_check`: the next data check required after refresh, with OHLCV coverage checked before book coverage and zone comparison; and
+- `confidence_risk`: OHLCV/book status, book coverage, evidence-grade counts, and the single-snapshot limitation.
+
+This object contains no confidence score, threshold-based trade state, direction forecast, or entry/exit instruction. `next_evidence_check` tells the user what evidence to compare, not what price should do.
 
 ## Observed zone contract
 
@@ -110,6 +123,13 @@ Evidence grades evaluate source corroboration only:
 | `CORROBORATED` | `COMPOSITE_BOOK_OK`, at least two contributing venues, and no venue supplies more than half of the bucket depth |
 | `CONCENTRATED` | One venue supplies more than half of observed bucket depth |
 | `LIMITED` | Book status is partial/weak or fewer than two venues contribute |
+
+Each zone also exposes:
+
+- `reference_relation`: `BELOW_REFERENCE`, `ABOVE_REFERENCE`, or `CONTAINS_REFERENCE`; and
+- `distance_to_reference_pct`: the percentage distance from the reference price to the nearest zone edge, or zero when the zone contains the reference.
+
+The distance is descriptive and does not rank opportunity quality or imply future reaction.
 
 These grades do not estimate future price reaction. `persistence` and `spoof_risk_proxy` remain engine proxies. A single artifact snapshot cannot establish a zone lifecycle.
 

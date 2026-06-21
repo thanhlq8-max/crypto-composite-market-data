@@ -11,7 +11,7 @@ Python stdlib ThreadingHTTPServer
 `-- same-origin static frontend
 ```
 
-Dashboard V2 covers composite price context, public depth, practical observed zones, source corroboration, spot/perpetual dislocation, artifact paths, and read-only JSON inspection. Future panels must continue to use the existing public artifact contract and wording guard.
+Dashboard V3 covers composite price context, public depth, practical observed zones, source corroboration, exact reference-relative zone distance, a structured practical monitoring brief, spot/perpetual dislocation, artifact paths, and read-only JSON inspection. Future panels must continue to use the existing public artifact contract and wording guard.
 
 ## Implemented analytical endpoint
 
@@ -21,13 +21,13 @@ Dashboard V2 covers composite price context, public depth, practical observed zo
 
 The endpoint joins existing combined OHLCV, orderbook ladder, quality, run-summary, and universe-summary artifacts. It does not mutate artifacts or pipeline behavior.
 
-## Dashboard V2 panels
+## Dashboard V3 panels
 
 1. Asset/timeframe/market filters and current composite metrics.
-2. Past observation, current observation, and next evidence check.
+2. DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk monitoring brief.
 3. Composite close chart with observed zone bands.
 4. Public-depth profile.
-5. Practical observed-zone table with evidence grades.
+5. Practical observed-zone table with reference relation, edge distance, and evidence grades.
 6. Spot/perpetual dislocation context.
 7. Methodology and artifact manifest.
 

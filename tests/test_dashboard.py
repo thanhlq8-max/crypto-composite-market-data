@@ -48,6 +48,9 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     html = render_dashboard_html()
 
     assert "Observed Market Structure" in html
+    assert "Dashboard V3 / practical monitoring brief" in html
+    assert 'id="confidence-title"' in html
+    assert "distance_to_reference_pct" in html
     assert 'getJson("/api/dashboard-snapshot")' in html
     assert 'getJson("/api/artifacts")' in html
     assert "item.path" in html
@@ -124,13 +127,19 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
     }
     ladder = {
         "asset": "BTC-USDT", "market_type": "spot_usdt", "generated_at_ms": 2000,
-        "reference_price": 101.0, "coverage": 1.0, "status": "COMPOSITE_BOOK_OK",
+        "reference_price": 101.0, "coverage": 1.0, "venue_count": 3,
+        "bid_depth_total": 1100.0, "ask_depth_total": 900.0, "depth_imbalance": 0.1,
+        "status": "COMPOSITE_BOOK_OK",
         "bid_levels": [bid_wall, bid_vacuum], "ask_levels": [ask_wall],
         "top_bid_wall": bid_wall, "top_ask_wall": ask_wall,
     }
     (tmp_path / "composite_ohlcv.json").write_text(json.dumps({"15m": bars}), encoding="utf-8")
     (tmp_path / "composite_orderbook_ladder.json").write_text(
         json.dumps({"15m": {"spot_usdt": ladder}}), encoding="utf-8"
+    )
+    (tmp_path / "data_quality.json").write_text(
+        json.dumps({"15m": {"status": "OK", "note": "Reviewed fixture; not live data."}}),
+        encoding="utf-8",
     )
     (tmp_path / "run_summary.json").write_text(json.dumps({"asset": "BTC-USDT"}), encoding="utf-8")
 
@@ -140,16 +149,51 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
 
     assert market["observed_zones"][0]["kind"] == "BID_LIQUIDITY_CONCENTRATION"
     assert market["observed_zones"][0]["evidence_grade"] == "CORROBORATED"
+    assert market["observed_zones"][0]["reference_relation"] == "BELOW_REFERENCE"
+    assert market["observed_zones"][0]["distance_to_reference_pct"] == pytest.approx(0.990099)
     assert market["observed_zones"][1]["kind"] == "BID_PUBLIC_DEPTH_VACUUM"
     assert market["observed_zones"][1]["evidence_grade"] == "LIMITED"
     assert market["observed_zones"][2]["evidence_grade"] == "CONCENTRATED"
+    assert market["observed_zones"][2]["reference_relation"] == "ABOVE_REFERENCE"
+    assert market["observed_zones"][2]["distance_to_reference_pct"] == pytest.approx(0.990099)
+    assert market["monitoring_brief"]["past"] == {
+        "timeframe": "15m",
+        "bar_count": 2,
+        "close_change_pct": 1.0,
+    }
+    assert market["monitoring_brief"]["now"]["book"] == {
+        "status": "COMPOSITE_BOOK_OK",
+        "reference_price": 101.0,
+        "coverage": 1.0,
+        "venue_count": 3,
+        "bid_depth_total": 1100.0,
+        "ask_depth_total": 900.0,
+        "depth_imbalance": 0.1,
+    }
+    assert market["monitoring_brief"]["now"]["nearest_bid_concentration"]["price_low"] == 99.0
+    assert market["monitoring_brief"]["now"]["nearest_ask_concentration"]["price_low"] == 102.0
+    assert market["monitoring_brief"]["next_evidence_check"]["kind"] == "REFRESH_ZONE_EVIDENCE"
+    assert market["monitoring_brief"]["confidence_risk"]["evidence_grade_counts"] == {
+        "CORROBORATED": 1,
+        "CONCENTRATED": 1,
+        "LIMITED": 1,
+    }
+    assert timeframe["source_note"] == "Reviewed fixture; not live data."
     assert timeframe["spot_perp_dislocation"]["basis_pct"] == pytest.approx(0.4950495)
     assert snapshot["mode"] == "OBSERVED_PUBLIC_DATA"
 
 
 def test_dashboard_snapshot_endpoint_returns_object(tmp_path: Path) -> None:
     (tmp_path / "composite_ohlcv.json").write_text(
-        json.dumps({"15m": {"asset": "ETH-USDT", "bars_by_market_type": {}, "latest_by_market_type": {}}}),
+        json.dumps(
+            {
+                "15m": {
+                    "asset": "ETH-USDT",
+                    "bars_by_market_type": {"spot_usdt": []},
+                    "latest_by_market_type": {},
+                }
+            }
+        ),
         encoding="utf-8",
     )
     (tmp_path / "run_summary.json").write_text(json.dumps({"asset": "ETH-USDT"}), encoding="utf-8")
@@ -163,10 +207,34 @@ def test_dashboard_snapshot_endpoint_returns_object(tmp_path: Path) -> None:
             assert response.status == 200
             assert payload["mode"] == "OBSERVED_PUBLIC_DATA"
             assert payload["assets"][0]["asset"] == "ETH-USDT"
+            market = payload["assets"][0]["timeframes"][0]["markets"][0]
+            assert market["monitoring_brief"]["next_evidence_check"]["kind"] == "GENERATE_BOOK_CONTEXT"
     finally:
         server.shutdown()
         thread.join(timeout=5)
         server.server_close()
+
+
+def test_dashboard_snapshot_prioritizes_partial_ohlcv_warning(tmp_path: Path) -> None:
+    (tmp_path / "composite_ohlcv.json").write_text(
+        json.dumps(
+            {
+                "15m": {
+                    "asset": "BTC-USDT",
+                    "bars_by_market_type": {"spot_usdt": [{"timestamp_ms": 1000, "close": 100.0}]},
+                    "latest_by_market_type": {"spot_usdt": {"timestamp_ms": 1000, "close": 100.0}},
+                    "status_by_market_type": {"spot_usdt": "COMPOSITE_DATA_PARTIAL"},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "run_summary.json").write_text(json.dumps({"asset": "BTC-USDT"}), encoding="utf-8")
+
+    snapshot = build_dashboard_snapshot(tmp_path)
+    market = snapshot["assets"][0]["timeframes"][0]["markets"][0]
+
+    assert market["monitoring_brief"]["next_evidence_check"]["kind"] == "RESTORE_OHLCV_COVERAGE"
 
 
 def test_write_dashboard_export_embeds_snapshot_and_safe_index(tmp_path: Path) -> None:

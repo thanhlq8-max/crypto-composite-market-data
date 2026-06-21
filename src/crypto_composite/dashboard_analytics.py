@@ -71,8 +71,23 @@ def _evidence_grade(level: dict[str, Any], ladder: dict[str, Any]) -> tuple[str,
     return "CORROBORATED", majority_share
 
 
+def _zone_reference_context(level: dict[str, Any], ladder: dict[str, Any]) -> tuple[str | None, float | None]:
+    reference = _finite_number(ladder.get("reference_price"))
+    low = _finite_number(level.get("price_low"))
+    high = _finite_number(level.get("price_high"))
+    if reference is None or reference <= 0 or low is None or high is None:
+        return None, None
+    low, high = min(low, high), max(low, high)
+    if high < reference:
+        return "BELOW_REFERENCE", round((reference - high) / reference * 100.0, 6)
+    if low > reference:
+        return "ABOVE_REFERENCE", round((low - reference) / reference * 100.0, 6)
+    return "CONTAINS_REFERENCE", 0.0
+
+
 def _zone(level: dict[str, Any], ladder: dict[str, Any], kind: str, label: str) -> dict[str, Any]:
     grade, majority_share = _evidence_grade(level, ladder)
+    reference_relation, distance_to_reference_pct = _zone_reference_context(level, ladder)
     return {
         "kind": kind,
         "label": label,
@@ -87,6 +102,8 @@ def _zone(level: dict[str, Any], ladder: dict[str, Any], kind: str, label: str) 
         "persistence_proxy": level.get("persistence"),
         "spoof_risk_proxy": level.get("spoof_risk_proxy"),
         "vacuum_score": level.get("vacuum_score"),
+        "reference_relation": reference_relation,
+        "distance_to_reference_pct": distance_to_reference_pct,
         "evidence_grade": grade,
         "evidence_definition": EVIDENCE_METHOD[grade],
     }
@@ -158,6 +175,114 @@ def _dislocation(markets: list[dict[str, Any]]) -> dict[str, Any] | None:
     }
 
 
+def _nearest_concentration(zones: list[dict[str, Any]], side: str) -> dict[str, Any] | None:
+    kind = f"{side.upper()}_LIQUIDITY_CONCENTRATION"
+    candidates = [
+        zone
+        for zone in zones
+        if zone.get("kind") == kind and _finite_number(zone.get("distance_to_reference_pct")) is not None
+    ]
+    return min(candidates, key=lambda zone: float(zone["distance_to_reference_pct"]), default=None)
+
+
+def _monitoring_brief(
+    timeframe: str,
+    bars: list[dict[str, Any]],
+    latest: dict[str, Any] | None,
+    ohlcv_status: Any,
+    ladder: dict[str, Any] | None,
+    zones: list[dict[str, Any]],
+) -> dict[str, Any]:
+    close_change_pct = None
+    if len(bars) >= 2:
+        prior_close = _finite_number(bars[-2].get("close"))
+        current_close = _finite_number(bars[-1].get("close"))
+        if prior_close is not None and current_close is not None and prior_close != 0:
+            close_change_pct = round((current_close - prior_close) / prior_close * 100.0, 6)
+
+    latest = latest if isinstance(latest, dict) else None
+    grade_counts = {grade: 0 for grade in EVIDENCE_METHOD}
+    for zone in zones:
+        grade = zone.get("evidence_grade")
+        if grade in grade_counts:
+            grade_counts[grade] += 1
+
+    book = (
+        {
+            "status": ladder.get("status"),
+            "reference_price": ladder.get("reference_price"),
+            "coverage": ladder.get("coverage"),
+            "venue_count": ladder.get("venue_count"),
+            "bid_depth_total": ladder.get("bid_depth_total"),
+            "ask_depth_total": ladder.get("ask_depth_total"),
+            "depth_imbalance": ladder.get("depth_imbalance"),
+        }
+        if ladder is not None
+        else None
+    )
+    nearest_bid = _nearest_concentration(zones, "bid")
+    nearest_ask = _nearest_concentration(zones, "ask")
+
+    if ohlcv_status is not None and ohlcv_status != "COMPOSITE_DATA_OK":
+        next_evidence_check = {
+            "kind": "RESTORE_OHLCV_COVERAGE",
+            "condition": "Before interpreting the latest composite price movement",
+            "observe": "Refresh missing OHLCV venue data until the composite data status is OK.",
+        }
+    elif ladder is None:
+        next_evidence_check = {
+            "kind": "GENERATE_BOOK_CONTEXT",
+            "condition": "After a composite orderbook artifact is generated",
+            "observe": "Review venue coverage before interpreting public-depth zones.",
+        }
+    else:
+        if ladder.get("status") != "COMPOSITE_BOOK_OK":
+            next_evidence_check = {
+                "kind": "RESTORE_BOOK_COVERAGE",
+                "condition": "Before interpreting public-depth structure",
+                "observe": "Restore or refresh venue coverage until the composite book status is OK.",
+            }
+        elif nearest_bid is not None or nearest_ask is not None:
+            next_evidence_check = {
+                "kind": "REFRESH_ZONE_EVIDENCE",
+                "condition": "After the next artifact refresh",
+                "observe": (
+                    "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote."
+                ),
+            }
+        else:
+            next_evidence_check = {
+                "kind": "REFRESH_BOOK_CONTEXT",
+                "condition": "After the next artifact refresh",
+                "observe": "Check whether a practical multi-venue concentration range becomes available.",
+            }
+
+    return {
+        "past": {
+            "timeframe": timeframe,
+            "bar_count": len(bars),
+            "close_change_pct": close_change_pct,
+        },
+        "now": {
+            "latest_close": latest.get("close") if latest is not None else None,
+            "price_dispersion_pct": latest.get("price_dispersion_pct") if latest is not None else None,
+            "ohlcv_coverage": latest.get("coverage") if latest is not None else None,
+            "book": book,
+            "nearest_bid_concentration": nearest_bid,
+            "nearest_ask_concentration": nearest_ask,
+        },
+        "next_evidence_check": next_evidence_check,
+        "confidence_risk": {
+            "ohlcv_status": ohlcv_status,
+            "book_status": ladder.get("status") if ladder is not None else None,
+            "book_coverage": ladder.get("coverage") if ladder is not None else None,
+            "zone_count": len(zones),
+            "evidence_grade_counts": grade_counts,
+            "snapshot_limit": "Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+        },
+    }
+
+
 def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[str, Any] | None:
     ohlcv_by_timeframe = _read_object(asset_root / "composite_ohlcv.json") or {}
     ladder_by_timeframe = _read_object(asset_root / "composite_orderbook_ladder.json") or {}
@@ -189,6 +314,7 @@ def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[s
             latest = latest if isinstance(latest, dict) else (bars[-1] if bars else None)
             ladder = ladders.get(market_type)
             ladder = ladder if isinstance(ladder, dict) else None
+            zones = _observed_zones(ladder)
             markets.append(
                 {
                     "market_type": market_type,
@@ -199,14 +325,24 @@ def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[s
                     "bars": bars,
                     "latest_bar": latest,
                     "orderbook": ladder,
-                    "observed_zones": _observed_zones(ladder),
+                    "observed_zones": zones,
+                    "monitoring_brief": _monitoring_brief(
+                        timeframe,
+                        bars,
+                        latest,
+                        status_by_market.get(market_type),
+                        ladder,
+                        zones,
+                    ),
                 }
             )
         quality = quality_by_timeframe.get(timeframe)
+        quality = quality if isinstance(quality, dict) else None
         timeframe_rows.append(
             {
                 "timeframe": timeframe,
-                "quality": quality if isinstance(quality, dict) else None,
+                "quality": quality,
+                "source_note": quality.get("note") if quality is not None and isinstance(quality.get("note"), str) else None,
                 "markets": markets,
                 "spot_perp_dislocation": _dislocation(markets),
             }
@@ -219,7 +355,7 @@ def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[s
 
 
 def build_dashboard_snapshot(artifact_root: str | Path) -> dict[str, Any]:
-    """Build a read-only, artifact-derived view for Dashboard V2."""
+    """Build a read-only, artifact-derived view for Dashboard V3."""
     root = Path(artifact_root).expanduser().resolve()
     assets = [
         asset

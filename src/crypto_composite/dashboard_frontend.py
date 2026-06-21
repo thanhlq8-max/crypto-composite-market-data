@@ -39,6 +39,8 @@ def render_dashboard_html(
     .badge::before { width: 7px; height: 7px; border-radius: 50%; background: #6b7d91; content: ""; }
     .badge.ok::before { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
     .badge.error::before { background: #ff8290; }
+    .source-note { max-width: 760px; margin-top: 9px; color: #f4bf67; font-size: .78rem; }
+    .source-note[hidden] { display: none; }
     .filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
     label { display: grid; gap: 5px; color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     select, button { border: 1px solid #31475d; border-radius: 9px; color: #e4edf7; background: #102236; font: inherit; }
@@ -51,10 +53,10 @@ def render_dashboard_html(
     .card span, .metric-label { color: var(--muted); font-size: .69rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
     .card strong { display: block; margin-top: 13px; font-size: 1.65rem; font-variant-numeric: tabular-nums; }
     .card small { display: block; margin-top: 5px; color: #8498ae; }
-    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-bottom: 11px; }
+    .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin-bottom: 11px; }
     .flow-item { position: relative; min-height: 112px; padding: 16px 17px; border-radius: 14px; overflow: hidden; }
     .flow-item::after { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--blue); content: ""; }
-    .flow-item:nth-child(2)::after { background: var(--cyan); } .flow-item:nth-child(3)::after { background: var(--amber); }
+    .flow-item:nth-child(2)::after { background: var(--cyan); } .flow-item:nth-child(3)::after { background: var(--amber); } .flow-item:nth-child(4)::after { background: #c79cff; }
     .flow-item strong { display: block; margin: 10px 0 4px; font-size: .95rem; }
     .flow-item p { font-size: .81rem; }
     .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr); gap: 11px; }
@@ -77,7 +79,7 @@ def render_dashboard_html(
     pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
     .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
-    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
     @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
@@ -86,10 +88,11 @@ def render_dashboard_html(
 <main>
   <header>
     <div>
-      <p class="eyebrow">Dashboard V2 / evidence-grade snapshots</p>
+      <p class="eyebrow">Dashboard V3 / practical monitoring brief</p>
       <h1>Observed Market Structure</h1>
       <p>Composite price, public depth, and practical zones derived from generated artifacts.</p>
       <span id="service-state" class="badge">Connecting</span>
+      <p id="source-note" class="source-note" hidden></p>
     </div>
     <div class="filters" aria-label="Dashboard filters">
       <label>Asset<select id="asset-select"></select></label>
@@ -105,10 +108,11 @@ def render_dashboard_html(
     <article class="card"><span>Artifact freshness</span><strong id="freshness">-</strong><small id="generated-at">No timestamp</small></article>
   </section>
 
-  <section class="flow" aria-label="Observed evidence sequence">
-    <article class="flow-item"><span class="metric-label">Past observation</span><strong id="past-title">Unavailable</strong><p id="past-detail">At least two composite bars are required.</p></article>
-    <article class="flow-item"><span class="metric-label">Current observation</span><strong id="now-title">Unavailable</strong><p id="now-detail">No orderbook context loaded.</p></article>
-    <article class="flow-item"><span class="metric-label">Next evidence check</span><strong>Refresh, then compare</strong><p>Check whether zone venue breadth, concentration, and depth persist in a later generated snapshot.</p></article>
+  <section class="flow" aria-label="Practical monitoring brief">
+    <article class="flow-item"><span class="metric-label">DID / Past</span><strong id="past-title">Unavailable</strong><p id="past-detail">At least two composite bars are required.</p></article>
+    <article class="flow-item"><span class="metric-label">DOING / Now</span><strong id="now-title">Unavailable</strong><p id="now-detail">No orderbook context loaded.</p></article>
+    <article class="flow-item"><span class="metric-label">NEXT evidence</span><strong id="next-title">Unavailable</strong><p id="next-detail">No evidence check available.</p></article>
+    <article class="flow-item"><span class="metric-label">Confidence / Risk</span><strong id="confidence-title">Unavailable</strong><p id="confidence-detail">No evidence quality context loaded.</p></article>
   </section>
 
   <section class="layout">
@@ -124,8 +128,8 @@ def render_dashboard_html(
     <article class="panel full">
       <div class="panel-head"><div><h2>Observed zones</h2><p>Practical filtering: concentration and maximum-vacuum bucket per side</p></div><p id="zone-count"></p></div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Zone</th><th>Range</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th></tr></thead>
-        <tbody id="zone-body"><tr><td class="empty" colspan="8">Loading observed zones...</td></tr></tbody>
+        <thead><tr><th>Zone</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th></tr></thead>
+        <tbody id="zone-body"><tr><td class="empty" colspan="10">Loading observed zones...</td></tr></tbody>
       </table></div>
       <p class="callout" id="zone-note">Zone evidence describes the current public snapshot. It does not establish support, resistance, hidden liquidity, or future reaction.</p>
     </article>
@@ -173,8 +177,11 @@ def render_dashboard_html(
     return new Intl.NumberFormat(undefined, { maximumFractionDigits: digits }).format(number);
   }
   function pct(value, digits = 2) { const number = numeric(value); return number === null ? "unavailable" : `${fmt(number * 100, digits)}%`; }
+  function signedPercent(value, digits = 3) { const number = numeric(value); return number === null ? "unavailable" : `${number > 0 ? "+" : ""}${fmt(number, digits)}%`; }
   function price(value) { const number = numeric(value); return number === null ? "unavailable" : fmt(number, Math.abs(number) < 10 ? 5 : 2); }
   function bytes(value) { const n = numeric(value); return n === null ? "unknown" : n < 1024 ? `${n} B` : n < 1048576 ? `${fmt(n / 1024, 1)} KiB` : `${fmt(n / 1048576, 1)} MiB`; }
+  function relationLabel(value) { return value === "BELOW_REFERENCE" ? "below reference" : value === "ABOVE_REFERENCE" ? "above reference" : value === "CONTAINS_REFERENCE" ? "contains reference" : "unavailable"; }
+  function zoneSummary(zone) { return zone ? `${price(zone.price_low)} - ${price(zone.price_high)} · ${zone.evidence_grade || "LIMITED"}` : "unavailable"; }
   function svg(tag, attrs = {}, text = "") { const node = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value); if (text) node.textContent = text; return node; }
   async function getJson(url) {
     if (url === "/api/dashboard-snapshot" && embeddedSnapshot) return embeddedSnapshot;
@@ -219,17 +226,28 @@ def render_dashboard_html(
     } else { byId("freshness").textContent = "unavailable"; byId("generated-at").textContent = "No timestamp"; }
   }
   function renderFlow(market) {
-    const bars = market?.bars || [];
-    if (bars.length >= 2) {
-      const prior = numeric(bars[bars.length - 2].close); const current = numeric(bars[bars.length - 1].close);
-      const change = prior !== null && current !== null && prior !== 0 ? (current - prior) / prior * 100 : null;
-      byId("past-title").textContent = change !== null ? `Composite close ${change >= 0 ? "+" : ""}${fmt(change, 3)}%` : "Change unavailable";
-      byId("past-detail").textContent = `Observed across the last ${market.latest_bar?.timeframe || "selected"} interval; no forward inference.`;
-    } else { byId("past-title").textContent = "History unavailable"; byId("past-detail").textContent = "At least two composite bars are required."; }
-    const zones = market?.observed_zones || [];
-    const corroborated = zones.filter((zone) => zone.evidence_grade === "CORROBORATED").length;
-    byId("now-title").textContent = `${zones.length} practical zone${zones.length === 1 ? "" : "s"}`;
-    byId("now-detail").textContent = `${corroborated} corroborated by multi-venue depth without a single-venue majority.`;
+    const brief = market?.monitoring_brief; const past = brief?.past; const now = brief?.now;
+    if (numeric(past?.close_change_pct) !== null) {
+      byId("past-title").textContent = `Composite close ${signedPercent(past.close_change_pct)}`;
+      byId("past-detail").textContent = `Observed over the latest ${past.timeframe} interval from ${past.bar_count} available composite bars; no forward inference.`;
+    } else { byId("past-title").textContent = "History unavailable"; byId("past-detail").textContent = "At least two valid composite closes are required."; }
+
+    const bid = now?.nearest_bid_concentration; const ask = now?.nearest_ask_concentration;
+    const nearest = [bid ? `Bid ${fmt(bid.distance_to_reference_pct, 3)}% ${relationLabel(bid.reference_relation)}` : null, ask ? `Ask ${fmt(ask.distance_to_reference_pct, 3)}% ${relationLabel(ask.reference_relation)}` : null].filter(Boolean);
+    byId("now-title").textContent = nearest.length ? nearest.join(" · ") : "Concentration unavailable";
+    const book = now?.book; const zoneText = [bid ? `Bid ${zoneSummary(bid)}` : null, ask ? `Ask ${zoneSummary(ask)}` : null].filter(Boolean).join("; ");
+    const imbalance = numeric(book?.depth_imbalance);
+    const depthText = book ? `Depth bid ${fmt(book.bid_depth_total, 0)} vs ask ${fmt(book.ask_depth_total, 0)}; imbalance ${imbalance === null ? "unavailable" : signedPercent(imbalance * 100)}.` : "No composite book context.";
+    byId("now-detail").textContent = `${zoneText || "No practical concentration range."} ${depthText}`;
+
+    const next = brief?.next_evidence_check;
+    byId("next-title").textContent = next?.condition || "Evidence check unavailable";
+    byId("next-detail").textContent = next?.observe || "Generate a new artifact snapshot before comparison.";
+
+    const confidence = brief?.confidence_risk; const counts = confidence?.evidence_grade_counts || {};
+    const qualityStates = [confidence?.ohlcv_status, confidence?.book_status].filter(Boolean);
+    byId("confidence-title").textContent = qualityStates.length ? qualityStates.join(" · ") : "Quality unavailable";
+    byId("confidence-detail").textContent = `${pct(confidence?.book_coverage)} book coverage · ${counts.CORROBORATED || 0}/${confidence?.zone_count || 0} zones corroborated. ${confidence?.snapshot_limit || "Snapshot limitations unavailable."}`;
   }
   function renderPriceChart(market) {
     const chart = byId("price-chart"); chart.replaceChildren();
@@ -262,15 +280,15 @@ def render_dashboard_html(
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
   function renderZones(market) {
     const body = byId("zone-body"); body.replaceChildren(); const zones = market?.observed_zones || []; byId("zone-count").textContent = `${zones.length} shown`;
-    if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 8; body.appendChild(row); return; }
-    for (const zone of zones) { const row = document.createElement("tr"); addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); body.appendChild(row); }
+    if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 10; body.appendChild(row); return; }
+    for (const zone of zones) { const row = document.createElement("tr"); addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, relationLabel(zone.reference_relation)); addCell(row, `${fmt(zone.distance_to_reference_pct, 3)}%`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); body.appendChild(row); }
   }
   function renderDislocation(timeframe) {
     const node = byId("dislocation"); node.replaceChildren(); const band = timeframe?.spot_perp_dislocation;
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent() { const { timeframe, market } = context(); renderCards(market); renderFlow(market); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
+  function renderCurrent() { const { timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
