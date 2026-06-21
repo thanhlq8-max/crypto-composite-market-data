@@ -2,7 +2,7 @@
 
 This tracker separates official program requirements from internal adoption goals.
 
-Last verified: **2026-06-20**.
+Last verified: **2026-06-21**.
 
 Official sources:
 
@@ -43,7 +43,7 @@ Claims for this track must be backed by public, verifiable evidence. Stars, down
 
 ## Verified repository evidence
 
-Snapshot captured on 2026-06-20:
+Snapshot captured on 2026-06-21:
 
 | Evidence | Current value | Interpretation |
 |---|---:|---|
@@ -53,11 +53,11 @@ Snapshot captured on 2026-06-20:
 | Forks | 0 | No external fork evidence yet |
 | External issues | 0 | Existing issues were opened by the repository owner |
 | External PRs | 0 | No external contribution evidence yet |
-| GitHub releases | 11 | Latest release is `v0.8.0` |
-| PyPI version | `0.8.0` | Aligned with the latest GitHub release |
-| PyPI recent downloads | 745 | Raw download count; not proof of unique users or downstream dependence |
+| GitHub releases | 12 | Latest release is `v0.9.0` |
+| PyPI version | `0.9.0` | Aligned with the latest GitHub release |
+| PyPI recent downloads | 971 | Raw download count; not proof of unique users or downstream dependence |
 | Latest CI on `main` | Passing | Python 3.11-3.13 tests and package build passed |
-| Public Dashboard V2 | Live | GitHub Pages returns the static synthetic demo and public JSON artifacts |
+| Public Dashboard V3 | Live | GitHub Pages returns the practical monitoring brief, synthetic demo, and public JSON artifacts |
 | Recent maintainer activity | Yes | Commits and releases occurred within three months |
 
 ## Application evidence still required
@@ -87,8 +87,8 @@ Snapshot captured on 2026-06-20:
 - [x] Repository-hosted dashboard screenshot rendered from the synthetic fixture.
 - [x] Repository-hosted technical guide for coverage, dispersion, and public book concentration.
 - [x] Structured GitHub Issue Form for downstream-use evidence intake.
-- [x] Manual GitHub Pages workflow for a reproducible synthetic Dashboard V2 demo.
-- [x] Dashboard V2 static export path for a public, no-backend demo.
+- [x] Manual GitHub Pages workflow for a reproducible synthetic Dashboard V3 demo.
+- [x] Dashboard V3 practical monitoring brief and static no-backend export path.
 - [ ] First verified external user or downstream project.
 - [ ] First external issue.
 - [ ] First external pull request.
