@@ -70,9 +70,9 @@ def main() -> None:
     dashboard.add_argument("--host", default=DEFAULT_DASHBOARD_HOST)
     dashboard.add_argument("--port", type=int, default=DEFAULT_DASHBOARD_PORT)
 
-    dashboard_export = sub.add_parser("dashboard-export", help="Write Dashboard V2 as static HTML.")
+    dashboard_export = sub.add_parser("dashboard-export", help="Write Dashboard V3 as static HTML.")
     dashboard_export.add_argument("--artifact-root", required=True, help="Directory containing JSON artifacts.")
-    dashboard_export.add_argument("--out-file", required=True, help="Static Dashboard V2 HTML file to write.")
+    dashboard_export.add_argument("--out-file", required=True, help="Static Dashboard V3 HTML file to write.")
     dashboard_export.add_argument(
         "--artifact-base-url",
         help="Optional relative URL containing JSON artifacts for the static inspector.",

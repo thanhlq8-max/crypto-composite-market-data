@@ -1,4 +1,4 @@
-name: Deploy synthetic Dashboard V2 to GitHub Pages
+name: Deploy synthetic Dashboard V3 to GitHub Pages
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Build synthetic Dashboard V2 site
+      - name: Build synthetic Dashboard V3 site
         run: |
           mkdir -p _site
           cp -R examples/sample_artifacts _site/artifacts
