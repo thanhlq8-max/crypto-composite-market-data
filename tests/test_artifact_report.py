@@ -167,6 +167,11 @@ def test_write_static_report_creates_html(tmp_path: Path) -> None:
     assert result["quality_grade"] in {"A", "B"}
     assert "Crypto Composite Artifact Report" in html
     assert "Operational briefing" in html
+    assert "briefing-card-grid" in html
+    assert "briefing-card" in html
+    assert "briefing-label" in html
+    assert "Monitor-only context" in html
+    assert "BTC-USDT Â· 15m Â· spot_usdt" in html
     assert "DID" in html
     assert "DOING" in html
     assert "NEXT MONITOR" in html

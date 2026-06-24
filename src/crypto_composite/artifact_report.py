@@ -366,6 +366,100 @@ def _next_monitor_briefing(state: str, ladder: dict[str, Any], latest: dict[str,
     return "Monitor composite coverage, dispersion, and public ladder state."
 
 
+def _operational_briefing_items(artifact_root: Path, quality: dict[str, Any]) -> list[dict[str, str]]:
+    items: list[dict[str, str]] = []
+    for asset, asset_root in _asset_report_roots(artifact_root, quality):
+        ohlcv_by_tf = _as_mapping(_read_json(asset_root / "composite_ohlcv.json"))
+        ladder_by_tf = _as_mapping(_read_json(asset_root / "composite_orderbook_ladder.json"))
+        for timeframe, ohlcv_context_raw in sorted(ohlcv_by_tf.items()):
+            ohlcv_context = _as_mapping(ohlcv_context_raw)
+            coverage_by_market_type = _as_mapping(ohlcv_context.get("coverage_by_market_type"))
+            status_by_market_type = _as_mapping(ohlcv_context.get("status_by_market_type"))
+            latest_by_market_type = _as_mapping(ohlcv_context.get("latest_by_market_type"))
+            ladder_for_timeframe = _as_mapping(ladder_by_tf.get(timeframe))
+            market_types = sorted(set(coverage_by_market_type) | set(latest_by_market_type) | set(ladder_for_timeframe))
+            if not market_types:
+                market_types = ["artifact"]
+
+            tf_quality = _quality_lookup(quality, asset, timeframe)
+            tf_grade = tf_quality.get("quality_grade") or "n/a"
+
+            for market_type in market_types:
+                latest = _latest_bar(ohlcv_context, market_type)
+                previous = _previous_bar(ohlcv_context, market_type)
+                ladder = _as_mapping(ladder_for_timeframe.get(market_type))
+                ohlcv_coverage = coverage_by_market_type.get(market_type)
+                ohlcv_status = status_by_market_type.get(market_type)
+                book_coverage = ladder.get("coverage")
+                book_status = ladder.get("status")
+                dispersion_pct = latest.get("price_dispersion_pct")
+                depth_imbalance = ladder.get("depth_imbalance")
+                state, operator_mode, _context_next = _operational_state(
+                    tf_grade,
+                    ohlcv_coverage,
+                    ohlcv_status,
+                    book_coverage,
+                    book_status,
+                    dispersion_pct,
+                    depth_imbalance,
+                )
+                items.append(
+                    {
+                        "asset": str(asset),
+                        "timeframe": str(timeframe),
+                        "market": str(market_type),
+                        "did": _bar_direction_text(latest, previous),
+                        "doing": _range_text(latest),
+                        "next_monitor": _next_monitor_briefing(state, ladder, latest),
+                        "key_levels": _key_levels_text(ladder),
+                        "risk_context": _risk_context_text(
+                            ohlcv_coverage,
+                            book_coverage,
+                            dispersion_pct,
+                            depth_imbalance,
+                            state,
+                        ),
+                        "operator_mode": operator_mode,
+                    }
+                )
+    return items
+
+
+def _operational_briefing_cards(artifact_root: Path, quality: dict[str, Any]) -> str:
+    items = _operational_briefing_items(artifact_root, quality)
+    if not items:
+        return (
+            '<div class="briefing-card-grid">'
+            '<div class="briefing-card">No operational briefing could be derived from the artifact root.</div>'
+            '</div>'
+        )
+
+    cards: list[str] = []
+    for item in items:
+        operator_mode = item["operator_mode"]
+        operator_class = "ok" if operator_mode == "OBSERVE" else "warn"
+        cards.append(
+            '<article class="briefing-card">'
+            f'<h3>{_html_text(item["asset"])} Â· {_html_text(item["timeframe"])} Â· {_html_text(item["market"])}</h3>'
+            '<div class="briefing-meta">'
+            '<span class="badge neutral">Monitor-only context</span> '
+            f'<span class="badge {operator_class}">{_html_text(operator_mode)}</span>'
+            '</div>'
+            '<div class="briefing-block"><div class="briefing-label">DID</div>'
+            f'<div class="briefing-value">{_html_text(item["did"])}</div></div>'
+            '<div class="briefing-block"><div class="briefing-label">DOING</div>'
+            f'<div class="briefing-value">{_html_text(item["doing"])}</div></div>'
+            '<div class="briefing-block"><div class="briefing-label">NEXT MONITOR</div>'
+            f'<div class="briefing-value">{_html_text(item["next_monitor"])}</div></div>'
+            '<div class="briefing-block"><div class="briefing-label">KEY LEVELS</div>'
+            f'<div class="briefing-value">{_html_text(item["key_levels"])}</div></div>'
+            '<div class="briefing-block"><div class="briefing-label">RISK CONTEXT</div>'
+            f'<div class="briefing-value">{_html_text(item["risk_context"])}</div></div>'
+            '</article>'
+        )
+    return '<div class="briefing-card-grid">' + "\n".join(cards) + '</div>'
+
+
 def _operational_briefing_rows(artifact_root: Path, quality: dict[str, Any]) -> str:
     rows: list[str] = []
     for asset, asset_root in _asset_report_roots(artifact_root, quality):
@@ -551,6 +645,13 @@ def _render_html(artifact_root: Path, report_file: Path, quality: dict[str, Any]
     .metric strong {{ display: block; font-size: 1.6rem; margin-top: 6px; }}
     .metric strong {{ overflow-wrap: anywhere; }}
     .context-note {{ margin-top: 8px; color: color-mix(in srgb, CanvasText 72%, transparent); }}
+    .briefing-card-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }}
+    .briefing-card {{ border: 1px solid color-mix(in srgb, CanvasText 14%, transparent); border-radius: 14px; padding: 16px; background: color-mix(in srgb, Canvas 90%, CanvasText 10%); }}
+    .briefing-card h3 {{ margin: 0 0 8px; letter-spacing: -0.01em; }}
+    .briefing-meta {{ color: color-mix(in srgb, CanvasText 72%, transparent); font-size: 0.92rem; margin-bottom: 12px; }}
+    .briefing-block {{ margin-top: 12px; }}
+    .briefing-label {{ font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; color: color-mix(in srgb, CanvasText 66%, transparent); }}
+    .briefing-value {{ margin-top: 3px; overflow-wrap: anywhere; }}
     table {{ border-collapse: collapse; width: 100%; margin-top: 10px; }}
     th, td {{ border-bottom: 1px solid color-mix(in srgb, CanvasText 16%, transparent); padding: 10px; text-align: left; vertical-align: top; }}
     th {{ font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.04em; }}
@@ -587,6 +688,7 @@ def _render_html(artifact_root: Path, report_file: Path, quality: dict[str, Any]
     <h2>Operational briefing</h2>
     <p class=\"context-note\">LFX-style DID / DOING / NEXT / KEY LEVELS summary derived from composite OHLCV and public ladder artifacts. Monitor-only context; no execution guidance.</p>
     {_operational_briefing_summary(quality)}
+    {_operational_briefing_cards(artifact_root, quality)}
     <table>
       <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>DID</th><th>DOING</th><th>NEXT MONITOR</th><th>KEY LEVELS</th><th>RISK CONTEXT</th><th>Operator mode</th></tr></thead>
       <tbody>{_operational_briefing_rows(artifact_root, quality)}</tbody>
