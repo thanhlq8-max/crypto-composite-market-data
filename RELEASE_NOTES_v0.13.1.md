@@ -1,4 +1,4 @@
-# v0.13.1 â€” Sample Report Windows Path Hotfix
+# v0.13.1 — Sample Report Windows Path Hotfix
 
 ## Summary
 
