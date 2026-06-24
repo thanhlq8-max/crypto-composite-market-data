@@ -384,6 +384,7 @@ See:
 - [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md)
 - [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md)
 - [docs/COINBASE_CONNECTOR.md](docs/COINBASE_CONNECTOR.md)
+- [docs/KRAKEN_CONNECTOR.md](docs/KRAKEN_CONNECTOR.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
 - [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)
@@ -393,9 +394,6 @@ See:
 - [docs/CLAUDE_FOR_OSS_READINESS.md](docs/CLAUDE_FOR_OSS_READINESS.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 
-## License
-
-Apache License 2.0. See [LICENSE](LICENSE).
 ## Artifact quality scoring
 
 After generating artifacts, compute a compact quality score:
@@ -407,3 +405,7 @@ crypto-composite score-artifacts --artifact-root artifacts-universe --write
 This writes `quality_score.json` with a reproducible A-F grade based on venue coverage, composite OHLCV coverage, price dispersion, orderbook coverage and existing data-quality status. The score is for artifact inspection only; it is not a trading signal or prediction score.
 
 See [docs/ARTIFACT_QUALITY_SCORE.md](docs/ARTIFACT_QUALITY_SCORE.md).
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
