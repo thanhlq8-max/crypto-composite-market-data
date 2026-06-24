@@ -77,11 +77,21 @@ Goal: make generated public-data artifacts easier to inspect and share without c
 - Dashboard snapshot API for artifact-derived price, depth, zone, and methodology context.
 - Practical monitoring brief language remains descriptive and non-predictive.
 
-## v0.10 ??? CSV artifact interoperability
+## v0.10 - CSV artifact interoperability
 
 Goal: make composite OHLCV artifacts easier to consume from spreadsheet, DuckDB, pandas, and notebooks.
 
 - `crypto-composite export-ohlcv-csv --artifact-root ... --out-file ...`.
 - Single-asset and universe artifact roots.
 - One row per asset, timeframe, market type, and composite OHLCV bar.
+- No ranking, signal, prediction, execution, or financial-advice semantics.
+
+## v0.11 - Coinbase Exchange spot connector
+
+Goal: expand public venue coverage without adding private account APIs, derivatives assumptions, or execution semantics.
+
+- Optional `coinbase` venue.
+- Public spot OHLCV, recent trades, and level-2 orderbook snapshots.
+- `spot_usdt` only; no Coinbase perpetual/funding/open-interest support in this release.
+- Mocked parser tests and connector contract tests.
 - No ranking, signal, prediction, execution, or financial-advice semantics.

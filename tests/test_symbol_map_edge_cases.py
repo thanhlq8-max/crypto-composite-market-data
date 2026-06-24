@@ -15,7 +15,7 @@ def test_resolve_symbol_for_bybit_perp_uses_linear_symbol() -> None:
 
 def test_resolve_symbol_rejects_unsupported_venue() -> None:
     with pytest.raises(SymbolMappingError, match="VENUE_UNSUPPORTED"):
-        resolve_symbol("BTC-USDT", "coinbase", "spot_usdt")
+        resolve_symbol("BTC-USDT", "unknownvenue", "spot_usdt")
 
 
 def test_resolve_symbol_rejects_unsupported_market_type() -> None:

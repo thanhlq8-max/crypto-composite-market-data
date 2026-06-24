@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crypto-composite-market-data"
-version = "0.10.0"
+version = "0.11.0"
 description = "Public multi-exchange crypto market-data composite toolkit."
 readme = "README.md"
 requires-python = ">=3.11"

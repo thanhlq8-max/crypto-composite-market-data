@@ -7,7 +7,7 @@
 
 Public multi-exchange crypto market-data composite toolkit.
 
-`crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX and Bybit endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
+`crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX, Bybit and optional Coinbase Exchange spot endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
 
 ![Read-only artifact dashboard showing synthetic BTC-USDT and ETH-USDT data-quality coverage](https://raw.githubusercontent.com/thanhlq8-max/crypto-composite-market-data/main/docs/assets/dashboard-overview.png)
 
@@ -40,6 +40,7 @@ See [Why composite public market data](docs/WHY_COMPOSITE_MARKET_DATA.md) for th
 ## What it does
 
 - Fetches public OHLCV, recent trades, orderbook snapshots, funding and open-interest data.
+- Supports optional Coinbase Exchange public spot data without private account or order APIs.
 - Normalizes records into stable Python dataclasses.
 - Builds timestamp-aligned composite OHLCV by market type.
 - Builds public composite orderbook ladder buckets near a reference price.
@@ -155,6 +156,21 @@ python -m crypto_composite.cli run \
   --out-dir artifacts
 ```
 
+## Optional Coinbase spot connector
+
+Coinbase Exchange can be used as an additional public spot venue. Use `spot_usdt` only:
+
+```bash
+crypto-composite run \
+  --asset BTC-USDT \
+  --venues binance,okx,bybit,coinbase \
+  --market-types spot_usdt \
+  --timeframes 15m \
+  --out-dir artifacts-spot
+```
+
+See [docs/COINBASE_CONNECTOR.md](docs/COINBASE_CONNECTOR.md).
+
 ## Useful output preview
 
 A `data_quality.json` artifact summarizes whether downstream consumers should trust the generated composite data:
@@ -226,7 +242,7 @@ See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md).
 
 | Area | Supported |
 |---|---|
-| Venues | Binance, OKX, Bybit |
+| Venues | Binance, OKX, Bybit; Coinbase Exchange spot-only |
 | Asset format | `BASE-USDT`, for example `BTC-USDT` |
 | Market types | `spot_usdt`, `perp_usdt` |
 | Timeframes | `1m`, `5m`, `15m`, `1h` |
@@ -367,6 +383,7 @@ See:
 - [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md)
 - [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md)
 - [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md)
+- [docs/COINBASE_CONNECTOR.md](docs/COINBASE_CONNECTOR.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
 - [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)

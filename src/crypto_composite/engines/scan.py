@@ -4,10 +4,11 @@ from crypto_composite.symbol_map import resolve_symbol
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.connectors.bybit import BybitConnector
+from crypto_composite.connectors.coinbase import CoinbaseConnector
 from crypto_composite.schemas import DataQualityReport
 from crypto_composite.utils import now_ms
 
-CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector}
+CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector, "coinbase": CoinbaseConnector}
 
 
 class ScanInputError(ValueError):

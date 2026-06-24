@@ -6,7 +6,7 @@ class SymbolMappingError(ValueError):
 
 
 SUPPORTED_MARKET_TYPES = {"spot_usdt", "perp_usdt"}
-SUPPORTED_VENUES = {"binance", "okx", "bybit"}
+SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase"}
 
 
 def _split_asset(asset: str) -> tuple[str, str]:
@@ -36,6 +36,10 @@ def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
         raise SymbolMappingError(f"QUOTE_UNSUPPORTED quote={quote!r}; only USDT pairs are supported in v0.1")
     if venue in {"binance", "bybit"}:
         return f"{base}{quote}"
+    if venue == "coinbase" and market_type == "spot_usdt":
+        return f"{base}-{quote}"
+    if venue == "coinbase" and market_type == "perp_usdt":
+        raise SymbolMappingError("MARKET_TYPE_UNSUPPORTED venue=\'coinbase\' market_type=\'perp_usdt\'; Coinbase connector supports spot_usdt only")
     if venue == "okx" and market_type == "spot_usdt":
         return f"{base}-{quote}"
     if venue == "okx" and market_type == "perp_usdt":
