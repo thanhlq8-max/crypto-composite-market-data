@@ -122,3 +122,38 @@ def test_cli_dashboard_export_invokes_writer(monkeypatch, capsys) -> None:
         }
     ]
     assert json.loads(capsys.readouterr().out)["status"] == "OK"
+
+
+def test_cli_sample_report_invokes_workflow(monkeypatch, capsys) -> None:
+    calls: list[dict] = []
+
+    def fake_run_sample_report(**kwargs) -> dict:
+        calls.append(kwargs)
+        return {"status": "OK", "report_path": "sample-report/artifact_report.html"}
+
+    monkeypatch.setattr(cli, "run_sample_report", fake_run_sample_report)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "crypto-composite",
+            "sample-report",
+            "--artifact-root",
+            "examples/sample_artifacts",
+            "--out-dir",
+            "sample-report",
+            "--artifact-base-url",
+            "artifacts",
+        ],
+    )
+
+    cli.main()
+
+    assert calls == [
+        {
+            "artifact_root": "examples/sample_artifacts",
+            "out_dir": "sample-report",
+            "artifact_base_url": "artifacts",
+        }
+    ]
+    assert json.loads(capsys.readouterr().out)["status"] == "OK"

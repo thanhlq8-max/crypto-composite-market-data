@@ -7,6 +7,7 @@ from typing import Iterable
 from crypto_composite.artifact_csv import write_composite_ohlcv_csv
 from crypto_composite.artifact_quality import score_artifact_root, write_quality_score
 from crypto_composite.artifact_report import write_static_report
+from crypto_composite.sample_workflow import run_sample_report
 from crypto_composite.artifact_validator import validate_artifact_root
 from crypto_composite.dashboard import (
     DEFAULT_DASHBOARD_HOST,
@@ -94,6 +95,11 @@ def main() -> None:
     report.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
     report.add_argument("--out-file", required=True, help="HTML report file to write.")
 
+    sample_report = sub.add_parser("sample-report", help="Validate sample artifacts and write offline HTML inspection files.")
+    sample_report.add_argument("--artifact-root", default="examples/sample_artifacts", help="Existing artifact root to inspect.")
+    sample_report.add_argument("--out-dir", default="sample-report", help="Directory for generated sample inspection HTML.")
+    sample_report.add_argument("--artifact-base-url", help="Optional artifact base URL for dashboard links.")
+
     args = parser.parse_args()
     if args.cmd == "run":
         result = run_composite(
@@ -158,6 +164,15 @@ def main() -> None:
         export_result = write_composite_ohlcv_csv(args.artifact_root, args.out_file)
         print(json.dumps(export_result, indent=2, sort_keys=True))
         if export_result["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "sample-report":
+        sample_result = run_sample_report(
+            artifact_root=args.artifact_root,
+            out_dir=args.out_dir,
+            artifact_base_url=args.artifact_base_url,
+        )
+        print(json.dumps(sample_result, indent=2, sort_keys=True))
+        if sample_result["status"] == "ERROR":
             parser.exit(1)
     elif args.cmd == "report":
         report_result = write_static_report(args.artifact_root, args.out_file)

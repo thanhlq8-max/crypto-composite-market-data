@@ -106,3 +106,14 @@ Goal: expand optional public spot venue coverage while preserving the public-dat
 - `spot_usdt` only; no Kraken perpetual/funding/open-interest support in this release.
 - Mocked parser tests and connector contract tests.
 - No ranking, signal, prediction, execution, or financial-advice semantics.
+
+## v0.13 - Offline sample report workflow
+
+Goal: reduce first-run friction by letting users inspect checked-in sample artifacts before fetching live public data.
+
+- `crypto-composite sample-report`.
+- Validates `examples/sample_artifacts`.
+- Computes artifact quality score.
+- Writes static artifact report and dashboard HTML under `sample-report/`.
+- No live API fetch, ranking, prediction, execution, or financial-advice semantics.
+

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crypto Composite Artifact Report</title>
+  <style>
+    :root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px; background: Canvas; color: CanvasText; }
+    main { max-width: 1180px; margin: 0 auto; }
+    h1, h2 { letter-spacing: -0.02em; }
+    .card { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 14px; padding: 20px; margin: 18px 0; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .metric { border: 1px solid color-mix(in srgb, CanvasText 14%, transparent); border-radius: 12px; padding: 14px; }
+    .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border-bottom: 1px solid color-mix(in srgb, CanvasText 16%, transparent); padding: 10px; text-align: left; vertical-align: top; }
+    th { font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    pre { overflow-x: auto; border-radius: 12px; padding: 14px; background: color-mix(in srgb, CanvasText 9%, transparent); }
+    a { color: LinkText; }
+    .badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-weight: 700; }
+    .ok { background: color-mix(in srgb, green 24%, transparent); }
+    .warn { background: color-mix(in srgb, orange 28%, transparent); }
+    .error { background: color-mix(in srgb, red 25%, transparent); }
+    .neutral { background: color-mix(in srgb, CanvasText 12%, transparent); }
+    .boundary { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Crypto Composite Artifact Report</h1>
+  <p class="boundary">Static data-quality report only. No trade call, execution instruction, position sizing, prediction, or financial advice.</p>
+
+  <section class="card">
+    <h2>Summary</h2>
+    <div class="grid">
+      <div class="metric">Status<strong><span class="badge ok">OK</span></strong></div>
+      <div class="metric">Quality score<strong>98.5</strong></div>
+      <div class="metric">Quality grade<strong><span class="badge ok">A</span></strong></div>
+      <div class="metric">Assets checked<strong>2</strong></div>
+      <div class="metric">Mode<strong>universe</strong></div>
+      <div class="metric">Artifact root<strong>examples\sample_artifacts</strong></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Assets</h2>
+    <table>
+      <thead><tr><th>Asset</th><th>Score</th><th>Grade</th><th>Timeframes</th><th>Warnings</th></tr></thead>
+      <tbody><tr><td>BTC-USDT</td><td>99.0</td><td><span class="badge ok">A</span></td><td>15m</td><td>0</td></tr>
+<tr><td>ETH-USDT</td><td>98.0</td><td><span class="badge ok">A</span></td><td>15m</td><td>0</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Timeframe components</h2>
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Score</th><th>Grade</th><th>Venue coverage</th><th>OHLCV coverage</th><th>OHLCV status</th><th>Price dispersion</th><th>Book coverage</th><th>Book status</th></tr></thead>
+      <tbody><tr><td>BTC-USDT</td><td>15m</td><td>99.0</td><td><span class="badge ok">A</span></td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td></tr>
+<tr><td>ETH-USDT</td><td>15m</td><td>98.0</td><td><span class="badge ok">A</span></td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Warnings and errors</h2>
+    <h3>Warnings</h3>
+    <pre>[]</pre>
+    <h3>Errors</h3>
+    <pre>[]</pre>
+  </section>
+
+  <section class="card">
+    <h2>Validation summary</h2>
+    <pre>{
+  "artifact_root": "examples\\sample_artifacts",
+  "assets_checked": 2,
+  "boundaries": [
+    "Artifact validation only; no trading signal, execution instruction, or financial advice."
+  ],
+  "errors": [],
+  "files_checked": 13,
+  "mode": "universe",
+  "status": "OK",
+  "warnings": []
+}</pre>
+  </section>
+
+  <section class="card">
+    <h2>Artifact files</h2>
+    <ul><li><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv.json">BTC-USDT/composite_ohlcv.json</a></li>
+<li><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv_15m.json">BTC-USDT/composite_ohlcv_15m.json</a></li>
+<li><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder.json">BTC-USDT/composite_orderbook_ladder.json</a></li>
+<li><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder_15m.json">BTC-USDT/composite_orderbook_ladder_15m.json</a></li>
+<li><a href="../examples/sample_artifacts/BTC-USDT/data_quality.json">BTC-USDT/data_quality.json</a></li>
+<li><a href="../examples/sample_artifacts/BTC-USDT/run_summary.json">BTC-USDT/run_summary.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv.json">ETH-USDT/composite_ohlcv.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv_15m.json">ETH-USDT/composite_ohlcv_15m.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder.json">ETH-USDT/composite_orderbook_ladder.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder_15m.json">ETH-USDT/composite_orderbook_ladder_15m.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/data_quality.json">ETH-USDT/data_quality.json</a></li>
+<li><a href="../examples/sample_artifacts/ETH-USDT/run_summary.json">ETH-USDT/run_summary.json</a></li>
+<li><a href="../examples/sample_artifacts/universe_summary.json">universe_summary.json</a></li></ul>
+  </section>
+</main>
+</body>
+</html>

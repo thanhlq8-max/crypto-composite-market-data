@@ -86,6 +86,23 @@ python -m pip install -e .
 python -m pytest -q
 ```
 
+## Offline sample report
+
+From a source clone, inspect the checked-in sample artifacts without calling live exchange APIs:
+
+```bash
+crypto-composite sample-report
+```
+
+This writes:
+
+```text
+sample-report/artifact_report.html
+sample-report/dashboard.html
+```
+
+See [docs/SAMPLE_REPORT.md](docs/SAMPLE_REPORT.md).
+
 ## 5-minute quickstart
 
 Create a small multi-asset universe:
@@ -385,6 +402,7 @@ See:
 - [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md)
 - [docs/COINBASE_CONNECTOR.md](docs/COINBASE_CONNECTOR.md)
 - [docs/KRAKEN_CONNECTOR.md](docs/KRAKEN_CONNECTOR.md)
+- [docs/SAMPLE_REPORT.md](docs/SAMPLE_REPORT.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
 - [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)
