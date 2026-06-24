@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
@@ -128,4 +128,3 @@ class CoinbaseConnector(ExchangeConnector):
 
     def fetch_open_interest(self, symbol, market_type):
         return None
-

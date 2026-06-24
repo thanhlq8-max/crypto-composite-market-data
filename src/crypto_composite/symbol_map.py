@@ -21,9 +21,9 @@ def _split_asset(asset: str) -> tuple[str, str]:
 def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
     """Resolve BASE-QUOTE assets to public exchange symbols.
 
-    Supported scope is explicit: Binance/OKX/Bybit and spot_usdt/perp_usdt markets.
-    This does not verify that an exchange currently lists the instrument; connector calls
-    surface listing errors from the public API.
+    Supported scope is explicit: Binance, OKX, Bybit, and optional Coinbase
+    Exchange spot. The mapper does not verify live exchange listings;
+    connector calls surface listing errors from the public API.
     """
     venue = venue.lower()
     market_type = market_type.lower()
@@ -33,13 +33,13 @@ def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
         raise SymbolMappingError(f"MARKET_TYPE_UNSUPPORTED market_type={market_type!r}")
     base, quote = _split_asset(asset)
     if quote != "USDT":
-        raise SymbolMappingError(f"QUOTE_UNSUPPORTED quote={quote!r}; only USDT pairs are supported in v0.1")
+        raise SymbolMappingError(f"QUOTE_UNSUPPORTED quote={quote!r}; only USDT pairs are supported")
     if venue in {"binance", "bybit"}:
         return f"{base}{quote}"
     if venue == "coinbase" and market_type == "spot_usdt":
         return f"{base}-{quote}"
     if venue == "coinbase" and market_type == "perp_usdt":
-        raise SymbolMappingError("MARKET_TYPE_UNSUPPORTED venue=\'coinbase\' market_type=\'perp_usdt\'; Coinbase connector supports spot_usdt only")
+        raise SymbolMappingError("MARKET_TYPE_UNSUPPORTED venue='coinbase' market_type='perp_usdt'; Coinbase connector supports spot_usdt only")
     if venue == "okx" and market_type == "spot_usdt":
         return f"{base}-{quote}"
     if venue == "okx" and market_type == "perp_usdt":

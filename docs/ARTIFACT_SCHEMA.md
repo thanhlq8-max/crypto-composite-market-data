@@ -1,6 +1,6 @@
 # Artifact contract
 
-This document describes the artifact contract emitted by package version `0.11.0`.
+This document describes the artifact contract emitted by package version `0.11.1`.
 
 Artifacts do not currently contain a `schema_version` field. Consumers should use the installed package version as the compatibility reference and run `validate-artifacts` before consuming a directory.
 

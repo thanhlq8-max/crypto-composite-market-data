@@ -1,4 +1,4 @@
-﻿# v0.11.0 - Coinbase Exchange Spot Connector
+# v0.11.0 - Coinbase Exchange Spot Connector
 
 ## Added
 
@@ -20,4 +20,3 @@ py -m compileall src tests
 py -m pytest -q
 py -m build
 ```
-

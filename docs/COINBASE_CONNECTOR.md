@@ -1,4 +1,4 @@
-﻿# Coinbase Exchange spot connector
+# Coinbase Exchange spot connector
 
 `crypto-composite-market-data` supports Coinbase Exchange as an optional public spot data source.
 
@@ -32,4 +32,3 @@ Coinbase product IDs are resolved from `BASE-USDT` to `BASE-USDT`, for example `
 ## Boundary
 
 This connector is market-data infrastructure only. It does not create rankings, predictions, trading signals, execution instructions, position sizing, profitability claims, or financial advice.
-
