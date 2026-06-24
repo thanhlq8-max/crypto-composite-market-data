@@ -46,6 +46,18 @@
     </div>
   </section>
 
+
+  <section class="card">
+    <h2>Operational briefing</h2>
+    <p class="context-note">LFX-style DID / DOING / NEXT / KEY LEVELS summary derived from composite OHLCV and public ladder artifacts. Monitor-only context; no execution guidance.</p>
+    <div class="grid"><div class="metric">Briefing state<strong>READY FOR REVIEW</strong></div><div class="metric">Briefing mode<strong>Monitor-only</strong></div><div class="metric">Assets summarized<strong>2</strong></div><div class="metric">Decision boundary<strong>No execution guidance</strong></div></div>
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>DID</th><th>DOING</th><th>NEXT MONITOR</th><th>KEY LEVELS</th><th>RISK CONTEXT</th><th>Operator mode</th></tr></thead>
+      <tbody><tr><td>BTC-USDT</td><td>15m</td><td>spot_usdt</td><td>Recent composite close advanced by 0.3.</td><td>Close 101; range 99 - 102; volume 30 base.</td><td>Monitor how composite price behaves between the nearest public bid wall (99.5) and ask wall (102.5).</td><td>Reference 101; Bid wall 99.5 | depth 1.00k quote | venues 3 | spoof 0.05 | vacuum 0; Ask wall 102.5 | depth 900 quote | venues 2 | spoof 0.15 | vacuum 0.1.</td><td>OHLCV coverage 100.0%; book coverage 100.0%; venue dispersion 0.04%; depth imbalance 0.053.</td><td>OBSERVE</td></tr>
+<tr><td>ETH-USDT</td><td>15m</td><td>spot_usdt</td><td>Recent composite close advanced by 0.3.</td><td>Close 50.5; range 49 - 51; volume 60 base.</td><td>Monitor how composite price behaves between the nearest public bid wall (50.25) and ask wall (50.75).</td><td>Reference 50.5; Bid wall 50.25 | depth 800 quote | venues 3 | spoof 0.05 | vacuum 0; Ask wall 50.75 | depth 780 quote | venues 3 | spoof 0.05 | vacuum 0.03.</td><td>OHLCV coverage 100.0%; book coverage 100.0%; venue dispersion 0.06%; depth imbalance 0.017.</td><td>OBSERVE</td></tr></tbody>
+    </table>
+  </section>
+
   <section class="card">
     <h2>Operational context</h2>
     <p class="context-note">LFX-style monitor-only context derived from composite coverage, venue dispersion, and public orderbook depth. This is not a trading signal.</p>

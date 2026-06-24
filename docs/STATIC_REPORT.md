@@ -60,3 +60,16 @@ The HTML file is static and uses no JavaScript. It can be opened locally or copi
 ## Boundary
 
 This report is data infrastructure. It is not a signal engine, strategy system, order system, or financial-advice document.
+
+
+## Operational briefing
+
+The report now includes a monitor-only operational briefing:
+
+- DID: recent composite OHLCV behavior.
+- DOING: latest composite range, close, and volume context.
+- NEXT MONITOR: conditional observation for public-data context.
+- KEY LEVELS: nearest public bid/ask ladder references.
+- RISK CONTEXT: data coverage, venue dispersion, and public depth caveats.
+
+The briefing is derived only from existing artifact JSON files. It does not call live APIs and does not provide execution guidance.

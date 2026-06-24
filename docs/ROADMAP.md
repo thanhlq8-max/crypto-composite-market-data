@@ -132,3 +132,10 @@ Goal: grow the project as a credible open-source data-infrastructure utility.
 - Prefer docs, examples, artifact interoperability, and reproducibility before complex runtime expansion.
 - Track real adoption evidence honestly: users, issues, forks, downloads, external examples, and integrations.
 - Treat external maintainer-support programs as downstream opportunities, not as current eligibility claims.
+
+
+## v0.15.0 â€” Operational briefing report
+
+- Add DID / DOING / NEXT MONITOR / KEY LEVELS / RISK CONTEXT to the static report.
+- Derive the briefing only from existing composite OHLCV and public ladder artifacts.
+- Keep the report monitor-only with no execution guidance or prediction.

@@ -244,6 +244,203 @@ def _operational_state(
     )
 
 
+
+def _format_price(value: Any) -> str:
+    number = _number(value)
+    if number is None:
+        return "n/a"
+    return f"{number:.4f}".rstrip("0").rstrip(".")
+
+
+def _format_volume(value: Any) -> str:
+    number = _number(value)
+    if number is None:
+        return "n/a"
+    if abs(number) >= 1_000_000:
+        return f"{number / 1_000_000:.2f}m"
+    if abs(number) >= 1_000:
+        return f"{number / 1_000:.2f}k"
+    return f"{number:.2f}".rstrip("0").rstrip(".")
+
+
+def _bar_sequence(ohlcv_context: dict[str, Any], market_type: str) -> list[dict[str, Any]]:
+    bars_by_market_type = _as_mapping(ohlcv_context.get("bars_by_market_type"))
+    bars = _as_list(bars_by_market_type.get(market_type))
+    return [_as_mapping(item) for item in bars]
+
+
+def _latest_bar(ohlcv_context: dict[str, Any], market_type: str) -> dict[str, Any]:
+    bars = _bar_sequence(ohlcv_context, market_type)
+    if bars:
+        return bars[-1]
+    latest_by_market_type = _as_mapping(ohlcv_context.get("latest_by_market_type"))
+    return _as_mapping(latest_by_market_type.get(market_type))
+
+
+def _previous_bar(ohlcv_context: dict[str, Any], market_type: str) -> dict[str, Any]:
+    bars = _bar_sequence(ohlcv_context, market_type)
+    if len(bars) >= 2:
+        return bars[-2]
+    return {}
+
+
+def _bar_direction_text(latest: dict[str, Any], previous: dict[str, Any]) -> str:
+    close = _number(latest.get("close"))
+    previous_close = _number(previous.get("close"))
+    if close is None or previous_close is None:
+        return "Recent composite path is not available."
+    delta = close - previous_close
+    if abs(delta) < 1e-12:
+        return "Recent composite close is unchanged."
+    verb = "advanced" if delta > 0 else "softened"
+    return f"Recent composite close {verb} by {_format_price(abs(delta))}."
+
+
+def _range_text(bar: dict[str, Any]) -> str:
+    low = _format_price(bar.get("low"))
+    high = _format_price(bar.get("high"))
+    close = _format_price(bar.get("close"))
+    volume = _format_volume(bar.get("volume_base_total"))
+    return f"Close {close}; range {low} - {high}; volume {volume} base."
+
+
+def _wall_label(wall: dict[str, Any], label: str) -> str:
+    if not wall:
+        return f"{label} n/a"
+    price = wall.get("price_mid")
+    if price is None:
+        price = wall.get("price_high") if label == "Ask wall" else wall.get("price_low")
+    depth = _format_volume(wall.get("depth_quote"))
+    venues = wall.get("venue_count", "n/a")
+    spoof = _plain_number(wall.get("spoof_risk_proxy"), 2)
+    vacuum = _plain_number(wall.get("vacuum_score"), 2)
+    return f"{label} {_format_price(price)} | depth {depth} quote | venues {venues} | spoof {spoof} | vacuum {vacuum}"
+
+
+def _key_levels_text(ladder: dict[str, Any]) -> str:
+    top_bid = _as_mapping(ladder.get("top_bid_wall"))
+    top_ask = _as_mapping(ladder.get("top_ask_wall"))
+    reference = _format_price(ladder.get("reference_price"))
+    bid_text = _wall_label(top_bid, "Bid wall")
+    ask_text = _wall_label(top_ask, "Ask wall")
+    return f"Reference {reference}; {bid_text}; {ask_text}."
+
+
+def _risk_context_text(
+    ohlcv_coverage: Any,
+    book_coverage: Any,
+    dispersion_pct: Any,
+    depth_imbalance: Any,
+    state: str,
+) -> str:
+    items = [
+        f"OHLCV coverage {_ratio_pct(ohlcv_coverage)}",
+        f"book coverage {_ratio_pct(book_coverage)}",
+        f"venue dispersion {_plain_number(dispersion_pct, 4)}%",
+        f"depth imbalance {_plain_number(depth_imbalance, 3)}",
+    ]
+    if state != "OBSERVATION READY":
+        items.append(f"context state {state}")
+    return "; ".join(items) + "."
+
+
+def _next_monitor_briefing(state: str, ladder: dict[str, Any], latest: dict[str, Any]) -> str:
+    if state == "DATA WEAK":
+        return "Verify composite coverage before using the report for monitoring."
+    if state == "BOOK WEAK":
+        return "Verify public ladder coverage before interpreting depth context."
+    if state == "VENUE DIVERGENCE":
+        return "Watch whether venue dispersion compresses or persists."
+    if state == "DEPTH IMBALANCE":
+        return "Watch whether public depth remains concentrated on one side."
+    top_bid = _as_mapping(ladder.get("top_bid_wall"))
+    top_ask = _as_mapping(ladder.get("top_ask_wall"))
+    close = _number(latest.get("close"))
+    bid_mid = _number(top_bid.get("price_mid"))
+    ask_mid = _number(top_ask.get("price_mid"))
+    if close is not None and bid_mid is not None and ask_mid is not None:
+        return (
+            "Monitor how composite price behaves between the nearest public bid wall "
+            f"({_format_price(bid_mid)}) and ask wall ({_format_price(ask_mid)})."
+        )
+    return "Monitor composite coverage, dispersion, and public ladder state."
+
+
+def _operational_briefing_rows(artifact_root: Path, quality: dict[str, Any]) -> str:
+    rows: list[str] = []
+    for asset, asset_root in _asset_report_roots(artifact_root, quality):
+        ohlcv_by_tf = _as_mapping(_read_json(asset_root / "composite_ohlcv.json"))
+        ladder_by_tf = _as_mapping(_read_json(asset_root / "composite_orderbook_ladder.json"))
+        for timeframe, ohlcv_context_raw in sorted(ohlcv_by_tf.items()):
+            ohlcv_context = _as_mapping(ohlcv_context_raw)
+            coverage_by_market_type = _as_mapping(ohlcv_context.get("coverage_by_market_type"))
+            status_by_market_type = _as_mapping(ohlcv_context.get("status_by_market_type"))
+            latest_by_market_type = _as_mapping(ohlcv_context.get("latest_by_market_type"))
+            ladder_for_timeframe = _as_mapping(ladder_by_tf.get(timeframe))
+            market_types = sorted(set(coverage_by_market_type) | set(latest_by_market_type) | set(ladder_for_timeframe))
+            if not market_types:
+                market_types = ["artifact"]
+
+            tf_quality = _quality_lookup(quality, asset, timeframe)
+            tf_grade = tf_quality.get("quality_grade") or "n/a"
+
+            for market_type in market_types:
+                latest = _latest_bar(ohlcv_context, market_type)
+                previous = _previous_bar(ohlcv_context, market_type)
+                ladder = _as_mapping(ladder_for_timeframe.get(market_type))
+                ohlcv_coverage = coverage_by_market_type.get(market_type)
+                ohlcv_status = status_by_market_type.get(market_type)
+                book_coverage = ladder.get("coverage")
+                book_status = ladder.get("status")
+                dispersion_pct = latest.get("price_dispersion_pct")
+                depth_imbalance = ladder.get("depth_imbalance")
+                state, operator_mode, _context_next = _operational_state(
+                    tf_grade,
+                    ohlcv_coverage,
+                    ohlcv_status,
+                    book_coverage,
+                    book_status,
+                    dispersion_pct,
+                    depth_imbalance,
+                )
+                rows.append(
+                    "<tr>"
+                    f"<td>{_html_text(asset)}</td>"
+                    f"<td>{_html_text(timeframe)}</td>"
+                    f"<td>{_html_text(market_type)}</td>"
+                    f"<td>{_html_text(_bar_direction_text(latest, previous))}</td>"
+                    f"<td>{_html_text(_range_text(latest))}</td>"
+                    f"<td>{_html_text(_next_monitor_briefing(state, ladder, latest))}</td>"
+                    f"<td>{_html_text(_key_levels_text(ladder))}</td>"
+                    f"<td>{_html_text(_risk_context_text(ohlcv_coverage, book_coverage, dispersion_pct, depth_imbalance, state))}</td>"
+                    f"<td>{_html_text(operator_mode)}</td>"
+                    "</tr>"
+                )
+    if not rows:
+        return "<tr><td colspan=\"9\">No operational briefing could be derived from the artifact root.</td></tr>"
+    return "\n".join(rows)
+
+
+def _operational_briefing_summary(quality: dict[str, Any]) -> str:
+    status = str(quality.get("status", "UNKNOWN")).upper()
+    grade = str(quality.get("quality_grade", "n/a")).upper()
+    assets_checked = quality.get("assets_checked", "n/a")
+    if status == "OK" and grade in {"A", "B"}:
+        briefing_state = "READY FOR REVIEW"
+    elif status == "WARN":
+        briefing_state = "REVIEW WITH CAVEATS"
+    else:
+        briefing_state = "VERIFY FIRST"
+    return (
+        "<div class=\"grid\">"
+        f"<div class=\"metric\">Briefing state<strong>{_html_text(briefing_state)}</strong></div>"
+        "<div class=\"metric\">Briefing mode<strong>Monitor-only</strong></div>"
+        f"<div class=\"metric\">Assets summarized<strong>{_html_text(assets_checked)}</strong></div>"
+        "<div class=\"metric\">Decision boundary<strong>No execution guidance</strong></div>"
+        "</div>"
+    )
+
+
 def _operational_context_rows(artifact_root: Path, quality: dict[str, Any]) -> str:
     rows: list[str] = []
     for asset, asset_root in _asset_report_roots(artifact_root, quality):
@@ -383,6 +580,17 @@ def _render_html(artifact_root: Path, report_file: Path, quality: dict[str, Any]
       <div class=\"metric\">Mode<strong>{_html_text(quality.get('mode'))}</strong></div>
       <div class=\"metric\">Artifact root<strong>{_html_text(artifact_root)}</strong></div>
     </div>
+  </section>
+
+
+  <section class=\"card\">
+    <h2>Operational briefing</h2>
+    <p class=\"context-note\">LFX-style DID / DOING / NEXT / KEY LEVELS summary derived from composite OHLCV and public ladder artifacts. Monitor-only context; no execution guidance.</p>
+    {_operational_briefing_summary(quality)}
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>DID</th><th>DOING</th><th>NEXT MONITOR</th><th>KEY LEVELS</th><th>RISK CONTEXT</th><th>Operator mode</th></tr></thead>
+      <tbody>{_operational_briefing_rows(artifact_root, quality)}</tbody>
+    </table>
   </section>
 
   <section class=\"card\">

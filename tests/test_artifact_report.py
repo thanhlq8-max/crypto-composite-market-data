@@ -31,7 +31,54 @@ def _write_single_asset(root: Path, asset: str = "BTC-USDT", quality: float = 0.
         "timeframe": "15m",
         "generated_at_ms": 1000,
         "expected_venues": ["binance", "okx", "bybit"],
-        "bars_by_market_type": {},
+        "bars_by_market_type": {
+            "spot_usdt": [
+                {
+                    "asset": asset,
+                    "timeframe": "15m",
+                    "market_type": "spot_usdt",
+                    "timestamp_ms": 1000,
+                    "open": 99.0,
+                    "high": 101.0,
+                    "low": 98.5,
+                    "close": 100.0,
+                    "volume_base_total": 10.0,
+                    "coverage": 1.0,
+                    "price_dispersion_pct": 0.03,
+                    "data_quality": 0.91,
+                },
+                {
+                    "asset": asset,
+                    "timeframe": "15m",
+                    "market_type": "spot_usdt",
+                    "timestamp_ms": 2000,
+                    "open": 100.0,
+                    "high": 102.0,
+                    "low": 99.5,
+                    "close": 101.0,
+                    "volume_base_total": 12.0,
+                    "coverage": 1.0,
+                    "price_dispersion_pct": 0.02,
+                    "data_quality": 0.93,
+                },
+            ],
+            "perp_usdt": [
+                {
+                    "asset": asset,
+                    "timeframe": "15m",
+                    "market_type": "perp_usdt",
+                    "timestamp_ms": 2000,
+                    "open": 100.0,
+                    "high": 101.5,
+                    "low": 99.7,
+                    "close": 100.8,
+                    "volume_base_total": 15.0,
+                    "coverage": 1.0,
+                    "price_dispersion_pct": 0.03,
+                    "data_quality": 0.92,
+                }
+            ],
+        },
         "coverage_by_market_type": {"spot_usdt": 1.0, "perp_usdt": 1.0},
         "status_by_market_type": {
             "spot_usdt": "COMPOSITE_DATA_OK",
@@ -56,8 +103,22 @@ def _write_single_asset(root: Path, asset: str = "BTC-USDT", quality: float = 0.
             "coverage": 1.0,
             "bid_levels": [],
             "ask_levels": [],
-            "top_bid_wall": None,
-            "top_ask_wall": None,
+            "top_bid_wall": {
+                "side": "bid",
+                "price_mid": 99.5,
+                "depth_quote": 1000.0,
+                "venue_count": 3,
+                "spoof_risk_proxy": 0.05,
+                "vacuum_score": 0.1,
+            },
+            "top_ask_wall": {
+                "side": "ask",
+                "price_mid": 102.5,
+                "depth_quote": 900.0,
+                "venue_count": 2,
+                "spoof_risk_proxy": 0.15,
+                "vacuum_score": 0.2,
+            },
             "bid_depth_total": 0.0,
             "ask_depth_total": 0.0,
             "depth_imbalance": 0.0,
@@ -105,6 +166,15 @@ def test_write_static_report_creates_html(tmp_path: Path) -> None:
     assert result["status"] == "OK"
     assert result["quality_grade"] in {"A", "B"}
     assert "Crypto Composite Artifact Report" in html
+    assert "Operational briefing" in html
+    assert "DID" in html
+    assert "DOING" in html
+    assert "NEXT MONITOR" in html
+    assert "KEY LEVELS" in html
+    assert "RISK CONTEXT" in html
+    assert "Recent composite close advanced" in html
+    assert "Bid wall" in html
+    assert "Ask wall" in html
     assert "Operational context" in html
     assert "OBSERVATION READY" in html
     assert "Operator mode" in html

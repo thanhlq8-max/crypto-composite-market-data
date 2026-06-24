@@ -435,3 +435,16 @@ See [docs/ARTIFACT_QUALITY_SCORE.md](docs/ARTIFACT_QUALITY_SCORE.md).
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
+
+
+## Operational briefing report
+
+The static report includes an LFX-style monitor-only briefing derived from composite OHLCV and public ladder artifacts:
+
+- DID: recent composite OHLCV behavior.
+- DOING: latest composite range, close, and volume context.
+- NEXT MONITOR: conditional observation for coverage, dispersion, or ladder state.
+- KEY LEVELS: nearest public bid/ask ladder references.
+- RISK CONTEXT: coverage, dispersion, and depth caveats.
+
+This is public-data context only and does not provide execution guidance, position sizing, prediction, or financial advice.
