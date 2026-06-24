@@ -105,6 +105,11 @@ def test_write_static_report_creates_html(tmp_path: Path) -> None:
     assert result["status"] == "OK"
     assert result["quality_grade"] in {"A", "B"}
     assert "Crypto Composite Artifact Report" in html
+    assert "Operational context" in html
+    assert "OBSERVATION READY" in html
+    assert "Operator mode" in html
+    assert "Monitor-only public data" in html
+    assert "spot_usdt" in html
     assert "BTC-USDT" in html
     assert "composite_ohlcv_15m.json" in html
     assert "BUY" not in html.upper()

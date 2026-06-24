@@ -386,6 +386,16 @@ def _render_html(artifact_root: Path, report_file: Path, quality: dict[str, Any]
   </section>
 
   <section class=\"card\">
+    <h2>Operational context</h2>
+    <p class=\"context-note\">LFX-style monitor-only context derived from composite coverage, venue dispersion, and public orderbook depth. This is not a trading signal.</p>
+    {_operational_context_summary(quality)}
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>Mission</th><th>Operator mode</th><th>Next monitor</th><th>Coverage</th><th>Price dispersion</th><th>Depth balance</th><th>Quality</th></tr></thead>
+      <tbody>{_operational_context_rows(artifact_root, quality)}</tbody>
+    </table>
+  </section>
+
+  <section class=\"card\">
     <h2>Assets</h2>
     <table>
       <thead><tr><th>Asset</th><th>Score</th><th>Grade</th><th>Timeframes</th><th>Warnings</th></tr></thead>
