@@ -6,6 +6,7 @@ from crypto_composite.connectors.base import ConnectorDataError, UnsupportedTime
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.bybit import BybitConnector
 from crypto_composite.connectors.coinbase import CoinbaseConnector
+from crypto_composite.connectors.kraken import KrakenConnector
 from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.engines.scan import ScanInputError, scan
 from crypto_composite.symbol_map import SymbolMappingError, resolve_symbol
@@ -18,6 +19,7 @@ from crypto_composite.symbol_map import SymbolMappingError, resolve_symbol
         (OKXConnector(), "BTC-USDT"),
         (BybitConnector(), "BTCUSDT"),
         (CoinbaseConnector(), "BTC-USDT"),
+        (KrakenConnector(), "XBTUSDT"),
     ],
 )
 def test_connectors_raise_domain_error_for_unsupported_timeframe(connector, symbol) -> None:
@@ -32,6 +34,7 @@ def test_connectors_raise_domain_error_for_unsupported_timeframe(connector, symb
         (OKXConnector(), "BTC-USDT", {"data": [{"bids": [], "asks": [], "ts": "1000"}]}),
         (BybitConnector(), "BTCUSDT", {"result": {"b": [], "a": [], "ts": 1000}}),
         (CoinbaseConnector(), "BTC-USDT", {"bids": [], "asks": [], "time": "2023-11-14T22:13:20.000Z"}),
+        (KrakenConnector(), "XBTUSDT", {"error": [], "result": {"XBTUSDT": {"bids": [], "asks": []}}}),
     ],
 )
 def test_connectors_raise_domain_error_for_empty_orderbook(monkeypatch, connector, symbol, payload) -> None:
@@ -161,6 +164,62 @@ def test_coinbase_symbol_mapping_is_spot_only() -> None:
     assert resolve_symbol("BTC-USDT", "coinbase", "spot_usdt") == "BTC-USDT"
     with pytest.raises(SymbolMappingError, match="Coinbase connector supports spot_usdt only"):
         resolve_symbol("BTC-USDT", "coinbase", "perp_usdt")
+
+
+def test_kraken_connector_parses_public_payloads(monkeypatch) -> None:
+    connector = KrakenConnector()
+
+    def fake_get(url: str, params: dict | None = None):
+        if "OHLC" in url:
+            return {
+                "error": [],
+                "result": {
+                    "XBTUSDT": [[1700000000, "100", "110", "90", "105", "104", "2", 12]],
+                    "last": 1700000000,
+                },
+            }
+        if "Trades" in url:
+            return {
+                "error": [],
+                "result": {
+                    "XBTUSDT": [["105", "0.5", 1700000001.25, "b", "m", "", 123]],
+                    "last": "1700000001250000000",
+                },
+            }
+        if "Depth" in url:
+            return {
+                "error": [],
+                "result": {
+                    "XBTUSDT": {
+                        "bids": [["104", "1.0", 1700000001]],
+                        "asks": [["106", "1.5", 1700000002]],
+                    }
+                },
+            }
+        raise AssertionError(url)
+
+    monkeypatch.setattr(connector, "_get", fake_get)
+
+    bars = connector.fetch_ohlcv("XBTUSDT", "spot_usdt", "15m", 1)
+    trades = connector.fetch_recent_trades("XBTUSDT", "spot_usdt", 1)
+    book = connector.fetch_orderbook("XBTUSDT", "spot_usdt", 10)
+
+    assert bars[0].timestamp_ms == 1700000000000
+    assert bars[0].volume_quote == 210.0
+    assert bars[0].trade_count == 12
+    assert trades[0].timestamp_ms == 1700000001250
+    assert trades[0].side == "buy"
+    assert trades[0].is_aggressive is True
+    assert book.best_bid == 104.0
+    assert book.best_ask == 106.0
+    assert book.mid == 105.0
+
+
+def test_kraken_symbol_mapping_is_spot_only() -> None:
+    assert resolve_symbol("BTC-USDT", "kraken", "spot_usdt") == "XBTUSDT"
+    assert resolve_symbol("ETH-USDT", "kraken", "spot_usdt") == "ETHUSDT"
+    with pytest.raises(SymbolMappingError, match="Kraken connector supports spot_usdt only"):
+        resolve_symbol("BTC-USDT", "kraken", "perp_usdt")
 
 
 def test_scan_rejects_unsupported_venue_before_connector_lookup() -> None:

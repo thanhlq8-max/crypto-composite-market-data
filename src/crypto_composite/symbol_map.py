@@ -6,7 +6,7 @@ class SymbolMappingError(ValueError):
 
 
 SUPPORTED_MARKET_TYPES = {"spot_usdt", "perp_usdt"}
-SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase"}
+SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase", "kraken"}
 
 
 def _split_asset(asset: str) -> tuple[str, str]:
@@ -21,8 +21,8 @@ def _split_asset(asset: str) -> tuple[str, str]:
 def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
     """Resolve BASE-QUOTE assets to public exchange symbols.
 
-    Supported scope is explicit: Binance, OKX, Bybit, and optional Coinbase
-    Exchange spot. The mapper does not verify live exchange listings;
+    Supported scope is explicit: Binance, OKX, Bybit, optional Coinbase
+    Exchange spot, and optional Kraken spot. The mapper does not verify live exchange listings;
     connector calls surface listing errors from the public API.
     """
     venue = venue.lower()
@@ -40,6 +40,11 @@ def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
         return f"{base}-{quote}"
     if venue == "coinbase" and market_type == "perp_usdt":
         raise SymbolMappingError("MARKET_TYPE_UNSUPPORTED venue='coinbase' market_type='perp_usdt'; Coinbase connector supports spot_usdt only")
+    if venue == "kraken" and market_type == "spot_usdt":
+        kraken_base = "XBT" if base == "BTC" else base
+        return f"{kraken_base}{quote}"
+    if venue == "kraken" and market_type == "perp_usdt":
+        raise SymbolMappingError("MARKET_TYPE_UNSUPPORTED venue='kraken' market_type='perp_usdt'; Kraken connector supports spot_usdt only")
     if venue == "okx" and market_type == "spot_usdt":
         return f"{base}-{quote}"
     if venue == "okx" and market_type == "perp_usdt":

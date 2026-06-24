@@ -95,3 +95,14 @@ Goal: expand public venue coverage without adding private account APIs, derivati
 - `spot_usdt` only; no Coinbase perpetual/funding/open-interest support in this release.
 - Mocked parser tests and connector contract tests.
 - No ranking, signal, prediction, execution, or financial-advice semantics.
+
+
+## v0.12 - Kraken spot connector
+
+Goal: expand optional public spot venue coverage while preserving the public-data-only boundary.
+
+- Optional `kraken` venue.
+- Public spot OHLCV, recent trades, and level-2 orderbook snapshots.
+- `spot_usdt` only; no Kraken perpetual/funding/open-interest support in this release.
+- Mocked parser tests and connector contract tests.
+- No ranking, signal, prediction, execution, or financial-advice semantics.
