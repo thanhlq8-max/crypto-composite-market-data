@@ -440,7 +440,7 @@ def _operational_briefing_cards(artifact_root: Path, quality: dict[str, Any]) ->
         operator_class = "ok" if operator_mode == "OBSERVE" else "warn"
         cards.append(
             '<article class="briefing-card">'
-            f'<h3>{_html_text(item["asset"])} Â· {_html_text(item["timeframe"])} Â· {_html_text(item["market"])}</h3>'
+            f'<h3>{_html_text(item["asset"])} / {_html_text(item["timeframe"])} / {_html_text(item["market"])}</h3>'
             '<div class="briefing-meta">'
             '<span class="badge neutral">Monitor-only context</span> '
             f'<span class="badge {operator_class}">{_html_text(operator_mode)}</span>'
