@@ -102,25 +102,26 @@ Goal: reduce first-run friction by letting users inspect checked-in sample artif
 - Validates `examples/sample_artifacts`.
 - Computes artifact quality score.
 - Writes static artifact report and dashboard HTML under `sample-report/`.
+- GitHub Pages workflow builds the same report/dashboard from checked-in fixtures.
 - No live API fetch, ranking, prediction, execution, or financial-advice semantics.
 
-## v0.14 candidate — Checked-in demo/site polish
+## v0.14 candidate — Live demo verification and sample-site polish
 
-Goal: improve adoption evidence by making sample outputs and demo navigation easier to review from GitHub.
+Goal: make the public demo easier to verify, reproduce, and use as an adoption asset.
 
 Candidate scope:
 
-- Add or refresh checked-in sample report/dashboard outputs only if generated from existing sample artifacts.
-- Document how to regenerate the sample report from a clean clone.
-- Keep generated demo outputs clearly labeled as sample/illustrative artifacts.
-- Ensure links from README, `docs/SAMPLE_REPORT.md`, and GitHub Pages docs are consistent.
+- Verify the live GitHub Pages demo opens after deployment and links resolve.
+- Keep the deployed demo generated from `examples/sample_artifacts` through `crypto-composite sample-report`.
+- Document the current demo URL, local reproduction command, and release verification status consistently.
+- Improve sample-site navigation only if it can be generated from existing synthetic fixtures.
 - Do not fetch live APIs, add ranking, add prediction, add execution, or introduce financial-advice wording.
 
 Acceptance:
 
+- README, `docs/SAMPLE_REPORT.md`, and `docs/GITHUB_PAGES_DEMO.md` point to the same demo workflow and URL.
 - A new user can inspect sample artifacts, report HTML, and dashboard HTML without live API access.
-- Regeneration commands are documented and tested or smoke-testable.
-- Demo files are static and safe to publish through GitHub Pages.
+- Regeneration commands are documented and smoke-testable.
 - No runtime behavior change unless separately scoped.
 
 ## Long-term adoption track
