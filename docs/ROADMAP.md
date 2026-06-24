@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap keeps the project focused on reusable market-data infrastructure, not trading signals.
+This roadmap keeps the project focused on reusable public market-data infrastructure, artifact inspection, and adoption readiness. It is not a trading-signal, execution, ranking, prediction, or financial-advice roadmap.
 
 ## v0.2 — Core contract hardening
 
@@ -20,64 +20,52 @@ Goal: support explicit multi-asset research runs without turning the project int
 - `universe_summary.json` for data-quality and artifact discovery.
 - No buy/sell ranking or performance claims.
 
-## v0.4 — Artifact schema and reproducibility
+## v0.4 — Artifact schema validation
 
-Goal: make outputs stable enough for notebooks, dashboards, and downstream tools.
+Goal: make generated artifact folders structurally checkable before downstream use.
 
-- Versioned artifact schemas.
-- Manifest files with run inputs and generated filenames.
-- Clear compatibility notes for future schema changes.
-- Example notebooks that inspect data quality, not trading outcomes.
+- `crypto-composite validate-artifacts --artifact-root ...`.
+- Single-asset and universe artifact-root validation.
+- Explicit errors and warnings for missing or malformed JSON files.
+- Validator remains structural; it does not judge market direction or tradability.
 
-## v0.5 — Local data-quality dashboard
+## v0.5 — Artifact quality scoring
 
-Goal: expose useful public-data diagnostics visually.
+Goal: give users a compact, reproducible quality score for artifact inspection.
 
-Candidate panels:
+- `crypto-composite score-artifacts --artifact-root ... --write`.
+- A-F artifact-quality grade derived from venue coverage, composite status, price dispersion, orderbook coverage, and existing data-quality status.
+- `quality_score.json` for dashboards, reports, and CI inspection.
+- No ranking, signal, prediction, execution, or financial-advice semantics.
 
-- Universe health.
-- Venue coverage.
-- Composite OHLCV viewer.
-- Public orderbook ladder viewer.
-- Spot/perp divergence context.
-- Data-quality warnings.
-- Artifact manifest browser.
+## v0.6 — Static HTML artifact report
 
-Forbidden dashboard semantics:
+Goal: make generated public-data artifacts easier to inspect and share offline.
 
-- Buy/sell signals.
-- Entry, stop-loss, or take-profit instructions.
-- Profitability claims.
-- Market-maker intent claims.
+- `crypto-composite report --artifact-root ... --out-file report.html`.
+- Static, dependency-light HTML report.
+- Includes quality score, validation status, venue coverage, composite status, price dispersion, and artifact links.
+- Inspection-only; no trading advice or predictive claims.
 
-## v0.6 — Optional package distribution
+## v0.7 — Sample artifacts and GitHub Pages demo plan
 
-Goal: make adoption easier.
+Goal: make the repository easier to understand before users run live public API fetches.
 
-- PyPI release after CI and packaging checks remain stable.
-- Installation docs for `pip install crypto-composite-market-data`.
-- Release notes with migration notes.
+- Checked-in synthetic or illustrative sample artifacts.
+- GitHub Pages demo plan and sample artifact documentation.
+- Contributor-facing docs for useful first issues and downstream examples.
+- External examples and tutorials must avoid trading-performance claims.
 
-## v0.7 — Community-ready contribution surface
-
-Goal: make the repository easy for external users and contributors to engage with.
-
-- Issue templates for bugs, feature requests, and data-source requests.
-- Pull request template with validation and boundary checks.
-- Good-first-issue backlog for connectors, exports, docs, and dashboard API.
-- Community growth documentation focused on data-quality and reproducible artifacts.
-- External examples and tutorials that avoid trading-signal claims.
-
-
-## v0.8-v0.9 ??? Shareable dashboard inspection artifacts
+## v0.8-v0.9 — Shareable dashboard inspection artifacts
 
 Goal: make generated public-data artifacts easier to inspect and share without creating trading signals.
 
 - Static dashboard export for GitHub Pages or offline inspection.
 - Dashboard snapshot API for artifact-derived price, depth, zone, and methodology context.
 - Practical monitoring brief language remains descriptive and non-predictive.
+- Read-only dashboard and static export only; no private APIs or order APIs.
 
-## v0.10 - CSV artifact interoperability
+## v0.10 — CSV artifact interoperability
 
 Goal: make composite OHLCV artifacts easier to consume from spreadsheet, DuckDB, pandas, and notebooks.
 
@@ -86,7 +74,7 @@ Goal: make composite OHLCV artifacts easier to consume from spreadsheet, DuckDB,
 - One row per asset, timeframe, market type, and composite OHLCV bar.
 - No ranking, signal, prediction, execution, or financial-advice semantics.
 
-## v0.11 - Coinbase Exchange spot connector
+## v0.11 — Coinbase Exchange spot connector
 
 Goal: expand public venue coverage without adding private account APIs, derivatives assumptions, or execution semantics.
 
@@ -96,8 +84,7 @@ Goal: expand public venue coverage without adding private account APIs, derivati
 - Mocked parser tests and connector contract tests.
 - No ranking, signal, prediction, execution, or financial-advice semantics.
 
-
-## v0.12 - Kraken spot connector
+## v0.12 — Kraken spot connector
 
 Goal: expand optional public spot venue coverage while preserving the public-data-only boundary.
 
@@ -107,7 +94,7 @@ Goal: expand optional public spot venue coverage while preserving the public-dat
 - Mocked parser tests and connector contract tests.
 - No ranking, signal, prediction, execution, or financial-advice semantics.
 
-## v0.13 - Offline sample report workflow
+## v0.13 — Offline sample report workflow
 
 Goal: reduce first-run friction by letting users inspect checked-in sample artifacts before fetching live public data.
 
@@ -117,3 +104,30 @@ Goal: reduce first-run friction by letting users inspect checked-in sample artif
 - Writes static artifact report and dashboard HTML under `sample-report/`.
 - No live API fetch, ranking, prediction, execution, or financial-advice semantics.
 
+## v0.14 candidate — Checked-in demo/site polish
+
+Goal: improve adoption evidence by making sample outputs and demo navigation easier to review from GitHub.
+
+Candidate scope:
+
+- Add or refresh checked-in sample report/dashboard outputs only if generated from existing sample artifacts.
+- Document how to regenerate the sample report from a clean clone.
+- Keep generated demo outputs clearly labeled as sample/illustrative artifacts.
+- Ensure links from README, `docs/SAMPLE_REPORT.md`, and GitHub Pages docs are consistent.
+- Do not fetch live APIs, add ranking, add prediction, add execution, or introduce financial-advice wording.
+
+Acceptance:
+
+- A new user can inspect sample artifacts, report HTML, and dashboard HTML without live API access.
+- Regeneration commands are documented and tested or smoke-testable.
+- Demo files are static and safe to publish through GitHub Pages.
+- No runtime behavior change unless separately scoped.
+
+## Long-term adoption track
+
+Goal: grow the project as a credible open-source data-infrastructure utility.
+
+- Keep issue backlog small, concrete, and contributor-friendly.
+- Prefer docs, examples, artifact interoperability, and reproducibility before complex runtime expansion.
+- Track real adoption evidence honestly: users, issues, forks, downloads, external examples, and integrations.
+- Treat external maintainer-support programs as downstream opportunities, not as current eligibility claims.
