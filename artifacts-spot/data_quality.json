@@ -1,0 +1,27 @@
+{
+  "15m": {
+    "asset": "BTC-USDT",
+    "venues_requested": [
+      "binance",
+      "okx",
+      "bybit",
+      "coinbase",
+      "kraken"
+    ],
+    "venues_ok": [
+      "binance",
+      "bybit",
+      "coinbase",
+      "kraken",
+      "okx"
+    ],
+    "venues_failed": [],
+    "market_types": [
+      "spot_usdt"
+    ],
+    "timeframe": "15m",
+    "missing_sources": [],
+    "overall_quality": 0.8488643761301989,
+    "status": "OK"
+  }
+}

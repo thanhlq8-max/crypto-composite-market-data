@@ -1,0 +1,1120 @@
+{
+  "spot_usdt": {
+    "asset": "BTC-USDT",
+    "market_type": "spot_usdt",
+    "generated_at_ms": 1782275784347,
+    "reference_price": 62689.85207193679,
+    "bucket_size": 25.0,
+    "expected_venues": [
+      "binance",
+      "okx",
+      "bybit",
+      "coinbase",
+      "kraken"
+    ],
+    "venue_count": 5,
+    "coverage": 1.0,
+    "bid_levels": [
+      {
+        "side": "bid",
+        "price_low": 62675.0,
+        "price_high": 62700.0,
+        "price_mid": 62687.5,
+        "depth_quote": 2113988.0265408317,
+        "venue_count": 5,
+        "venue_depth_quote": {
+          "binance": 644251.1507072999,
+          "bybit": 502234.6701692,
+          "coinbase": 128024.0706275537,
+          "kraken": 184915.40540000002,
+          "okx": 654562.7296367781
+        },
+        "hhi": 0.256511,
+        "persistence": 0.3425,
+        "spoof_risk_proxy": 0.132045,
+        "vacuum_score": 0.0
+      },
+      {
+        "side": "bid",
+        "price_low": 62700.0,
+        "price_high": 62725.0,
+        "price_mid": 62712.5,
+        "depth_quote": 92630.5498200501,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 7561.942875439098,
+          "okx": 85068.606944611
+        },
+        "hhi": 0.850058,
+        "persistence": 0.199073,
+        "spoof_risk_proxy": 0.514268,
+        "vacuum_score": 0.956182
+      },
+      {
+        "side": "bid",
+        "price_low": 62650.0,
+        "price_high": 62675.0,
+        "price_mid": 62662.5,
+        "depth_quote": 1660517.5427224827,
+        "venue_count": 5,
+        "venue_depth_quote": {
+          "binance": 217927.5387475,
+          "bybit": 596991.5219726,
+          "coinbase": 35248.33617848979,
+          "kraken": 80957.1184,
+          "okx": 729393.0274238929
+        },
+        "hhi": 0.342254,
+        "persistence": 0.310324,
+        "spoof_risk_proxy": 0.152521,
+        "vacuum_score": 0.214509
+      },
+      {
+        "side": "bid",
+        "price_low": 62625.0,
+        "price_high": 62650.0,
+        "price_mid": 62637.5,
+        "depth_quote": 258984.52144735766,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 1677.1502473576998,
+          "kraken": 257307.37119999997
+        },
+        "hhi": 0.987132,
+        "persistence": 0.210876,
+        "spoof_risk_proxy": 0.606447,
+        "vacuum_score": 0.87749
+      },
+      {
+        "side": "bid",
+        "price_low": 62600.0,
+        "price_high": 62625.0,
+        "price_mid": 62612.5,
+        "depth_quote": 53803.705926210096,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 6847.1819262101,
+          "kraken": 46956.524
+        },
+        "hhi": 0.777867,
+        "persistence": 0.196318,
+        "spoof_risk_proxy": 0.463519,
+        "vacuum_score": 0.974549
+      },
+      {
+        "side": "bid",
+        "price_low": 62575.0,
+        "price_high": 62600.0,
+        "price_mid": 62587.5,
+        "depth_quote": 63478.4045303312,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 58409.0924303312,
+          "kraken": 5069.3121
+        },
+        "hhi": 0.853037,
+        "persistence": 0.197004,
+        "spoof_risk_proxy": 0.517752,
+        "vacuum_score": 0.969972
+      },
+      {
+        "side": "bid",
+        "price_low": 62550.0,
+        "price_high": 62575.0,
+        "price_mid": 62562.5,
+        "depth_quote": 260432.09232644862,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 3891.6303264486,
+          "kraken": 256540.46200000003
+        },
+        "hhi": 0.970561,
+        "persistence": 0.210979,
+        "spoof_risk_proxy": 0.59433,
+        "vacuum_score": 0.876805
+      },
+      {
+        "side": "bid",
+        "price_low": 62525.0,
+        "price_high": 62550.0,
+        "price_mid": 62537.5,
+        "depth_quote": 242186.10957315037,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 15931.861173150399,
+          "kraken": 226254.24839999998
+        },
+        "hhi": 0.877088,
+        "persistence": 0.209685,
+        "spoof_risk_proxy": 0.527174,
+        "vacuum_score": 0.885436
+      },
+      {
+        "side": "bid",
+        "price_low": 62500.0,
+        "price_high": 62525.0,
+        "price_mid": 62512.5,
+        "depth_quote": 129637.62249113002,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 937.7734911299999,
+          "kraken": 128699.84900000002
+        },
+        "hhi": 0.985637,
+        "persistence": 0.201699,
+        "spoof_risk_proxy": 0.611201,
+        "vacuum_score": 0.938676
+      },
+      {
+        "side": "bid",
+        "price_low": 62475.0,
+        "price_high": 62500.0,
+        "price_mid": 62487.5,
+        "depth_quote": 110095.5875,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 110095.5875
+        },
+        "hhi": 1.0,
+        "persistence": 0.130312,
+        "spoof_risk_proxy": 0.867074,
+        "vacuum_score": 0.94792
+      },
+      {
+        "side": "bid",
+        "price_low": 62450.0,
+        "price_high": 62475.0,
+        "price_mid": 62462.5,
+        "depth_quote": 183990.183221515,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 51886.73562151499,
+          "kraken": 132103.4476
+        },
+        "hhi": 0.595041,
+        "persistence": 0.205555,
+        "spoof_risk_proxy": 0.324676,
+        "vacuum_score": 0.912965
+      },
+      {
+        "side": "bid",
+        "price_low": 62425.0,
+        "price_high": 62450.0,
+        "price_mid": 62437.5,
+        "depth_quote": 144336.4105,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 624.2767,
+          "kraken": 143712.1338
+        },
+        "hhi": 0.991387,
+        "persistence": 0.202742,
+        "spoof_risk_proxy": 0.614719,
+        "vacuum_score": 0.931723
+      },
+      {
+        "side": "bid",
+        "price_low": 62400.0,
+        "price_high": 62425.0,
+        "price_mid": 62412.5,
+        "depth_quote": 52122.3658,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 52122.3658
+        },
+        "hhi": 1.0,
+        "persistence": 0.126198,
+        "spoof_risk_proxy": 0.869692,
+        "vacuum_score": 0.975344
+      },
+      {
+        "side": "bid",
+        "price_low": 62375.0,
+        "price_high": 62400.0,
+        "price_mid": 62387.5,
+        "depth_quote": 94646.3626,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 94646.3626
+        },
+        "hhi": 1.0,
+        "persistence": 0.129216,
+        "spoof_risk_proxy": 0.867772,
+        "vacuum_score": 0.955229
+      },
+      {
+        "side": "bid",
+        "price_low": 62350.0,
+        "price_high": 62375.0,
+        "price_mid": 62362.5,
+        "depth_quote": 2527.958948336,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 2465.591648336,
+          "kraken": 62.36730000000001
+        },
+        "hhi": 0.951875,
+        "persistence": 0.192679,
+        "spoof_risk_proxy": 0.592386,
+        "vacuum_score": 0.998804
+      },
+      {
+        "side": "bid",
+        "price_low": 62325.0,
+        "price_high": 62350.0,
+        "price_mid": 62337.5,
+        "depth_quote": 93.51028500000001,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 93.51028500000001
+        },
+        "hhi": 1.0,
+        "persistence": 0.122507,
+        "spoof_risk_proxy": 0.872041,
+        "vacuum_score": 0.999956
+      },
+      {
+        "side": "bid",
+        "price_low": 62225.0,
+        "price_high": 62250.0,
+        "price_mid": 62237.5,
+        "depth_quote": 908.55216,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 908.55216
+        },
+        "hhi": 1.0,
+        "persistence": 0.122564,
+        "spoof_risk_proxy": 0.872004,
+        "vacuum_score": 0.99957
+      },
+      {
+        "side": "bid",
+        "price_low": 62175.0,
+        "price_high": 62200.0,
+        "price_mid": 62187.5,
+        "depth_quote": 422.4701278569,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 422.4701278569
+        },
+        "hhi": 1.0,
+        "persistence": 0.12253,
+        "spoof_risk_proxy": 0.872026,
+        "vacuum_score": 0.9998
+      },
+      {
+        "side": "bid",
+        "price_low": 62025.0,
+        "price_high": 62050.0,
+        "price_mid": 62037.5,
+        "depth_quote": 109.6387168887,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 109.6387168887
+        },
+        "hhi": 1.0,
+        "persistence": 0.122508,
+        "spoof_risk_proxy": 0.872041,
+        "vacuum_score": 0.999948
+      },
+      {
+        "side": "bid",
+        "price_low": 62000.0,
+        "price_high": 62025.0,
+        "price_mid": 62012.5,
+        "depth_quote": 9.999979999999999,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 9.999979999999999
+        },
+        "hhi": 1.0,
+        "persistence": 0.122501,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999995
+      },
+      {
+        "side": "bid",
+        "price_low": 61975.0,
+        "price_high": 62000.0,
+        "price_mid": 61987.5,
+        "depth_quote": 1555.1184733045,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 1555.1184733045
+        },
+        "hhi": 1.0,
+        "persistence": 0.12261,
+        "spoof_risk_proxy": 0.871975,
+        "vacuum_score": 0.999264
+      },
+      {
+        "side": "bid",
+        "price_low": 61900.0,
+        "price_high": 61925.0,
+        "price_mid": 61912.5,
+        "depth_quote": 22.1107548288,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 22.1107548288
+        },
+        "hhi": 1.0,
+        "persistence": 0.122502,
+        "spoof_risk_proxy": 0.872044,
+        "vacuum_score": 0.99999
+      },
+      {
+        "side": "bid",
+        "price_low": 61875.0,
+        "price_high": 61900.0,
+        "price_mid": 61887.5,
+        "depth_quote": 74.4121649642,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 74.4121649642
+        },
+        "hhi": 1.0,
+        "persistence": 0.122505,
+        "spoof_risk_proxy": 0.872042,
+        "vacuum_score": 0.999965
+      },
+      {
+        "side": "bid",
+        "price_low": 61825.0,
+        "price_high": 61850.0,
+        "price_mid": 61837.5,
+        "depth_quote": 3191.6330901764995,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 3191.6330901764995
+        },
+        "hhi": 1.0,
+        "persistence": 0.122726,
+        "spoof_risk_proxy": 0.871901,
+        "vacuum_score": 0.99849
+      },
+      {
+        "side": "bid",
+        "price_low": 61800.0,
+        "price_high": 61825.0,
+        "price_mid": 61812.5,
+        "depth_quote": 99.999816,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 99.999816
+        },
+        "hhi": 1.0,
+        "persistence": 0.122507,
+        "spoof_risk_proxy": 0.872041,
+        "vacuum_score": 0.999953
+      },
+      {
+        "side": "bid",
+        "price_low": 61775.0,
+        "price_high": 61800.0,
+        "price_mid": 61787.5,
+        "depth_quote": 435.9028839044,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 435.9028839044
+        },
+        "hhi": 1.0,
+        "persistence": 0.122531,
+        "spoof_risk_proxy": 0.872026,
+        "vacuum_score": 0.999794
+      },
+      {
+        "side": "bid",
+        "price_low": 61700.0,
+        "price_high": 61725.0,
+        "price_mid": 61712.5,
+        "depth_quote": 239.46540521450004,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 239.46540521450004
+        },
+        "hhi": 1.0,
+        "persistence": 0.122517,
+        "spoof_risk_proxy": 0.872035,
+        "vacuum_score": 0.999887
+      },
+      {
+        "side": "bid",
+        "price_low": 61675.0,
+        "price_high": 61700.0,
+        "price_mid": 61687.5,
+        "depth_quote": 180.06656084969998,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 180.06656084969998
+        },
+        "hhi": 1.0,
+        "persistence": 0.122513,
+        "spoof_risk_proxy": 0.872037,
+        "vacuum_score": 0.999915
+      },
+      {
+        "side": "bid",
+        "price_low": 61650.0,
+        "price_high": 61675.0,
+        "price_mid": 61662.5,
+        "depth_quote": 9.7965162058,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 9.7965162058
+        },
+        "hhi": 1.0,
+        "persistence": 0.122501,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999995
+      },
+      {
+        "side": "bid",
+        "price_low": 61625.0,
+        "price_high": 61650.0,
+        "price_mid": 61637.5,
+        "depth_quote": 12.6520498764,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 12.6520498764
+        },
+        "hhi": 1.0,
+        "persistence": 0.122501,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999994
+      },
+      {
+        "side": "bid",
+        "price_low": 61600.0,
+        "price_high": 61625.0,
+        "price_mid": 61612.5,
+        "depth_quote": 1606.5822733304,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 1606.5822733304
+        },
+        "hhi": 1.0,
+        "persistence": 0.122614,
+        "spoof_risk_proxy": 0.871973,
+        "vacuum_score": 0.99924
+      }
+    ],
+    "ask_levels": [
+      {
+        "side": "ask",
+        "price_low": 62675.0,
+        "price_high": 62700.0,
+        "price_mid": 62687.5,
+        "depth_quote": 401334.5840041,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "binance": 388666.9451461,
+          "bybit": 12667.638858
+        },
+        "hhi": 0.938865,
+        "persistence": 0.220977,
+        "spoof_risk_proxy": 0.564916,
+        "vacuum_score": 0.810153
+      },
+      {
+        "side": "ask",
+        "price_low": 62700.0,
+        "price_high": 62725.0,
+        "price_mid": 62712.5,
+        "depth_quote": 643360.8885078601,
+        "venue_count": 4,
+        "venue_depth_quote": {
+          "binance": 89203.65275680002,
+          "bybit": 288627.4354869001,
+          "kraken": 50171.760800000004,
+          "okx": 215358.03946416
+        },
+        "hhi": 0.33862,
+        "persistence": 0.23815,
+        "spoof_risk_proxy": 0.19845,
+        "vacuum_score": 0.695665
+      },
+      {
+        "side": "ask",
+        "price_low": 62725.0,
+        "price_high": 62750.0,
+        "price_mid": 62737.5,
+        "depth_quote": 1606668.7439075771,
+        "venue_count": 4,
+        "venue_depth_quote": {
+          "bybit": 529814.1447478001,
+          "coinbase": 37310.9427180518,
+          "kraken": 293993.34969999996,
+          "okx": 745550.3067417252
+        },
+        "hhi": 0.358092,
+        "persistence": 0.306503,
+        "spoof_risk_proxy": 0.154953,
+        "vacuum_score": 0.239982
+      },
+      {
+        "side": "ask",
+        "price_low": 62750.0,
+        "price_high": 62775.0,
+        "price_mid": 62762.5,
+        "depth_quote": 304679.842143505,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 13470.023943504999,
+          "kraken": 291209.8182
+        },
+        "hhi": 0.915488,
+        "persistence": 0.214119,
+        "spoof_risk_proxy": 0.552279,
+        "vacuum_score": 0.855874
+      },
+      {
+        "side": "ask",
+        "price_low": 62775.0,
+        "price_high": 62800.0,
+        "price_mid": 62787.5,
+        "depth_quote": 228188.7536736268,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 84832.0313736268,
+          "kraken": 143356.7223
+        },
+        "hhi": 0.53289,
+        "persistence": 0.208691,
+        "spoof_risk_proxy": 0.27748,
+        "vacuum_score": 0.892058
+      },
+      {
+        "side": "ask",
+        "price_low": 62800.0,
+        "price_high": 62825.0,
+        "price_mid": 62812.5,
+        "depth_quote": 210946.32615051212,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 17792.7067505121,
+          "kraken": 193153.61940000003
+        },
+        "hhi": 0.845535,
+        "persistence": 0.207468,
+        "spoof_risk_proxy": 0.505637,
+        "vacuum_score": 0.900214
+      },
+      {
+        "side": "ask",
+        "price_low": 62825.0,
+        "price_high": 62850.0,
+        "price_mid": 62837.5,
+        "depth_quote": 38083.5946,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 38083.5946
+        },
+        "hhi": 1.0,
+        "persistence": 0.125202,
+        "spoof_risk_proxy": 0.870326,
+        "vacuum_score": 0.981985
+      },
+      {
+        "side": "ask",
+        "price_low": 62850.0,
+        "price_high": 62875.0,
+        "price_mid": 62862.5,
+        "depth_quote": 196436.8373064429,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 21665.2196064429,
+          "kraken": 174771.6177
+        },
+        "hhi": 0.803746,
+        "persistence": 0.206438,
+        "spoof_risk_proxy": 0.4759,
+        "vacuum_score": 0.907078
+      },
+      {
+        "side": "ask",
+        "price_low": 62875.0,
+        "price_high": 62900.0,
+        "price_mid": 62887.5,
+        "depth_quote": 205199.03935203998,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 943.28135204,
+          "kraken": 204255.75799999997
+        },
+        "hhi": 0.990848,
+        "persistence": 0.20706,
+        "spoof_risk_proxy": 0.611579,
+        "vacuum_score": 0.902933
+      },
+      {
+        "side": "ask",
+        "price_low": 62900.0,
+        "price_high": 62925.0,
+        "price_mid": 62912.5,
+        "depth_quote": 49704.4495,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 49704.4495
+        },
+        "hhi": 1.0,
+        "persistence": 0.126027,
+        "spoof_risk_proxy": 0.869801,
+        "vacuum_score": 0.976488
+      },
+      {
+        "side": "ask",
+        "price_low": 62925.0,
+        "price_high": 62950.0,
+        "price_mid": 62937.5,
+        "depth_quote": 249361.67070000002,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 629.2646,
+          "kraken": 248732.40610000002
+        },
+        "hhi": 0.994966,
+        "persistence": 0.210194,
+        "spoof_risk_proxy": 0.612579,
+        "vacuum_score": 0.882042
+      },
+      {
+        "side": "ask",
+        "price_low": 62950.0,
+        "price_high": 62975.0,
+        "price_mid": 62962.5,
+        "depth_quote": 52619.036765700395,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 50982.028665700396,
+          "kraken": 1637.0081
+        },
+        "hhi": 0.939715,
+        "persistence": 0.196234,
+        "spoof_risk_proxy": 0.58128,
+        "vacuum_score": 0.975109
+      },
+      {
+        "side": "ask",
+        "price_low": 62975.0,
+        "price_high": 63000.0,
+        "price_mid": 62987.5,
+        "depth_quote": 3376.096898,
+        "venue_count": 2,
+        "venue_depth_quote": {
+          "coinbase": 919.5609979999999,
+          "kraken": 2456.5359
+        },
+        "hhi": 0.603627,
+        "persistence": 0.19274,
+        "spoof_risk_proxy": 0.339076,
+        "vacuum_score": 0.998403
+      },
+      {
+        "side": "ask",
+        "price_low": 63000.0,
+        "price_high": 63025.0,
+        "price_mid": 63012.5,
+        "depth_quote": 224317.18850000002,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 224317.18850000002
+        },
+        "hhi": 1.0,
+        "persistence": 0.138417,
+        "spoof_risk_proxy": 0.861917,
+        "vacuum_score": 0.893889
+      },
+      {
+        "side": "ask",
+        "price_low": 63025.0,
+        "price_high": 63050.0,
+        "price_mid": 63037.5,
+        "depth_quote": 63.0297,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "kraken": 63.0297
+        },
+        "hhi": 1.0,
+        "persistence": 0.122504,
+        "spoof_risk_proxy": 0.872043,
+        "vacuum_score": 0.99997
+      },
+      {
+        "side": "ask",
+        "price_low": 63050.0,
+        "price_high": 63075.0,
+        "price_mid": 63062.5,
+        "depth_quote": 94.57791,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 94.57791
+        },
+        "hhi": 1.0,
+        "persistence": 0.122507,
+        "spoof_risk_proxy": 0.872041,
+        "vacuum_score": 0.999955
+      },
+      {
+        "side": "ask",
+        "price_low": 63075.0,
+        "price_high": 63100.0,
+        "price_mid": 63087.5,
+        "depth_quote": 195.4141528979,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 195.4141528979
+        },
+        "hhi": 1.0,
+        "persistence": 0.122514,
+        "spoof_risk_proxy": 0.872037,
+        "vacuum_score": 0.999908
+      },
+      {
+        "side": "ask",
+        "price_low": 63100.0,
+        "price_high": 63125.0,
+        "price_mid": 63112.5,
+        "depth_quote": 921.457246,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 921.457246
+        },
+        "hhi": 1.0,
+        "persistence": 0.122565,
+        "spoof_risk_proxy": 0.872004,
+        "vacuum_score": 0.999564
+      },
+      {
+        "side": "ask",
+        "price_low": 63200.0,
+        "price_high": 63225.0,
+        "price_mid": 63212.5,
+        "depth_quote": 44.3064976662,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 44.3064976662
+        },
+        "hhi": 1.0,
+        "persistence": 0.122503,
+        "spoof_risk_proxy": 0.872043,
+        "vacuum_score": 0.999979
+      },
+      {
+        "side": "ask",
+        "price_low": 63225.0,
+        "price_high": 63250.0,
+        "price_mid": 63237.5,
+        "depth_quote": 1567.5574266187998,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 1567.5574266187998
+        },
+        "hhi": 1.0,
+        "persistence": 0.122611,
+        "spoof_risk_proxy": 0.871975,
+        "vacuum_score": 0.999258
+      },
+      {
+        "side": "ask",
+        "price_low": 63325.0,
+        "price_high": 63350.0,
+        "price_mid": 63337.5,
+        "depth_quote": 73.4395842004,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 73.4395842004
+        },
+        "hhi": 1.0,
+        "persistence": 0.122505,
+        "spoof_risk_proxy": 0.872042,
+        "vacuum_score": 0.999965
+      },
+      {
+        "side": "ask",
+        "price_low": 63425.0,
+        "price_high": 63450.0,
+        "price_mid": 63437.5,
+        "depth_quote": 95.14365,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 95.14365
+        },
+        "hhi": 1.0,
+        "persistence": 0.122507,
+        "spoof_risk_proxy": 0.872041,
+        "vacuum_score": 0.999955
+      },
+      {
+        "side": "ask",
+        "price_low": 63450.0,
+        "price_high": 63475.0,
+        "price_mid": 63462.5,
+        "depth_quote": 52.539157574799994,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 52.539157574799994
+        },
+        "hhi": 1.0,
+        "persistence": 0.122504,
+        "spoof_risk_proxy": 0.872043,
+        "vacuum_score": 0.999975
+      },
+      {
+        "side": "ask",
+        "price_low": 63575.0,
+        "price_high": 63600.0,
+        "price_mid": 63587.5,
+        "depth_quote": 44.575562997,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 44.575562997
+        },
+        "hhi": 1.0,
+        "persistence": 0.122503,
+        "spoof_risk_proxy": 0.872043,
+        "vacuum_score": 0.999979
+      },
+      {
+        "side": "ask",
+        "price_low": 63600.0,
+        "price_high": 63625.0,
+        "price_mid": 63612.5,
+        "depth_quote": 1567.5570034523998,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 1567.5570034523998
+        },
+        "hhi": 1.0,
+        "persistence": 0.122611,
+        "spoof_risk_proxy": 0.871975,
+        "vacuum_score": 0.999258
+      },
+      {
+        "side": "ask",
+        "price_low": 63625.0,
+        "price_high": 63650.0,
+        "price_mid": 63637.5,
+        "depth_quote": 75.8957595781,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 75.8957595781
+        },
+        "hhi": 1.0,
+        "persistence": 0.122505,
+        "spoof_risk_proxy": 0.872042,
+        "vacuum_score": 0.999964
+      },
+      {
+        "side": "ask",
+        "price_low": 63725.0,
+        "price_high": 63750.0,
+        "price_mid": 63737.5,
+        "depth_quote": 446.1470291784,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 446.1470291784
+        },
+        "hhi": 1.0,
+        "persistence": 0.122532,
+        "spoof_risk_proxy": 0.872025,
+        "vacuum_score": 0.999789
+      },
+      {
+        "side": "ask",
+        "price_low": 63825.0,
+        "price_high": 63850.0,
+        "price_mid": 63837.5,
+        "depth_quote": 430.41207758520005,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 430.41207758520005
+        },
+        "hhi": 1.0,
+        "persistence": 0.122531,
+        "spoof_risk_proxy": 0.872026,
+        "vacuum_score": 0.999796
+      },
+      {
+        "side": "ask",
+        "price_low": 63875.0,
+        "price_high": 63900.0,
+        "price_mid": 63887.5,
+        "depth_quote": 2.0934255926,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 2.0934255926
+        },
+        "hhi": 1.0,
+        "persistence": 0.1225,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999999
+      },
+      {
+        "side": "ask",
+        "price_low": 63900.0,
+        "price_high": 63925.0,
+        "price_mid": 63912.5,
+        "depth_quote": 270.0058234777,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 270.0058234777
+        },
+        "hhi": 1.0,
+        "persistence": 0.122519,
+        "spoof_risk_proxy": 0.872033,
+        "vacuum_score": 0.999872
+      },
+      {
+        "side": "ask",
+        "price_low": 63950.0,
+        "price_high": 63975.0,
+        "price_mid": 63962.5,
+        "depth_quote": 475.7851806509,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 475.7851806509
+        },
+        "hhi": 1.0,
+        "persistence": 0.122534,
+        "spoof_risk_proxy": 0.872024,
+        "vacuum_score": 0.999775
+      },
+      {
+        "side": "ask",
+        "price_low": 63975.0,
+        "price_high": 64000.0,
+        "price_mid": 63987.5,
+        "depth_quote": 1732.4391279345998,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 1732.4391279345998
+        },
+        "hhi": 1.0,
+        "persistence": 0.122623,
+        "spoof_risk_proxy": 0.871967,
+        "vacuum_score": 0.99918
+      },
+      {
+        "side": "ask",
+        "price_low": 64025.0,
+        "price_high": 64050.0,
+        "price_mid": 64037.5,
+        "depth_quote": 52.539144043600004,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 52.539144043600004
+        },
+        "hhi": 1.0,
+        "persistence": 0.122504,
+        "spoof_risk_proxy": 0.872043,
+        "vacuum_score": 0.999975
+      },
+      {
+        "side": "ask",
+        "price_low": 64050.0,
+        "price_high": 64075.0,
+        "price_mid": 64062.5,
+        "depth_quote": 13.0504996686,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 13.0504996686
+        },
+        "hhi": 1.0,
+        "persistence": 0.122501,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999994
+      },
+      {
+        "side": "ask",
+        "price_low": 64175.0,
+        "price_high": 64200.0,
+        "price_mid": 64187.5,
+        "depth_quote": 430.41212709300004,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 430.41212709300004
+        },
+        "hhi": 1.0,
+        "persistence": 0.122531,
+        "spoof_risk_proxy": 0.872026,
+        "vacuum_score": 0.999796
+      },
+      {
+        "side": "ask",
+        "price_low": 64200.0,
+        "price_high": 64225.0,
+        "price_mid": 64212.5,
+        "depth_quote": 446.14689469459995,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 446.14689469459995
+        },
+        "hhi": 1.0,
+        "persistence": 0.122532,
+        "spoof_risk_proxy": 0.872025,
+        "vacuum_score": 0.999789
+      },
+      {
+        "side": "ask",
+        "price_low": 64250.0,
+        "price_high": 64275.0,
+        "price_mid": 64262.5,
+        "depth_quote": 10.178485,
+        "venue_count": 1,
+        "venue_depth_quote": {
+          "coinbase": 10.178485
+        },
+        "hhi": 1.0,
+        "persistence": 0.122501,
+        "spoof_risk_proxy": 0.872045,
+        "vacuum_score": 0.999995
+      }
+    ],
+    "top_bid_wall": {
+      "side": "bid",
+      "price_low": 62675.0,
+      "price_high": 62700.0,
+      "price_mid": 62687.5,
+      "depth_quote": 2113988.0265408317,
+      "venue_count": 5,
+      "venue_depth_quote": {
+        "binance": 644251.1507072999,
+        "bybit": 502234.6701692,
+        "coinbase": 128024.0706275537,
+        "kraken": 184915.40540000002,
+        "okx": 654562.7296367781
+      },
+      "hhi": 0.256511,
+      "persistence": 0.3425,
+      "spoof_risk_proxy": 0.132045,
+      "vacuum_score": 0.0
+    },
+    "top_ask_wall": {
+      "side": "ask",
+      "price_low": 62725.0,
+      "price_high": 62750.0,
+      "price_mid": 62737.5,
+      "depth_quote": 1606668.7439075771,
+      "venue_count": 4,
+      "venue_depth_quote": {
+        "bybit": 529814.1447478001,
+        "coinbase": 37310.9427180518,
+        "kraken": 293993.34969999996,
+        "okx": 745550.3067417252
+      },
+      "hhi": 0.358092,
+      "persistence": 0.306503,
+      "spoof_risk_proxy": 0.154953,
+      "vacuum_score": 0.239982
+    },
+    "bid_depth_total": 5472349.355206245,
+    "ask_depth_total": 4423381.75547527,
+    "depth_imbalance": 0.106002,
+    "status": "COMPOSITE_BOOK_OK",
+    "notes": [
+      "spot_usdt: coverage=1.00 venues=['binance', 'bybit', 'coinbase', 'kraken', 'okx']",
+      "public snapshot/stream proxy; not a private matching-engine book"
+    ]
+  }
+}
