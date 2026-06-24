@@ -1,4 +1,4 @@
-# v0.15.0 â€” Operational Briefing Report
+# v0.15.0 — Operational Briefing Report
 
 ## Added
 
