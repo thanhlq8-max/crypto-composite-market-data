@@ -1,4 +1,4 @@
-name: Deploy synthetic Dashboard V3 to GitHub Pages
+name: Deploy synthetic sample report to GitHub Pages
 
 on:
   workflow_dispatch:
@@ -36,16 +36,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Build synthetic Dashboard V3 site
+      - name: Build synthetic sample report site
         run: |
           mkdir -p _site
           cp -R examples/sample_artifacts _site/artifacts
-          crypto-composite validate-artifacts --artifact-root _site/artifacts
-          crypto-composite score-artifacts --artifact-root _site/artifacts --write
-          crypto-composite dashboard-export \
+          crypto-composite sample-report \
             --artifact-root _site/artifacts \
-            --artifact-base-url artifacts \
-            --out-file _site/index.html
+            --out-dir _site \
+            --artifact-base-url artifacts
+          cp _site/artifact_report.html _site/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
