@@ -57,3 +57,14 @@ def test_run_sample_report_returns_error_when_a_step_fails(monkeypatch, tmp_path
 
     assert result["status"] == "ERROR"
     assert {item.get("code") for item in result["errors"] if isinstance(item, dict)} == {"BAD", "SAMPLE_WORKFLOW_STEP_ERROR"}
+
+
+def test_relative_artifact_base_url_falls_back_to_file_uri(monkeypatch, tmp_path: Path) -> None:
+    def fake_relpath(path: object, start: object) -> str:
+        raise ValueError("path is on mount 'D:', start on mount 'C:'")
+
+    monkeypatch.setattr(sample_workflow.os.path, "relpath", fake_relpath)
+
+    result = sample_workflow._relative_artifact_base_url(Path("examples/sample_artifacts"), tmp_path)
+
+    assert result == Path("examples/sample_artifacts").resolve().as_uri()

@@ -22,6 +22,14 @@ It performs these steps:
 
 The deployed pages link to the copied JSON files under `_site/artifacts`, so the demo remains self-contained.
 
+## Live demo
+
+After the manual Pages workflow passes on `main`, the current public demo is expected at:
+
+[https://thanhlq8-max.github.io/crypto-composite-market-data/](https://thanhlq8-max.github.io/crypto-composite-market-data/)
+
+Treat the URL as live only after the deployment workflow reports success and the page opens successfully.
+
 ## Generated files
 
 ```text

@@ -15,7 +15,15 @@ NO_SIGNAL_BOUNDARY = "Sample artifact workflow only; no trading signal, executio
 
 
 def _relative_artifact_base_url(artifact_root: Path, out_dir: Path) -> str:
-    return Path(os.path.relpath(artifact_root.resolve(), start=out_dir.resolve())).as_posix()
+    resolved_root = artifact_root.resolve()
+    resolved_out_dir = out_dir.resolve()
+    try:
+        return Path(os.path.relpath(resolved_root, start=resolved_out_dir)).as_posix()
+    except ValueError:
+        # Windows raises ValueError when artifact_root and out_dir are on
+        # different drives. A file:// URL keeps the static dashboard links
+        # usable without changing the offline/sample-only workflow boundary.
+        return resolved_root.as_uri()
 
 
 def _status_from_parts(parts: list[dict[str, Any]]) -> str:

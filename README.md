@@ -15,6 +15,14 @@ The dashboard screenshot uses the checked-in synthetic sample artifacts; it does
 
 > Note: PyPI/Shields badges can take a few minutes to refresh after a new release.
 
+## Live synthetic demo
+
+A GitHub Pages demo built from checked-in synthetic sample artifacts is available at:
+
+[https://thanhlq8-max.github.io/crypto-composite-market-data/](https://thanhlq8-max.github.io/crypto-composite-market-data/)
+
+The demo is a static artifact-inspection page. It does not call live exchange APIs, use private account APIs, rank assets, generate predictions, place orders, or provide financial advice.
+
 ## Why this exists
 
 Public crypto market data is fragmented. A single exchange can be stale, unavailable, noisy, rate-limited, or structurally different from the broader venue set.
