@@ -4,6 +4,7 @@ import argparse
 import json
 from typing import Iterable
 
+from crypto_composite.artifact_csv import write_composite_ohlcv_csv
 from crypto_composite.artifact_quality import score_artifact_root, write_quality_score
 from crypto_composite.artifact_report import write_static_report
 from crypto_composite.artifact_validator import validate_artifact_root
@@ -85,6 +86,10 @@ def main() -> None:
     score.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
     score.add_argument("--write", action="store_true", help="Write quality_score.json into the artifact root.")
 
+    csv_export = sub.add_parser("export-ohlcv-csv", help="Export composite OHLCV artifacts to a flat CSV file.")
+    csv_export.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
+    csv_export.add_argument("--out-file", required=True, help="CSV file to write.")
+
     report = sub.add_parser("report", help="Write a static HTML artifact quality report.")
     report.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
     report.add_argument("--out-file", required=True, help="HTML report file to write.")
@@ -148,6 +153,11 @@ def main() -> None:
         quality = write_quality_score(args.artifact_root) if args.write else score_artifact_root(args.artifact_root)
         print(json.dumps(quality, indent=2, sort_keys=True))
         if quality["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "export-ohlcv-csv":
+        export_result = write_composite_ohlcv_csv(args.artifact_root, args.out_file)
+        print(json.dumps(export_result, indent=2, sort_keys=True))
+        if export_result["status"] == "ERROR":
             parser.exit(1)
     elif args.cmd == "report":
         report_result = write_static_report(args.artifact_root, args.out_file)

@@ -288,6 +288,20 @@ The report summarizes quality score, venue coverage, composite OHLCV status, ord
 
 See [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md).
 
+## CSV export
+
+Export composite OHLCV artifacts to a flat CSV file for spreadsheet, DuckDB, pandas, or notebook inspection:
+
+```bash
+crypto-composite export-ohlcv-csv \
+  --artifact-root artifacts-universe \
+  --out-file composite_ohlcv.csv
+```
+
+The export writes one row per asset, timeframe, market type, and composite OHLCV bar. It preserves venue contribution metadata in `venue_weights_json` and remains an artifact-inspection output only.
+
+See [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md).
+
 ## Local dashboard API
 
 Serve a read-only local artifact API:
@@ -352,6 +366,7 @@ See:
 - [docs/DASHBOARD_PLAN.md](docs/DASHBOARD_PLAN.md)
 - [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md)
 - [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md)
+- [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
 - [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)

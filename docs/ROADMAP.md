@@ -67,3 +67,21 @@ Goal: make the repository easy for external users and contributors to engage wit
 - Good-first-issue backlog for connectors, exports, docs, and dashboard API.
 - Community growth documentation focused on data-quality and reproducible artifacts.
 - External examples and tutorials that avoid trading-signal claims.
+
+
+## v0.8-v0.9 ??? Shareable dashboard inspection artifacts
+
+Goal: make generated public-data artifacts easier to inspect and share without creating trading signals.
+
+- Static dashboard export for GitHub Pages or offline inspection.
+- Dashboard snapshot API for artifact-derived price, depth, zone, and methodology context.
+- Practical monitoring brief language remains descriptive and non-predictive.
+
+## v0.10 ??? CSV artifact interoperability
+
+Goal: make composite OHLCV artifacts easier to consume from spreadsheet, DuckDB, pandas, and notebooks.
+
+- `crypto-composite export-ohlcv-csv --artifact-root ... --out-file ...`.
+- Single-asset and universe artifact roots.
+- One row per asset, timeframe, market type, and composite OHLCV bar.
+- No ranking, signal, prediction, execution, or financial-advice semantics.

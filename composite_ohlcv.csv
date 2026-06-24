@@ -1,0 +1,9 @@
+asset,timeframe,market_type,timestamp_ms,open,high,low,close,median_close,vwap_close,volume_base_total,volume_quote_total,venue_count,coverage,price_dispersion_pct,data_quality,venue_weights_json
+BTC-USDT,15m,spot_usdt,1699997300000,99.2,100.1,98.9,99.6,99.6,99.6,25,2490,3,1,0.07,0.92,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+BTC-USDT,15m,spot_usdt,1699998200000,99.6,100.6,99.3,100.2,100.2,100.2,28,2805.6,3,1,0.06,0.93,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+BTC-USDT,15m,spot_usdt,1699999100000,100.2,101.1,99.8,100.7,100.7,100.7,29,2920.3,3,1,0.05,0.94,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+BTC-USDT,15m,spot_usdt,1700000000000,100,102,99,101,101,101,30,3030,3,1,0.04,0.95,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+ETH-USDT,15m,spot_usdt,1699997300000,49.2,49.9,49,49.6,49.6,49.6,52,2579.2,3,1,0.09,0.87,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+ETH-USDT,15m,spot_usdt,1699998200000,49.6,50.2,49.4,49.9,49.9,49.9,55,2744.5,3,1,0.08,0.88,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+ETH-USDT,15m,spot_usdt,1699999100000,49.9,50.6,49.7,50.2,50.2,50.2,58,2911.6,3,1,0.07,0.89,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
+ETH-USDT,15m,spot_usdt,1700000000000,50,51,49,50.5,50.5,50.5,60,3030,3,1,0.06,0.9,"{""binance"":0.34,""bybit"":0.33,""okx"":0.33}"
