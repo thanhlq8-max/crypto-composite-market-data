@@ -1,6 +1,6 @@
 {
   "asset": "ETH-USDT",
-  "timeframe": "15m",
+  "timeframe": "1h",
   "generated_at_ms": 1700000000000,
   "expected_venues": [
     "binance",
@@ -11,17 +11,63 @@
     "spot_usdt": [
       {
         "asset": "ETH-USDT",
-        "timeframe": "15m",
+        "timeframe": "1h",
         "market_type": "spot_usdt",
-        "timestamp_ms": 1699997300000,
-        "open": 49.2,
-        "high": 49.9,
-        "low": 49.0,
-        "close": 49.6,
-        "median_close": 49.6,
-        "vwap_close": 49.6,
-        "volume_base_total": 52.0,
-        "volume_quote_total": 2579.2,
+        "timestamp_ms": 1699989200000,
+        "open": 48.8064,
+        "high": 49.5008,
+        "low": 48.608,
+        "close": 49.2032,
+        "median_close": 49.2032,
+        "vwap_close": 49.2032,
+        "volume_base_total": 176.8,
+        "volume_quote_total": 8699.12576,
+        "venue_count": 3,
+        "venue_weights": {
+          "binance": 0.34,
+          "okx": 0.33,
+          "bybit": 0.33
+        },
+        "coverage": 1,
+        "price_dispersion_pct": 0.11,
+        "data_quality": 0.87
+      },
+      {
+        "asset": "ETH-USDT",
+        "timeframe": "1h",
+        "market_type": "spot_usdt",
+        "timestamp_ms": 1699992800000,
+        "open": 49.2032,
+        "high": 49.7984,
+        "low": 49.0048,
+        "close": 49.5008,
+        "median_close": 49.5008,
+        "vwap_close": 49.5008,
+        "volume_base_total": 187.0,
+        "volume_quote_total": 9256.6496,
+        "venue_count": 3,
+        "venue_weights": {
+          "binance": 0.34,
+          "okx": 0.33,
+          "bybit": 0.33
+        },
+        "coverage": 1,
+        "price_dispersion_pct": 0.1,
+        "data_quality": 0.88
+      },
+      {
+        "asset": "ETH-USDT",
+        "timeframe": "1h",
+        "market_type": "spot_usdt",
+        "timestamp_ms": 1699996400000,
+        "open": 49.5008,
+        "high": 50.1952,
+        "low": 49.3024,
+        "close": 49.7984,
+        "median_close": 49.7984,
+        "vwap_close": 49.7984,
+        "volume_base_total": 197.2,
+        "volume_quote_total": 9820.24448,
         "venue_count": 3,
         "venue_weights": {
           "binance": 0.34,
@@ -30,21 +76,21 @@
         },
         "coverage": 1,
         "price_dispersion_pct": 0.09,
-        "data_quality": 0.87
+        "data_quality": 0.89
       },
       {
         "asset": "ETH-USDT",
-        "timeframe": "15m",
+        "timeframe": "1h",
         "market_type": "spot_usdt",
-        "timestamp_ms": 1699998200000,
+        "timestamp_ms": 1700000000000,
         "open": 49.6,
-        "high": 50.2,
-        "low": 49.4,
-        "close": 49.9,
-        "median_close": 49.9,
-        "vwap_close": 49.9,
-        "volume_base_total": 55.0,
-        "volume_quote_total": 2744.5,
+        "high": 50.592,
+        "low": 48.608,
+        "close": 50.096,
+        "median_close": 50.096,
+        "vwap_close": 50.096,
+        "volume_base_total": 204.0,
+        "volume_quote_total": 10219.584,
         "venue_count": 3,
         "venue_weights": {
           "binance": 0.34,
@@ -53,52 +99,6 @@
         },
         "coverage": 1,
         "price_dispersion_pct": 0.08,
-        "data_quality": 0.88
-      },
-      {
-        "asset": "ETH-USDT",
-        "timeframe": "15m",
-        "market_type": "spot_usdt",
-        "timestamp_ms": 1699999100000,
-        "open": 49.9,
-        "high": 50.6,
-        "low": 49.7,
-        "close": 50.2,
-        "median_close": 50.2,
-        "vwap_close": 50.2,
-        "volume_base_total": 58.0,
-        "volume_quote_total": 2911.6,
-        "venue_count": 3,
-        "venue_weights": {
-          "binance": 0.34,
-          "okx": 0.33,
-          "bybit": 0.33
-        },
-        "coverage": 1,
-        "price_dispersion_pct": 0.07,
-        "data_quality": 0.89
-      },
-      {
-        "asset": "ETH-USDT",
-        "timeframe": "15m",
-        "market_type": "spot_usdt",
-        "timestamp_ms": 1700000000000,
-        "open": 50.0,
-        "high": 51.0,
-        "low": 49.0,
-        "close": 50.5,
-        "median_close": 50.5,
-        "vwap_close": 50.5,
-        "volume_base_total": 60.0,
-        "volume_quote_total": 3030.0,
-        "venue_count": 3,
-        "venue_weights": {
-          "binance": 0.34,
-          "okx": 0.33,
-          "bybit": 0.33
-        },
-        "coverage": 1,
-        "price_dispersion_pct": 0.06,
         "data_quality": 0.9
       }
     ]
@@ -106,17 +106,17 @@
   "latest_by_market_type": {
     "spot_usdt": {
       "asset": "ETH-USDT",
-      "timeframe": "15m",
+      "timeframe": "1h",
       "market_type": "spot_usdt",
       "timestamp_ms": 1700000000000,
-      "open": 50.0,
-      "high": 51.0,
-      "low": 49.0,
-      "close": 50.5,
-      "median_close": 50.5,
-      "vwap_close": 50.5,
-      "volume_base_total": 60.0,
-      "volume_quote_total": 3030.0,
+      "open": 49.6,
+      "high": 50.592,
+      "low": 48.608,
+      "close": 50.096,
+      "median_close": 50.096,
+      "vwap_close": 50.096,
+      "volume_base_total": 204.0,
+      "volume_quote_total": 10219.584,
       "venue_count": 3,
       "venue_weights": {
         "binance": 0.34,
@@ -124,8 +124,8 @@
         "bybit": 0.33
       },
       "coverage": 1,
-      "price_dispersion_pct": 0.06,
-      "data_quality": 0.9
+      "price_dispersion_pct": 0.08,
+      "data_quality": 0.88
     }
   },
   "status_by_market_type": {
@@ -136,6 +136,6 @@
   },
   "notes": [
     "Illustrative synthetic sample; not live market data.",
-    "Synthetic 15m fixture for dashboard multi-timeframe onboarding."
+    "Synthetic 1h fixture for dashboard multi-timeframe onboarding."
   ]
 }

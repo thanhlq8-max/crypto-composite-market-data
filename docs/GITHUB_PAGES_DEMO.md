@@ -21,6 +21,9 @@ It performs these steps:
 7. deploys it to the protected `github-pages` environment.
 
 The deployed pages link to the copied JSON files under `_site/artifacts`, so the demo remains self-contained.
+The copied fixture includes the locked dashboard onboarding profile: primary
+timeframe `15m`, multi-timeframe filters `5m,15m,1h`, and 60-second refresh
+metadata. This remains synthetic metadata, not a live refresh service.
 
 ## Refresh cadence boundary
 
@@ -82,6 +85,7 @@ Verify that:
 - `artifact_report.html` exists;
 - `dashboard.html` exists;
 - BTC-USDT and ETH-USDT sample assets are present;
+- dashboard filters include `5m`, `15m`, and `1h`, with `15m` selected first;
 - JSON artifact links resolve inside `.pages-preview/artifacts`;
 - no page claims live market conditions, trading signals, rankings, predictions, execution, or profitability.
 

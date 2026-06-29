@@ -12,19 +12,31 @@
     "spot_usdt"
   ],
   "timeframes": [
-    "15m"
+    "5m",
+    "15m",
+    "1h"
   ],
   "asset_count": 2,
   "asset_results": {
     "BTC-USDT": {
       "artifact_dir": "BTC-USDT",
       "timeframes": [
-        "15m"
+        "5m",
+        "15m",
+        "1h"
       ],
       "data_quality_by_timeframe": {
+        "5m": {
+          "status": "OK",
+          "overall_quality": 0.94
+        },
         "15m": {
           "status": "OK",
           "overall_quality": 0.95
+        },
+        "1h": {
+          "status": "OK",
+          "overall_quality": 0.93
         }
       },
       "outputs": {
@@ -36,12 +48,22 @@
     "ETH-USDT": {
       "artifact_dir": "ETH-USDT",
       "timeframes": [
-        "15m"
+        "5m",
+        "15m",
+        "1h"
       ],
       "data_quality_by_timeframe": {
+        "5m": {
+          "status": "OK",
+          "overall_quality": 0.89
+        },
         "15m": {
           "status": "OK",
           "overall_quality": 0.9
+        },
+        "1h": {
+          "status": "OK",
+          "overall_quality": 0.88
         }
       },
       "outputs": {

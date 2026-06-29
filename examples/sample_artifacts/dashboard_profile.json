@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "primary_timeframe": "15m",
+  "timeframes": [
+    "5m",
+    "15m",
+    "1h"
+  ],
+  "refresh_seconds": 60,
+  "boundaries": [
+    "Dashboard profile metadata only; no trading signal, prediction, ranking, or execution instruction.",
+    "Refresh cadence describes artifact regeneration cadence; it does not imply market-data completeness."
+  ]
+}

@@ -3,8 +3,8 @@
     "asset": "BTC-USDT",
     "market_type": "spot_usdt",
     "generated_at_ms": 1700000000000,
-    "reference_price": 101.0,
-    "bucket_size": 1.0,
+    "reference_price": 101.202,
+    "bucket_size": 1.002,
     "expected_venues": [
       "binance",
       "okx",
@@ -15,15 +15,15 @@
     "bid_levels": [
       {
         "side": "bid",
-        "price_low": 99.0,
-        "price_high": 100.0,
-        "price_mid": 99.5,
-        "depth_quote": 1000.0,
+        "price_low": 99.198,
+        "price_high": 100.2,
+        "price_mid": 99.699,
+        "depth_quote": 550.0,
         "venue_count": 3,
         "venue_depth_quote": {
-          "binance": 340.0,
-          "bybit": 330.0,
-          "okx": 330.0
+          "binance": 187.0,
+          "bybit": 181.5,
+          "okx": 181.5
         },
         "hhi": 0.3334,
         "persistence": 0.67,
@@ -32,13 +32,13 @@
       },
       {
         "side": "bid",
-        "price_low": 98.0,
-        "price_high": 99.0,
-        "price_mid": 98.5,
-        "depth_quote": 100.0,
+        "price_low": 98.196,
+        "price_high": 99.198,
+        "price_mid": 98.697,
+        "depth_quote": 55.0,
         "venue_count": 1,
         "venue_depth_quote": {
-          "binance": 100.0
+          "binance": 55.0
         },
         "hhi": 1,
         "persistence": 0.35,
@@ -49,14 +49,14 @@
     "ask_levels": [
       {
         "side": "ask",
-        "price_low": 102.0,
-        "price_high": 103.0,
-        "price_mid": 102.5,
-        "depth_quote": 900.0,
+        "price_low": 102.204,
+        "price_high": 103.206,
+        "price_mid": 102.705,
+        "depth_quote": 495.0,
         "venue_count": 2,
         "venue_depth_quote": {
-          "binance": 450.0,
-          "okx": 450.0
+          "binance": 247.5,
+          "okx": 247.5
         },
         "hhi": 0.5,
         "persistence": 0.61,
@@ -65,13 +65,13 @@
       },
       {
         "side": "ask",
-        "price_low": 103.0,
-        "price_high": 104.0,
-        "price_mid": 103.5,
-        "depth_quote": 90.0,
+        "price_low": 103.206,
+        "price_high": 104.208,
+        "price_mid": 103.707,
+        "depth_quote": 49.5,
         "venue_count": 1,
         "venue_depth_quote": {
-          "bybit": 90.0
+          "bybit": 49.5
         },
         "hhi": 1,
         "persistence": 0.35,
@@ -81,15 +81,15 @@
     ],
     "top_bid_wall": {
       "side": "bid",
-      "price_low": 99.0,
-      "price_high": 100.0,
-      "price_mid": 99.5,
-      "depth_quote": 1000.0,
+      "price_low": 99.198,
+      "price_high": 100.2,
+      "price_mid": 99.699,
+      "depth_quote": 550.0,
       "venue_count": 3,
       "venue_depth_quote": {
-        "binance": 340.0,
-        "bybit": 330.0,
-        "okx": 330.0
+        "binance": 187.0,
+        "bybit": 181.5,
+        "okx": 181.5
       },
       "hhi": 0.3334,
       "persistence": 0.67,
@@ -98,27 +98,27 @@
     },
     "top_ask_wall": {
       "side": "ask",
-      "price_low": 102.0,
-      "price_high": 103.0,
-      "price_mid": 102.5,
-      "depth_quote": 900.0,
+      "price_low": 102.204,
+      "price_high": 103.206,
+      "price_mid": 102.705,
+      "depth_quote": 495.0,
       "venue_count": 2,
       "venue_depth_quote": {
-        "binance": 450.0,
-        "okx": 450.0
+        "binance": 247.5,
+        "okx": 247.5
       },
       "hhi": 0.5,
       "persistence": 0.61,
       "spoof_risk_proxy": 0.15,
       "vacuum_score": 0.1
     },
-    "bid_depth_total": 1100.0,
-    "ask_depth_total": 990.0,
+    "bid_depth_total": 605.0,
+    "ask_depth_total": 544.5,
     "depth_imbalance": 0.052632,
     "status": "COMPOSITE_BOOK_OK",
     "notes": [
       "Illustrative synthetic sample; not live market data.",
-      "Synthetic 15m public-depth fixture for dashboard multi-timeframe onboarding."
+      "Synthetic 5m public-depth fixture for dashboard multi-timeframe onboarding."
     ]
   }
 }

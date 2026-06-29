@@ -10,6 +10,8 @@ sample-report/dashboard.html
 ```
 
 The default input is the checked-in `examples/sample_artifacts` directory.
+That fixture includes a dashboard profile with primary timeframe `15m`,
+multi-timeframe filters `5m,15m,1h`, and a 60-second refresh metadata cadence.
 
 The command does not fetch live exchange data. It is meant to let a new user inspect the project output shape before running public exchange connectors.
 

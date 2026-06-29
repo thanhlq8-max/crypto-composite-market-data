@@ -9,24 +9,38 @@
     "spot_usdt"
   ],
   "timeframes": [
-    "15m"
+    "5m",
+    "15m",
+    "1h"
   ],
   "outputs": {
     "raw_scan_by_timeframe": [],
     "composite_ohlcv_by_timeframe": [
-      "composite_ohlcv_15m.json"
+      "composite_ohlcv_5m.json",
+      "composite_ohlcv_15m.json",
+      "composite_ohlcv_1h.json"
     ],
     "composite_orderbook_ladder_by_timeframe": [
-      "composite_orderbook_ladder_15m.json"
+      "composite_orderbook_ladder_5m.json",
+      "composite_orderbook_ladder_15m.json",
+      "composite_orderbook_ladder_1h.json"
     ],
     "combined_composite_ohlcv": "composite_ohlcv.json",
     "combined_composite_orderbook_ladder": "composite_orderbook_ladder.json",
     "data_quality": "data_quality.json"
   },
   "data_quality_by_timeframe": {
+    "5m": {
+      "status": "OK",
+      "overall_quality": 0.94
+    },
     "15m": {
       "status": "OK",
       "overall_quality": 0.95
+    },
+    "1h": {
+      "status": "OK",
+      "overall_quality": 0.93
     }
   },
   "limitations": [

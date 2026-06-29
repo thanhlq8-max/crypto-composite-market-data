@@ -1,4 +1,26 @@
 {
+  "5m": {
+    "asset": "ETH-USDT",
+    "venues_requested": [
+      "binance",
+      "okx",
+      "bybit"
+    ],
+    "venues_ok": [
+      "binance",
+      "okx",
+      "bybit"
+    ],
+    "venues_failed": [],
+    "market_types": [
+      "spot_usdt"
+    ],
+    "timeframe": "5m",
+    "missing_sources": [],
+    "overall_quality": 0.89,
+    "status": "OK",
+    "note": "Illustrative synthetic 5m sample; not live market data."
+  },
   "15m": {
     "asset": "ETH-USDT",
     "venues_requested": [
@@ -19,6 +41,28 @@
     "missing_sources": [],
     "overall_quality": 0.9,
     "status": "OK",
-    "note": "Illustrative synthetic sample; not live market data."
+    "note": "Illustrative synthetic 15m sample; not live market data."
+  },
+  "1h": {
+    "asset": "ETH-USDT",
+    "venues_requested": [
+      "binance",
+      "okx",
+      "bybit"
+    ],
+    "venues_ok": [
+      "binance",
+      "okx",
+      "bybit"
+    ],
+    "venues_failed": [],
+    "market_types": [
+      "spot_usdt"
+    ],
+    "timeframe": "1h",
+    "missing_sources": [],
+    "overall_quality": 0.88,
+    "status": "OK",
+    "note": "Illustrative synthetic 1h sample; not live market data."
   }
 }
