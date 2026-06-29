@@ -134,7 +134,7 @@ Goal: grow the project as a credible open-source data-infrastructure utility.
 - Treat external maintainer-support programs as downstream opportunities, not as current eligibility claims.
 
 
-## v0.15.0 â€” Operational briefing report
+## v0.15.0 - Operational briefing report
 
 - Add DID / DOING / NEXT MONITOR / KEY LEVELS / RISK CONTEXT to the static report.
 - Derive the briefing only from existing composite OHLCV and public ladder artifacts.

@@ -20,6 +20,7 @@ from crypto_composite.dashboard import (
 )
 from crypto_composite.dashboard_analytics import build_dashboard_snapshot
 from crypto_composite.dashboard_frontend import render_dashboard_html
+from crypto_composite.dashboard_profile import write_dashboard_profile
 
 
 def test_build_artifact_index_lists_json_files(tmp_path: Path) -> None:
@@ -55,6 +56,8 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert 'getJson("/api/artifacts")' in html
     assert "item.path" in html
     assert "item.size_bytes" in html
+    assert 'id="profile-note"' in html
+    assert "\u00c2" not in html
     assert ">Buy<" not in html
     assert ">Sell<" not in html
 
@@ -181,6 +184,39 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
     assert timeframe["source_note"] == "Reviewed fixture; not live data."
     assert timeframe["spot_perp_dislocation"]["basis_pct"] == pytest.approx(0.4950495)
     assert snapshot["mode"] == "OBSERVED_PUBLIC_DATA"
+
+
+def test_dashboard_snapshot_uses_profile_primary_timeframe_order(tmp_path: Path) -> None:
+    contexts = {
+        timeframe: {
+            "asset": "BTC-USDT",
+            "timeframe": timeframe,
+            "bars_by_market_type": {"spot_usdt": []},
+            "latest_by_market_type": {},
+        }
+        for timeframe in ["5m", "15m", "1h"]
+    }
+    (tmp_path / "composite_ohlcv.json").write_text(json.dumps(contexts), encoding="utf-8")
+    (tmp_path / "data_quality.json").write_text(
+        json.dumps({timeframe: {"status": "OK"} for timeframe in contexts}),
+        encoding="utf-8",
+    )
+    (tmp_path / "run_summary.json").write_text(
+        json.dumps({"asset": "BTC-USDT", "timeframes": ["5m", "15m", "1h"]}),
+        encoding="utf-8",
+    )
+    write_dashboard_profile(
+        tmp_path,
+        primary_timeframe="15m",
+        timeframes=["5m", "15m", "1h"],
+        refresh_seconds=60,
+    )
+
+    snapshot = build_dashboard_snapshot(tmp_path)
+
+    assert snapshot["profile"]["primary_timeframe"] == "15m"
+    assert snapshot["profile"]["refresh_seconds"] == 60
+    assert [item["timeframe"] for item in snapshot["assets"][0]["timeframes"]] == ["15m", "5m", "1h"]
 
 
 def test_dashboard_snapshot_endpoint_returns_object(tmp_path: Path) -> None:

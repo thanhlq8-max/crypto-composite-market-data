@@ -22,6 +22,12 @@ It performs these steps:
 
 The deployed pages link to the copied JSON files under `_site/artifacts`, so the demo remains self-contained.
 
+## Refresh cadence boundary
+
+The Pages workflow is a synthetic sample deployment path, not the locked 60-second dashboard refresh runner. GitHub's scheduled workflow cadence is not suitable for this profile because GitHub documents the shortest scheduled interval as once every 5 minutes: [Events that trigger workflows](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#schedule).
+
+Use `crypto-composite dashboard-refresh` from a local machine or an external runner when a real 60-second artifact refresh loop is required.
+
 ## Live demo
 
 After the manual Pages workflow passes on `main`, the current public demo is expected at:

@@ -25,6 +25,44 @@ The dashboard cards, charts, filters, zones, and methodology work without the lo
 
 When `data_quality.json` contains a timeframe-level `note`, the dashboard displays that note verbatim near the load status. This keeps synthetic, reviewed, or otherwise qualified sources visibly labeled without inferring a source type.
 
+## Dashboard profile
+
+An artifact root may include `dashboard_profile.json` to make the dashboard select a locked primary timeframe first and display the configured refresh cadence:
+
+```bash
+crypto-composite dashboard-profile \
+  --artifact-root artifacts-universe \
+  --primary-timeframe 15m \
+  --timeframes 5m,15m,1h \
+  --refresh-seconds 60
+```
+
+The profile is metadata only. It does not certify source completeness, create a trading state, or modify composite calculation behavior.
+
+## Local refresh runner
+
+Use `dashboard-refresh` when a local or external runner must regenerate an explicit universe and rewrite a static dashboard on a fixed cadence:
+
+```bash
+crypto-composite dashboard-refresh \
+  --assets BTC-USDT,ETH-USDT,SOL-USDT \
+  --venues binance,okx,bybit \
+  --market-types spot_usdt,perp_usdt \
+  --timeframes 5m,15m,1h \
+  --primary-timeframe 15m \
+  --refresh-seconds 60 \
+  --limit 120 \
+  --depth 100 \
+  --bucket-size REVIEWED_BUCKET_SIZE \
+  --out-dir artifacts-live \
+  --dashboard-file artifacts-live/dashboard.html \
+  --artifact-base-url .
+```
+
+The command requires all material inputs, including the reviewed orderbook ladder bucket size for the selected assets. It writes `dashboard_profile.json`, validates and scores the refreshed artifact root, then writes the static dashboard file. Use `--max-cycles 1` for a single smoke run; omit it only when the process should continue refreshing until stopped.
+
+GitHub Pages is not the 60-second refresh runner. The repository Pages workflow remains a manual synthetic sample deployment.
+
 ## Screenshot
 
 ![Read-only dashboard rendered from the checked-in synthetic sample artifacts](assets/dashboard-overview.png)

@@ -16,6 +16,8 @@ from crypto_composite.dashboard import (
     serve_dashboard,
     write_dashboard_export,
 )
+from crypto_composite.dashboard_profile import DashboardProfileError, write_dashboard_profile
+from crypto_composite.dashboard_refresh import DashboardRefreshError, run_dashboard_refresh
 from crypto_composite.pipeline import (
     DEFAULT_ASSET,
     DEFAULT_DEPTH,
@@ -79,6 +81,30 @@ def main() -> None:
         "--artifact-base-url",
         help="Optional relative URL containing JSON artifacts for the static inspector.",
     )
+
+    dashboard_profile = sub.add_parser("dashboard-profile", help="Write explicit dashboard profile metadata.")
+    dashboard_profile.add_argument("--artifact-root", required=True, help="Directory containing JSON artifacts.")
+    dashboard_profile.add_argument("--primary-timeframe", required=True, help="Primary dashboard timeframe, for example 15m.")
+    dashboard_profile.add_argument("--timeframes", required=True, help="Comma-separated dashboard timeframes.")
+    dashboard_profile.add_argument("--refresh-seconds", type=int, required=True, help="Artifact refresh cadence in seconds.")
+
+    dashboard_refresh = sub.add_parser(
+        "dashboard-refresh",
+        help="Regenerate explicit universe artifacts and a static dashboard on a fixed cadence.",
+    )
+    dashboard_refresh.add_argument("--assets", required=True, help="Comma-separated BASE-USDT assets.")
+    dashboard_refresh.add_argument("--venues", required=True, help="Comma-separated public venues.")
+    dashboard_refresh.add_argument("--market-types", required=True, help="Comma-separated market types.")
+    dashboard_refresh.add_argument("--timeframes", required=True, help="Comma-separated timeframes.")
+    dashboard_refresh.add_argument("--primary-timeframe", required=True, help="Primary dashboard timeframe.")
+    dashboard_refresh.add_argument("--refresh-seconds", type=int, required=True, help="Artifact refresh cadence in seconds.")
+    dashboard_refresh.add_argument("--limit", type=int, required=True, help="OHLCV bar limit per refresh.")
+    dashboard_refresh.add_argument("--depth", type=int, required=True, help="Orderbook depth limit per refresh.")
+    dashboard_refresh.add_argument("--bucket-size", type=float, required=True, help="Explicit orderbook ladder bucket size.")
+    dashboard_refresh.add_argument("--out-dir", required=True, help="Artifact directory to refresh.")
+    dashboard_refresh.add_argument("--dashboard-file", required=True, help="Static dashboard HTML file to write.")
+    dashboard_refresh.add_argument("--artifact-base-url", required=True, help="Relative URL for dashboard JSON inspector links.")
+    dashboard_refresh.add_argument("--max-cycles", type=int, help="Stop after this many refresh cycles.")
 
     validate = sub.add_parser("validate-artifacts", help="Validate generated JSON artifact structure.")
     validate.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
@@ -149,6 +175,49 @@ def main() -> None:
         )
         print(json.dumps(export_result, indent=2, sort_keys=True))
         if export_result["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "dashboard-profile":
+        try:
+            profile_result = write_dashboard_profile(
+                args.artifact_root,
+                primary_timeframe=args.primary_timeframe,
+                timeframes=parse_csv(args.timeframes),
+                refresh_seconds=args.refresh_seconds,
+            )
+        except DashboardProfileError as exc:
+            parser.exit(1, f"ERROR: {exc}\n")
+        print(json.dumps(profile_result, indent=2, sort_keys=True))
+    elif args.cmd == "dashboard-refresh":
+        def _print_cycle(cycle: dict[str, object]) -> None:
+            print(
+                "STATUS: "
+                f"{cycle.get('status')} "
+                f"cycle={cycle.get('cycle')} "
+                f"dashboard={cycle.get('dashboard_path', 'unavailable')}",
+                flush=True,
+            )
+
+        try:
+            refresh_result = run_dashboard_refresh(
+                assets=parse_csv(args.assets),
+                venues=parse_csv(args.venues),
+                market_types=parse_csv(args.market_types),
+                timeframes=parse_csv(args.timeframes),
+                primary_timeframe=args.primary_timeframe,
+                refresh_seconds=args.refresh_seconds,
+                limit=args.limit,
+                depth=args.depth,
+                out_dir=args.out_dir,
+                dashboard_file=args.dashboard_file,
+                artifact_base_url=args.artifact_base_url,
+                bucket_size=args.bucket_size,
+                max_cycles=args.max_cycles,
+                on_cycle=_print_cycle,
+            )
+        except DashboardRefreshError as exc:
+            parser.exit(1, f"ERROR: {exc}\n")
+        print(json.dumps(refresh_result, indent=2, sort_keys=True))
+        if refresh_result["status"] == "ERROR":
             parser.exit(1)
     elif args.cmd == "validate-artifacts":
         validation = validate_artifact_root(args.artifact_root)

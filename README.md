@@ -372,6 +372,36 @@ crypto-composite dashboard-export \
   --artifact-base-url artifacts
 ```
 
+Write an explicit dashboard profile when an operating view has a locked primary timeframe and refresh cadence:
+
+```bash
+crypto-composite dashboard-profile \
+  --artifact-root artifacts-universe \
+  --primary-timeframe 15m \
+  --timeframes 5m,15m,1h \
+  --refresh-seconds 60
+```
+
+Run a local explicit-universe refresh loop and rewrite a static dashboard on the locked cadence. All material inputs are required; the command does not infer assets, venues, market types, row limits, or depth:
+
+```bash
+crypto-composite dashboard-refresh \
+  --assets BTC-USDT,ETH-USDT,SOL-USDT \
+  --venues binance,okx,bybit \
+  --market-types spot_usdt,perp_usdt \
+  --timeframes 5m,15m,1h \
+  --primary-timeframe 15m \
+  --refresh-seconds 60 \
+  --limit 120 \
+  --depth 100 \
+  --bucket-size REVIEWED_BUCKET_SIZE \
+  --out-dir artifacts-live \
+  --dashboard-file artifacts-live/dashboard.html \
+  --artifact-base-url .
+```
+
+GitHub Pages remains the synthetic sample demo path. A 60-second live refresh should run from a local machine or external runner that explicitly supplies the command inputs above, including a reviewed price bucket size for the selected assets.
+
 See [docs/DASHBOARD_API.md](docs/DASHBOARD_API.md).
 
 ## Community and contribution

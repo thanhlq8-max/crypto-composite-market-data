@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from crypto_composite.dashboard_profile import read_dashboard_profile
+
 
 EVIDENCE_METHOD = {
     "CORROBORATED": (
@@ -50,6 +52,25 @@ def _finite_number(value: Any) -> float | None:
         return None
     number = float(value)
     return number if number == number and number not in (float("inf"), float("-inf")) else None
+
+
+def _string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item]
+
+
+def _ordered_timeframes(keys: set[str], requested: list[str], primary: str | None) -> list[str]:
+    ordered: list[str] = []
+    if primary in keys:
+        ordered.append(primary)
+    for timeframe in requested:
+        if timeframe in keys and timeframe not in ordered:
+            ordered.append(timeframe)
+    for timeframe in sorted(keys):
+        if timeframe not in ordered:
+            ordered.append(timeframe)
+    return ordered
 
 
 def _venue_majority_share(level: dict[str, Any]) -> float | None:
@@ -283,13 +304,27 @@ def _monitoring_brief(
     }
 
 
-def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[str, Any] | None:
+def _build_asset(
+    asset_hint: str | None,
+    asset_root: Path,
+    root: Path,
+    profile: dict[str, Any] | None,
+) -> dict[str, Any] | None:
     ohlcv_by_timeframe = _read_object(asset_root / "composite_ohlcv.json") or {}
     ladder_by_timeframe = _read_object(asset_root / "composite_orderbook_ladder.json") or {}
     quality_by_timeframe = _read_object(asset_root / "data_quality.json") or {}
     run_summary = _read_object(asset_root / "run_summary.json") or {}
     asset = asset_hint or run_summary.get("asset")
-    timeframes = sorted(set(ohlcv_by_timeframe) | set(ladder_by_timeframe) | set(quality_by_timeframe))
+    requested_timeframes = _string_list(profile.get("timeframes") if profile is not None else None)
+    if not requested_timeframes:
+        requested_timeframes = _string_list(run_summary.get("timeframes"))
+    primary_timeframe = profile.get("primary_timeframe") if profile is not None else None
+    primary_timeframe = primary_timeframe if isinstance(primary_timeframe, str) else None
+    timeframes = _ordered_timeframes(
+        set(ohlcv_by_timeframe) | set(ladder_by_timeframe) | set(quality_by_timeframe),
+        requested_timeframes,
+        primary_timeframe,
+    )
     if not timeframes:
         return None
 
@@ -357,13 +392,15 @@ def _build_asset(asset_hint: str | None, asset_root: Path, root: Path) -> dict[s
 def build_dashboard_snapshot(artifact_root: str | Path) -> dict[str, Any]:
     """Build a read-only, artifact-derived view for Dashboard V3."""
     root = Path(artifact_root).expanduser().resolve()
+    profile = read_dashboard_profile(root)
     assets = [
         asset
         for hint, path in _asset_roots(root)
-        if (asset := _build_asset(hint, path, root)) is not None
+        if (asset := _build_asset(hint, path, root, profile)) is not None
     ]
     return {
         "mode": "OBSERVED_PUBLIC_DATA",
+        "profile": profile,
         "assets": assets,
         "methodology": {
             "zone_selection": (

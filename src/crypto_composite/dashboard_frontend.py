@@ -92,6 +92,7 @@ def render_dashboard_html(
       <h1>Observed Market Structure</h1>
       <p>Composite price, public depth, and practical zones derived from generated artifacts.</p>
       <span id="service-state" class="badge">Connecting</span>
+      <p id="profile-note" class="source-note" hidden></p>
       <p id="source-note" class="source-note" hidden></p>
     </div>
     <div class="filters" aria-label="Dashboard filters">
@@ -181,7 +182,7 @@ def render_dashboard_html(
   function price(value) { const number = numeric(value); return number === null ? "unavailable" : fmt(number, Math.abs(number) < 10 ? 5 : 2); }
   function bytes(value) { const n = numeric(value); return n === null ? "unknown" : n < 1024 ? `${n} B` : n < 1048576 ? `${fmt(n / 1024, 1)} KiB` : `${fmt(n / 1048576, 1)} MiB`; }
   function relationLabel(value) { return value === "BELOW_REFERENCE" ? "below reference" : value === "ABOVE_REFERENCE" ? "above reference" : value === "CONTAINS_REFERENCE" ? "contains reference" : "unavailable"; }
-  function zoneSummary(zone) { return zone ? `${price(zone.price_low)} - ${price(zone.price_high)} · ${zone.evidence_grade || "LIMITED"}` : "unavailable"; }
+  function zoneSummary(zone) { return zone ? `${price(zone.price_low)} - ${price(zone.price_high)} / ${zone.evidence_grade || "LIMITED"}` : "unavailable"; }
   function svg(tag, attrs = {}, text = "") { const node = document.createElementNS(NS, tag); for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value); if (text) node.textContent = text; return node; }
   async function getJson(url) {
     if (url === "/api/dashboard-snapshot" && embeddedSnapshot) return embeddedSnapshot;
@@ -204,7 +205,9 @@ def render_dashboard_html(
     options(assetSelect, assets.map((item) => String(item.asset)), assetValue);
     const asset = assets.find((item) => String(item.asset) === assetSelect.value) || assets[0];
     const timeframes = asset?.timeframes || [];
-    const timeframeValue = level === "timeframe" ? timeframeSelect.value : (timeframeSelect.value || timeframes[0]?.timeframe || "");
+    const primary = state.snapshot?.profile?.primary_timeframe;
+    const preferredTimeframe = timeframes.some((item) => item.timeframe === primary) ? primary : timeframes[0]?.timeframe;
+    const timeframeValue = level === "timeframe" ? timeframeSelect.value : (timeframeSelect.value || preferredTimeframe || "");
     options(timeframeSelect, timeframes.map((item) => item.timeframe), timeframeValue);
     const timeframe = timeframes.find((item) => item.timeframe === timeframeSelect.value) || timeframes[0];
     const markets = timeframe?.markets || [];
@@ -234,7 +237,7 @@ def render_dashboard_html(
 
     const bid = now?.nearest_bid_concentration; const ask = now?.nearest_ask_concentration;
     const nearest = [bid ? `Bid ${fmt(bid.distance_to_reference_pct, 3)}% ${relationLabel(bid.reference_relation)}` : null, ask ? `Ask ${fmt(ask.distance_to_reference_pct, 3)}% ${relationLabel(ask.reference_relation)}` : null].filter(Boolean);
-    byId("now-title").textContent = nearest.length ? nearest.join(" · ") : "Concentration unavailable";
+    byId("now-title").textContent = nearest.length ? nearest.join(" / ") : "Concentration unavailable";
     const book = now?.book; const zoneText = [bid ? `Bid ${zoneSummary(bid)}` : null, ask ? `Ask ${zoneSummary(ask)}` : null].filter(Boolean).join("; ");
     const imbalance = numeric(book?.depth_imbalance);
     const depthText = book ? `Depth bid ${fmt(book.bid_depth_total, 0)} vs ask ${fmt(book.ask_depth_total, 0)}; imbalance ${imbalance === null ? "unavailable" : signedPercent(imbalance * 100)}.` : "No composite book context.";
@@ -246,8 +249,8 @@ def render_dashboard_html(
 
     const confidence = brief?.confidence_risk; const counts = confidence?.evidence_grade_counts || {};
     const qualityStates = [confidence?.ohlcv_status, confidence?.book_status].filter(Boolean);
-    byId("confidence-title").textContent = qualityStates.length ? qualityStates.join(" · ") : "Quality unavailable";
-    byId("confidence-detail").textContent = `${pct(confidence?.book_coverage)} book coverage · ${counts.CORROBORATED || 0}/${confidence?.zone_count || 0} zones corroborated. ${confidence?.snapshot_limit || "Snapshot limitations unavailable."}`;
+    byId("confidence-title").textContent = qualityStates.length ? qualityStates.join(" / ") : "Quality unavailable";
+    byId("confidence-detail").textContent = `${pct(confidence?.book_coverage)} book coverage / ${counts.CORROBORATED || 0}/${confidence?.zone_count || 0} zones corroborated. ${confidence?.snapshot_limit || "Snapshot limitations unavailable."}`;
   }
   function renderPriceChart(market) {
     const chart = byId("price-chart"); chart.replaceChildren();
@@ -296,7 +299,12 @@ def render_dashboard_html(
       const [health, snapshot, index] = await Promise.all([getJson("/api/health"), getJson("/api/dashboard-snapshot"), getJson("/api/artifacts")]);
       if (health.status !== "OK") throw new Error("dashboard health is not OK"); state.snapshot = snapshot; state.index = index;
       if (!snapshot.assets?.length) throw new Error("no composite artifact contexts found");
-      byId("service-state").textContent = "Observed artifact context loaded"; byId("service-state").className = "badge ok";
+      const profile = snapshot.profile || {};
+      const profileNote = byId("profile-note");
+      const profileParts = [profile.primary_timeframe ? `Primary ${profile.primary_timeframe}` : null, profile.timeframes?.length ? `MTF ${profile.timeframes.join(",")}` : null, profile.refresh_seconds ? `Refresh profile ${profile.refresh_seconds}s` : null].filter(Boolean);
+      profileNote.textContent = profileParts.join(" / ");
+      profileNote.hidden = !profileParts.length;
+      byId("service-state").textContent = profile.refresh_seconds ? `Observed artifact context loaded / ${profile.refresh_seconds}s profile` : "Observed artifact context loaded"; byId("service-state").className = "badge ok";
       syncFilters(); renderCurrent(); renderManifest();
       byId("methodology").textContent = `${snapshot.methodology.zone_selection} ${snapshot.methodology.snapshot_limit} ${snapshot.methodology.cross_venue_limit}`;
       byId("evidence-method").textContent = Object.entries(snapshot.methodology.evidence_grades).map(([grade, definition]) => `${grade}: ${definition}`).join("\n\n");

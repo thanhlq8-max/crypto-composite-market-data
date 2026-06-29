@@ -124,6 +124,93 @@ def test_cli_dashboard_export_invokes_writer(monkeypatch, capsys) -> None:
     assert json.loads(capsys.readouterr().out)["status"] == "OK"
 
 
+def test_cli_dashboard_profile_writes_metadata(monkeypatch, capsys, tmp_path) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "crypto-composite",
+            "dashboard-profile",
+            "--artifact-root",
+            str(tmp_path),
+            "--primary-timeframe",
+            "15m",
+            "--timeframes",
+            "5m,15m,1h",
+            "--refresh-seconds",
+            "60",
+        ],
+    )
+
+    cli.main()
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == "OK"
+    assert payload["profile"]["primary_timeframe"] == "15m"
+    assert payload["profile"]["timeframes"] == ["5m", "15m", "1h"]
+    assert payload["profile"]["refresh_seconds"] == 60
+
+
+def test_cli_dashboard_refresh_requires_explicit_profile_inputs(monkeypatch, capsys) -> None:
+    calls: list[dict] = []
+
+    def fake_run_dashboard_refresh(**kwargs) -> dict:
+        calls.append(kwargs)
+        return {"status": "OK", "cycles_completed": 1}
+
+    monkeypatch.setattr(cli, "run_dashboard_refresh", fake_run_dashboard_refresh)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "crypto-composite",
+            "dashboard-refresh",
+            "--assets",
+            "BTC-USDT,ETH-USDT",
+            "--venues",
+            "binance,okx,bybit",
+            "--market-types",
+            "spot_usdt,perp_usdt",
+            "--timeframes",
+            "5m,15m,1h",
+            "--primary-timeframe",
+            "15m",
+            "--refresh-seconds",
+            "60",
+            "--limit",
+            "120",
+            "--depth",
+            "100",
+            "--bucket-size",
+            "1",
+            "--out-dir",
+            "artifacts-live",
+            "--dashboard-file",
+            "artifacts-live/dashboard.html",
+            "--artifact-base-url",
+            ".",
+            "--max-cycles",
+            "1",
+        ],
+    )
+
+    cli.main()
+
+    assert calls[0]["assets"] == ["BTC-USDT", "ETH-USDT"]
+    assert calls[0]["venues"] == ["binance", "okx", "bybit"]
+    assert calls[0]["market_types"] == ["spot_usdt", "perp_usdt"]
+    assert calls[0]["timeframes"] == ["5m", "15m", "1h"]
+    assert calls[0]["primary_timeframe"] == "15m"
+    assert calls[0]["refresh_seconds"] == 60
+    assert calls[0]["limit"] == 120
+    assert calls[0]["depth"] == 100
+    assert calls[0]["bucket_size"] == 1.0
+    assert calls[0]["artifact_base_url"] == "."
+    assert calls[0]["max_cycles"] == 1
+    assert callable(calls[0]["on_cycle"])
+    assert json.loads(capsys.readouterr().out)["status"] == "OK"
+
+
 def test_cli_sample_report_invokes_workflow(monkeypatch, capsys) -> None:
     calls: list[dict] = []
 
