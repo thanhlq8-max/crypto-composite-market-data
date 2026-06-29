@@ -1,4 +1,130 @@
 {
+  "5m": {
+    "spot_usdt": {
+      "asset": "ETH-USDT",
+      "market_type": "spot_usdt",
+      "generated_at_ms": 1700000000000,
+      "reference_price": 50.6515,
+      "bucket_size": 0.5015,
+      "expected_venues": [
+        "binance",
+        "okx",
+        "bybit"
+      ],
+      "venue_count": 3,
+      "coverage": 1,
+      "bid_levels": [
+        {
+          "side": "bid",
+          "price_low": 50.15,
+          "price_high": 50.6515,
+          "price_mid": 50.40075,
+          "depth_quote": 480.0,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 168.0,
+            "bybit": 156.0,
+            "okx": 156.0
+          },
+          "hhi": 0.33375,
+          "persistence": 0.66,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0
+        },
+        {
+          "side": "bid",
+          "price_low": 49.6485,
+          "price_high": 50.15,
+          "price_mid": 49.89925,
+          "depth_quote": 48.0,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "binance": 48.0
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9
+        }
+      ],
+      "ask_levels": [
+        {
+          "side": "ask",
+          "price_low": 50.6515,
+          "price_high": 51.153,
+          "price_mid": 50.90225,
+          "depth_quote": 468.0,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 156.0,
+            "bybit": 156.0,
+            "okx": 156.0
+          },
+          "hhi": 0.333333,
+          "persistence": 0.64,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0.025
+        },
+        {
+          "side": "ask",
+          "price_low": 51.153,
+          "price_high": 51.6545,
+          "price_mid": 51.40375,
+          "depth_quote": 42.0,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "bybit": 42.0
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9125
+        }
+      ],
+      "top_bid_wall": {
+        "side": "bid",
+        "price_low": 50.15,
+        "price_high": 50.6515,
+        "price_mid": 50.40075,
+        "depth_quote": 480.0,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 168.0,
+          "bybit": 156.0,
+          "okx": 156.0
+        },
+        "hhi": 0.33375,
+        "persistence": 0.66,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0
+      },
+      "top_ask_wall": {
+        "side": "ask",
+        "price_low": 50.6515,
+        "price_high": 51.153,
+        "price_mid": 50.90225,
+        "depth_quote": 468.0,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 156.0,
+          "bybit": 156.0,
+          "okx": 156.0
+        },
+        "hhi": 0.333333,
+        "persistence": 0.64,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0.025
+      },
+      "bid_depth_total": 528.0,
+      "ask_depth_total": 510.0,
+      "depth_imbalance": 0.017341,
+      "status": "COMPOSITE_BOOK_OK",
+      "notes": [
+        "Illustrative synthetic sample; not live market data.",
+        "Synthetic 5m public-depth fixture for dashboard multi-timeframe onboarding."
+      ]
+    }
+  },
   "15m": {
     "spot_usdt": {
       "asset": "ETH-USDT",
@@ -16,15 +142,15 @@
       "bid_levels": [
         {
           "side": "bid",
-          "price_low": 50,
+          "price_low": 50.0,
           "price_high": 50.5,
           "price_mid": 50.25,
-          "depth_quote": 800,
+          "depth_quote": 800.0,
           "venue_count": 3,
           "venue_depth_quote": {
-            "binance": 280,
-            "bybit": 260,
-            "okx": 260
+            "binance": 280.0,
+            "bybit": 260.0,
+            "okx": 260.0
           },
           "hhi": 0.33375,
           "persistence": 0.66,
@@ -34,12 +160,12 @@
         {
           "side": "bid",
           "price_low": 49.5,
-          "price_high": 50,
+          "price_high": 50.0,
           "price_mid": 49.75,
-          "depth_quote": 80,
+          "depth_quote": 80.0,
           "venue_count": 1,
           "venue_depth_quote": {
-            "binance": 80
+            "binance": 80.0
           },
           "hhi": 1,
           "persistence": 0.35,
@@ -51,14 +177,14 @@
         {
           "side": "ask",
           "price_low": 50.5,
-          "price_high": 51,
+          "price_high": 51.0,
           "price_mid": 50.75,
-          "depth_quote": 780,
+          "depth_quote": 780.0,
           "venue_count": 3,
           "venue_depth_quote": {
-            "binance": 260,
-            "bybit": 260,
-            "okx": 260
+            "binance": 260.0,
+            "bybit": 260.0,
+            "okx": 260.0
           },
           "hhi": 0.333333,
           "persistence": 0.64,
@@ -67,13 +193,13 @@
         },
         {
           "side": "ask",
-          "price_low": 51,
+          "price_low": 51.0,
           "price_high": 51.5,
           "price_mid": 51.25,
-          "depth_quote": 70,
+          "depth_quote": 70.0,
           "venue_count": 1,
           "venue_depth_quote": {
-            "bybit": 70
+            "bybit": 70.0
           },
           "hhi": 1,
           "persistence": 0.35,
@@ -83,15 +209,15 @@
       ],
       "top_bid_wall": {
         "side": "bid",
-        "price_low": 50,
+        "price_low": 50.0,
         "price_high": 50.5,
         "price_mid": 50.25,
-        "depth_quote": 800,
+        "depth_quote": 800.0,
         "venue_count": 3,
         "venue_depth_quote": {
-          "binance": 280,
-          "bybit": 260,
-          "okx": 260
+          "binance": 280.0,
+          "bybit": 260.0,
+          "okx": 260.0
         },
         "hhi": 0.33375,
         "persistence": 0.66,
@@ -101,26 +227,153 @@
       "top_ask_wall": {
         "side": "ask",
         "price_low": 50.5,
-        "price_high": 51,
+        "price_high": 51.0,
         "price_mid": 50.75,
-        "depth_quote": 780,
+        "depth_quote": 780.0,
         "venue_count": 3,
         "venue_depth_quote": {
-          "binance": 260,
-          "bybit": 260,
-          "okx": 260
+          "binance": 260.0,
+          "bybit": 260.0,
+          "okx": 260.0
         },
         "hhi": 0.333333,
         "persistence": 0.64,
         "spoof_risk_proxy": 0.05,
         "vacuum_score": 0.025
       },
-      "bid_depth_total": 880,
-      "ask_depth_total": 850,
+      "bid_depth_total": 880.0,
+      "ask_depth_total": 850.0,
       "depth_imbalance": 0.017341,
       "status": "COMPOSITE_BOOK_OK",
       "notes": [
-        "Illustrative synthetic sample; not live market data."
+        "Illustrative synthetic sample; not live market data.",
+        "Synthetic 15m public-depth fixture for dashboard multi-timeframe onboarding."
+      ]
+    }
+  },
+  "1h": {
+    "spot_usdt": {
+      "asset": "ETH-USDT",
+      "market_type": "spot_usdt",
+      "generated_at_ms": 1700000000000,
+      "reference_price": 50.096,
+      "bucket_size": 0.496,
+      "expected_venues": [
+        "binance",
+        "okx",
+        "bybit"
+      ],
+      "venue_count": 3,
+      "coverage": 1,
+      "bid_levels": [
+        {
+          "side": "bid",
+          "price_low": 49.6,
+          "price_high": 50.096,
+          "price_mid": 49.848,
+          "depth_quote": 1680.0,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 588.0,
+            "bybit": 546.0,
+            "okx": 546.0
+          },
+          "hhi": 0.33375,
+          "persistence": 0.66,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0
+        },
+        {
+          "side": "bid",
+          "price_low": 49.104,
+          "price_high": 49.6,
+          "price_mid": 49.352,
+          "depth_quote": 168.0,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "binance": 168.0
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9
+        }
+      ],
+      "ask_levels": [
+        {
+          "side": "ask",
+          "price_low": 50.096,
+          "price_high": 50.592,
+          "price_mid": 50.344,
+          "depth_quote": 1638.0,
+          "venue_count": 3,
+          "venue_depth_quote": {
+            "binance": 546.0,
+            "bybit": 546.0,
+            "okx": 546.0
+          },
+          "hhi": 0.333333,
+          "persistence": 0.64,
+          "spoof_risk_proxy": 0.05,
+          "vacuum_score": 0.025
+        },
+        {
+          "side": "ask",
+          "price_low": 50.592,
+          "price_high": 51.088,
+          "price_mid": 50.84,
+          "depth_quote": 147.0,
+          "venue_count": 1,
+          "venue_depth_quote": {
+            "bybit": 147.0
+          },
+          "hhi": 1,
+          "persistence": 0.35,
+          "spoof_risk_proxy": 0.7,
+          "vacuum_score": 0.9125
+        }
+      ],
+      "top_bid_wall": {
+        "side": "bid",
+        "price_low": 49.6,
+        "price_high": 50.096,
+        "price_mid": 49.848,
+        "depth_quote": 1680.0,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 588.0,
+          "bybit": 546.0,
+          "okx": 546.0
+        },
+        "hhi": 0.33375,
+        "persistence": 0.66,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0
+      },
+      "top_ask_wall": {
+        "side": "ask",
+        "price_low": 50.096,
+        "price_high": 50.592,
+        "price_mid": 50.344,
+        "depth_quote": 1638.0,
+        "venue_count": 3,
+        "venue_depth_quote": {
+          "binance": 546.0,
+          "bybit": 546.0,
+          "okx": 546.0
+        },
+        "hhi": 0.333333,
+        "persistence": 0.64,
+        "spoof_risk_proxy": 0.05,
+        "vacuum_score": 0.025
+      },
+      "bid_depth_total": 1848.0,
+      "ask_depth_total": 1785.0,
+      "depth_imbalance": 0.017341,
+      "status": "COMPOSITE_BOOK_OK",
+      "notes": [
+        "Illustrative synthetic sample; not live market data.",
+        "Synthetic 1h public-depth fixture for dashboard multi-timeframe onboarding."
       ]
     }
   }

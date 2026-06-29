@@ -68,6 +68,8 @@ GitHub Pages is not the 60-second refresh runner. The repository Pages workflow 
 ![Read-only dashboard rendered from the checked-in synthetic sample artifacts](assets/dashboard-overview.png)
 
 This screenshot is rendered from `examples/sample_artifacts`. The values are deterministic fixture data, not live market data.
+The checked-in sample artifact root includes `dashboard_profile.json` so the
+static dashboard opens on `15m` first while still exposing `5m` and `1h`.
 
 ## Endpoints
 

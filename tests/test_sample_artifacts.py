@@ -6,6 +6,7 @@ from pathlib import Path
 
 from crypto_composite.artifact_quality import score_artifact_root
 from crypto_composite.artifact_validator import validate_artifact_root
+from crypto_composite.dashboard_analytics import build_dashboard_snapshot
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +33,19 @@ def test_checked_in_sample_artifacts_validate_and_score() -> None:
     assert quality["status"] == "OK"
     assert quality["assets_checked"] == 2
     assert sorted(quality["asset_scores"]) == ["BTC-USDT", "ETH-USDT"]
+
+
+def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
+    snapshot = build_dashboard_snapshot(SAMPLE_ROOT)
+
+    assert snapshot["profile"]["primary_timeframe"] == "15m"
+    assert snapshot["profile"]["timeframes"] == ["5m", "15m", "1h"]
+    assert snapshot["profile"]["refresh_seconds"] == 60
+    assert [asset["asset"] for asset in snapshot["assets"]] == ["BTC-USDT", "ETH-USDT"]
+    assert [
+        [timeframe["timeframe"] for timeframe in asset["timeframes"]]
+        for asset in snapshot["assets"]
+    ] == [["15m", "5m", "1h"], ["15m", "5m", "1h"]]
 
 
 def test_inspect_quality_example_emits_compact_json(capsys) -> None:
