@@ -73,13 +73,18 @@ def render_dashboard_html(
     td { color: #d8e2ee; font-variant-numeric: tabular-nums; }
     .pill { display: inline-flex; padding: 4px 7px; border: 1px solid #3a526a; border-radius: 999px; font-size: .65rem; font-weight: 850; letter-spacing: .04em; }
     .pill.corroborated { color: #9bf0e4; border-color: #276c68; } .pill.concentrated { color: #ffd58c; border-color: #72552c; } .pill.limited { color: #c9d3df; }
+    .insight-grid { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 10px; margin: 0 0 13px; }
+    .insight-card { min-height: 102px; padding: 13px 14px; border: 1px solid rgba(148, 163, 184, .15); border-radius: 13px; background: rgba(5, 12, 19, .35); }
+    .insight-card span { color: var(--muted); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .insight-card strong { display: block; margin: 8px 0 5px; color: #eff6ff; font-size: .9rem; }
+    .insight-card p { font-size: .77rem; }
     .empty { padding: 18px 8px; color: var(--muted); text-align: center; }
     .callout { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--amber); color: #b7c4d2; background: rgba(244, 191, 103, .07); font-size: .78rem; line-height: 1.5; }
     details { margin-top: 11px; } summary { color: #c9d8e7; cursor: pointer; font-size: .82rem; font-weight: 750; }
     pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
     .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
-    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid { grid-template-columns: 1fr; } }
     @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
     @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
@@ -128,6 +133,11 @@ def render_dashboard_html(
 
     <article class="panel full">
       <div class="panel-head"><div><h2>Observed zones</h2><p>Practical filtering: concentration and maximum-vacuum bucket per side</p></div><p id="zone-count"></p></div>
+      <div class="insight-grid" id="zone-readout" aria-label="Observed zone readout">
+        <section class="insight-card"><span>Zone map</span><strong id="zone-readout-title">Loading zone map</strong><p id="zone-readout-detail">Waiting for public-depth evidence.</p></section>
+        <section class="insight-card"><span>Next check</span><strong>After refresh</strong><p id="zone-readout-next">Refresh artifacts before comparing zone evidence.</p></section>
+        <section class="insight-card"><span>Limit</span><strong>Snapshot only</strong><p id="zone-readout-limit">No future-reaction or hidden-liquidity inference.</p></section>
+      </div>
       <div class="table-wrap"><table>
         <thead><tr><th>Zone</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th></tr></thead>
         <tbody id="zone-body"><tr><td class="empty" colspan="10">Loading observed zones...</td></tr></tbody>
@@ -283,6 +293,11 @@ def render_dashboard_html(
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
   function renderZones(market) {
     const body = byId("zone-body"); body.replaceChildren(); const zones = market?.observed_zones || []; byId("zone-count").textContent = `${zones.length} shown`;
+    const readout = market?.zone_readout || {};
+    byId("zone-readout-title").textContent = readout.title || "Zone map unavailable";
+    byId("zone-readout-detail").textContent = readout.detail || "Generate or refresh a composite orderbook ladder before comparing public-depth zones.";
+    byId("zone-readout-next").textContent = readout.next_check || "Refresh artifacts before comparing zone evidence.";
+    byId("zone-readout-limit").textContent = readout.limitation || "Single generated snapshot; no future-reaction or hidden-liquidity inference.";
     if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 10; body.appendChild(row); return; }
     for (const zone of zones) { const row = document.createElement("tr"); addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, relationLabel(zone.reference_relation)); addCell(row, `${fmt(zone.distance_to_reference_pct, 3)}%`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); body.appendChild(row); }
   }

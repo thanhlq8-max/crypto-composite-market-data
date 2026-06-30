@@ -131,6 +131,7 @@ The frontend reads the API at runtime and displays:
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
+- an observed-zone readout that summarizes corroborated zone count, nearest bid/ask concentration ranges, the next refresh check, and the single-snapshot limitation;
 - practical concentration and maximum-vacuum zones with exact reference relation and distance;
 - spot/perpetual composite-close dislocation context;
 - artifact paths and sizes; and
@@ -170,6 +171,16 @@ Each zone also exposes:
 - `distance_to_reference_pct`: the percentage distance from the reference price to the nearest zone edge, or zero when the zone contains the reference.
 
 The distance is descriptive and does not rank opportunity quality or imply future reaction.
+
+Each market context also includes `zone_readout`, a compact dashboard-facing summary derived from the same observed zones:
+
+- `title`: corroborated zone count over total zone count;
+- `detail`: nearest bid/ask concentration text and any limited-evidence warning;
+- `next_check`: evidence to compare after the next artifact refresh;
+- `limitation`: the single-snapshot boundary; and
+- `evidence_mix`: count of total, corroborated, concentrated, and limited zones.
+
+`zone_readout` is an interpretation aid for public artifact inspection. It does not add scoring, ranking, prediction, or execution semantics.
 
 These grades do not estimate future price reaction. `persistence` and `spoof_risk_proxy` remain engine proxies. A single artifact snapshot cannot establish a zone lifecycle.
 

@@ -46,6 +46,12 @@ def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
         [timeframe["timeframe"] for timeframe in asset["timeframes"]]
         for asset in snapshot["assets"]
     ] == [["15m", "5m", "1h"], ["15m", "5m", "1h"]]
+    for asset in snapshot["assets"]:
+        for timeframe in asset["timeframes"]:
+            for market in timeframe["markets"]:
+                assert market["zone_readout"]["title"].endswith("zones corroborated")
+                assert market["zone_readout"]["evidence_mix"]["total_zones"] == len(market["observed_zones"])
+                assert "future-reaction" in market["zone_readout"]["limitation"]
 
 
 def test_inspect_quality_example_emits_compact_json(capsys) -> None:

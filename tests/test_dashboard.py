@@ -57,6 +57,8 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "item.path" in html
     assert "item.size_bytes" in html
     assert 'id="profile-note"' in html
+    assert 'id="zone-readout"' in html
+    assert "Observed zone readout" in html
     assert "\u00c2" not in html
     assert ">Buy<" not in html
     assert ">Sell<" not in html
@@ -181,6 +183,18 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
         "CONCENTRATED": 1,
         "LIMITED": 1,
     }
+    assert market["zone_readout"]["title"] == "1/3 zones corroborated"
+    assert "Nearest bid concentration 0.990% below reference" in market["zone_readout"]["detail"]
+    assert "Nearest ask concentration 0.990% above reference" in market["zone_readout"]["detail"]
+    assert market["zone_readout"]["evidence_mix"] == {
+        "total_zones": 3,
+        "corroborated": 1,
+        "concentrated": 1,
+        "limited": 1,
+    }
+    assert market["zone_readout"]["next_check"] == (
+        "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote."
+    )
     assert timeframe["source_note"] == "Reviewed fixture; not live data."
     assert timeframe["spot_perp_dislocation"]["basis_pct"] == pytest.approx(0.4950495)
     assert snapshot["mode"] == "OBSERVED_PUBLIC_DATA"
