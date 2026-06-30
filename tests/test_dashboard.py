@@ -66,6 +66,11 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert 'id="copy-view-brief"' in html
     assert "Current view brief" in html
     assert "Shareable observed-zone summary" in html
+    assert 'id="zone-evidence-checklist"' in html
+    assert 'id="zone-checklist-body"' in html
+    assert "Nearest zone checklist" in html
+    assert "Focused bid/ask concentration evidence" in html
+    assert "Compare these public-depth fields after refresh" in html
     assert "observed public-data context only" in html
     assert "no signal, ranking, prediction, execution, or financial advice" in html
     assert "initialViewParams" in html
