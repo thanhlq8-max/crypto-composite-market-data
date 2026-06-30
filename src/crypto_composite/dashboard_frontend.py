@@ -78,6 +78,9 @@ def render_dashboard_html(
     .insight-card span { color: var(--muted); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
     .insight-card strong { display: block; margin: 8px 0 5px; color: #eff6ff; font-size: .9rem; }
     .insight-card p { font-size: .77rem; }
+    .mtf-panel { margin-bottom: 11px; }
+    .mtf-primary { color: #9bf0e4; font-weight: 850; }
+    .mtf-boundary { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
     .empty { padding: 18px 8px; color: var(--muted); text-align: center; }
     .callout { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--amber); color: #b7c4d2; background: rgba(244, 191, 103, .07); font-size: .78rem; line-height: 1.5; }
     details { margin-top: 11px; } summary { color: #c9d8e7; cursor: pointer; font-size: .82rem; font-weight: 750; }
@@ -119,6 +122,15 @@ def render_dashboard_html(
     <article class="flow-item"><span class="metric-label">DOING / Now</span><strong id="now-title">Unavailable</strong><p id="now-detail">No orderbook context loaded.</p></article>
     <article class="flow-item"><span class="metric-label">NEXT evidence</span><strong id="next-title">Unavailable</strong><p id="next-detail">No evidence check available.</p></article>
     <article class="flow-item"><span class="metric-label">Confidence / Risk</span><strong id="confidence-title">Unavailable</strong><p id="confidence-detail">No evidence quality context loaded.</p></article>
+  </section>
+
+  <section class="panel mtf-panel" id="mtf-zone-map" aria-label="Multi-timeframe zone map">
+    <div class="panel-head"><div><h2>Multi-timeframe zone map</h2><p>Nearest public-depth concentrations across the selected asset profile</p></div><p id="mtf-zone-summary"></p></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Timeframe</th><th>Market</th><th>Primary</th><th>Zones</th><th>Nearest bid concentration</th><th>Nearest ask concentration</th><th>Next check</th></tr></thead>
+      <tbody id="mtf-zone-body"><tr><td class="empty" colspan="7">Loading multi-timeframe zone map...</td></tr></tbody>
+    </table></div>
+    <p class="mtf-boundary" id="mtf-zone-boundary">Cross-timeframe context is descriptive artifact evidence only.</p>
   </section>
 
   <section class="layout">
@@ -291,6 +303,34 @@ def render_dashboard_html(
     byId("depth-imbalance").textContent = numeric(book.depth_imbalance) === null ? "" : `imbalance ${fmt(book.depth_imbalance, 3)}`;
   }
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
+  function mtfZoneFocus(focus) {
+    if (!focus) return "unavailable";
+    const range = numeric(focus.price_low) === null || numeric(focus.price_high) === null ? null : `${price(focus.price_low)} - ${price(focus.price_high)}`;
+    return [range, focus.summary].filter(Boolean).join(" / ") || "unavailable";
+  }
+  function mtfZoneCount(item) {
+    const corroborated = numeric(item?.corroborated), total = numeric(item?.zone_count);
+    return corroborated === null || total === null ? "unavailable" : `${fmt(corroborated, 0)}/${fmt(total, 0)} corroborated`;
+  }
+  function renderMtfZoneMap(asset) {
+    const body = byId("mtf-zone-body"); body.replaceChildren();
+    const map = asset?.mtf_zone_map || {};
+    const rows = Array.isArray(map.rows) ? map.rows : [];
+    byId("mtf-zone-summary").textContent = rows.length ? `${rows.length} market-timeframe rows` : "No rows";
+    byId("mtf-zone-boundary").textContent = map.boundary || "Cross-timeframe context is descriptive artifact evidence only.";
+    if (!rows.length) { const row = document.createElement("tr"); const cell = addCell(row, "No multi-timeframe zone rows are present in this artifact.", "empty"); cell.colSpan = 7; body.appendChild(row); return; }
+    for (const item of rows) {
+      const row = document.createElement("tr");
+      addCell(row, item.timeframe || "unavailable", item.is_primary ? "mtf-primary" : "");
+      addCell(row, item.market_type || "unavailable");
+      addCell(row, item.is_primary ? "Primary profile" : "");
+      addCell(row, mtfZoneCount(item));
+      addCell(row, mtfZoneFocus(item.nearest_bid));
+      addCell(row, mtfZoneFocus(item.nearest_ask));
+      addCell(row, item.next_check || "Refresh artifacts before comparing zone evidence.");
+      body.appendChild(row);
+    }
+  }
   function renderZones(market) {
     const body = byId("zone-body"); body.replaceChildren(); const zones = market?.observed_zones || []; byId("zone-count").textContent = `${zones.length} shown`;
     const readout = market?.zone_readout || {};
@@ -306,7 +346,7 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent() { const { timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
+  function renderCurrent() { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
