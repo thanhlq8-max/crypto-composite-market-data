@@ -53,6 +53,12 @@
     .brief-note { color: var(--muted); font-size: .68rem; }
     .checklist-panel { margin-bottom: 11px; }
     .checklist-note { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
+    .guide-panel { margin-bottom: 11px; }
+    .guide-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .guide-card { padding: 13px 14px; border: 1px solid rgba(148, 163, 184, .15); border-radius: 13px; background: rgba(5, 12, 19, .35); }
+    .guide-card span { color: var(--muted); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .guide-card strong { display: block; margin: 8px 0 5px; color: #eff6ff; font-size: .9rem; }
+    .guide-card p { font-size: .77rem; }
     .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr); gap: 11px; }
     .panel { min-width: 0; padding: 18px; border-radius: 16px; overflow: hidden; }
     .panel.full { grid-column: 1 / -1; }
@@ -81,7 +87,7 @@
     pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
     .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
-    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid, .guide-grid { grid-template-columns: 1fr; } }
     @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
     @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
@@ -135,6 +141,16 @@
       <tbody id="zone-checklist-body"><tr><td class="empty" colspan="8">Loading nearest zone checklist...</td></tr></tbody>
     </table></div>
     <p class="checklist-note" id="zone-checklist-note">Compare these public-depth fields after refresh; descriptive context only.</p>
+  </section>
+
+  <section class="panel guide-panel" id="zone-reading-guide" aria-label="How to read observed zones">
+    <div class="panel-head"><div><h2>How to read observed zones</h2><p>Fast interpretation guide for the current public-data view</p></div><p>Monitor-only</p></div>
+    <div class="guide-grid">
+      <section class="guide-card"><span>Range / location</span><strong>Where public depth sits</strong><p>Use range, location, and distance to place the observed bucket relative to the reference price.</p></section>
+      <section class="guide-card"><span>Evidence grade</span><strong>How broad the source is</strong><p>CORROBORATED means multiple venues contribute without one venue supplying a majority of bucket depth.</p></section>
+      <section class="guide-card"><span>Depth quality</span><strong>What to compare</strong><p>Compare depth quote, venue count, HHI, persistence proxy, and vacuum value after the next artifact refresh.</p></section>
+      <section class="guide-card"><span>Boundary</span><strong>What not to infer</strong><p>Do not read zones as support, resistance, hidden liquidity, future reaction, signal, ranking, or execution guidance.</p></section>
+    </div>
   </section>
 
   <section class="panel mtf-panel" id="mtf-zone-map" aria-label="Multi-timeframe zone map">

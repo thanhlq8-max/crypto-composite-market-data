@@ -71,6 +71,10 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "Nearest zone checklist" in html
     assert "Focused bid/ask concentration evidence" in html
     assert "Compare these public-depth fields after refresh" in html
+    assert 'id="zone-reading-guide"' in html
+    assert "How to read observed zones" in html
+    assert "Range / location" in html
+    assert "What not to infer" in html
     assert "observed public-data context only" in html
     assert "no signal, ranking, prediction, execution, or financial advice" in html
     assert "initialViewParams" in html
