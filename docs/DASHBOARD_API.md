@@ -140,7 +140,7 @@ The frontend reads the API at runtime and displays:
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
 - a nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
-- observed zone notes that turn the selected nearest bid/ask concentrations into short review text using range, distance, evidence grade, depth quote, venue count, HHI, persistence proxy, vacuum value, and refresh comparison fields;
+- copyable observed zone notes that turn the selected nearest bid/ask concentrations into short review text using range, distance, evidence grade, depth quote, venue count, HHI, persistence proxy, vacuum value, and refresh comparison fields;
 - a how-to-read guide for observed zones, covering range/location, evidence grade, depth-quality fields, refresh comparison, and interpretation limits;
 - a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
 - a composite close chart with observed public-depth bands;
@@ -200,7 +200,7 @@ The frontend current-view brief is a display-only composition of existing snapsh
 
 The frontend nearest zone checklist is also display-only. It reads the nearest bid/ask concentration ranges already present in `monitoring_brief.now`, then shows the fields a user should compare after the next artifact refresh. It does not rank zones, estimate future reaction, or create execution semantics.
 
-The frontend observed zone notes are display-only review text over the same nearest bid/ask concentration objects. They do not create new scoring, support/resistance logic, signal logic, prediction, ranking, or execution guidance.
+The frontend observed zone notes are copyable, display-only review text over the same nearest bid/ask concentration objects. They do not create new scoring, support/resistance logic, signal logic, prediction, ranking, or execution guidance.
 
 The frontend how-to-read guide is static dashboard guidance. It does not inspect hidden data or add new calculations; it explains how to read existing public artifact fields without turning them into support/resistance claims, signals, rankings, predictions, or execution guidance.
 

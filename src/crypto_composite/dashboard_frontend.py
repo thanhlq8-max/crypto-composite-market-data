@@ -75,6 +75,8 @@ def render_dashboard_html(
     .zone-review-card strong { display: block; margin: 8px 0 5px; color: #eff6ff; font-size: .96rem; }
     .zone-review-card p { font-size: .79rem; }
     .zone-review-card small { display: block; margin-top: 8px; color: #93a7bb; line-height: 1.45; }
+    .review-copy-row { display: flex; justify-content: flex-end; align-items: center; gap: 9px; margin-top: 10px; }
+    .review-note { color: var(--muted); font-size: .68rem; }
     .review-boundary { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
     .guide-panel { margin-bottom: 11px; }
     .guide-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -171,6 +173,7 @@ def render_dashboard_html(
     <div class="zone-review-grid" id="zone-review-notes-body">
       <section class="zone-review-card"><span>Loading</span><strong>Waiting for zone context</strong><p>Nearest bid/ask concentration notes load with the selected artifact.</p></section>
     </div>
+    <div class="review-copy-row"><span id="zone-review-copy-note" class="review-note">Copy observed-zone notes</span><button id="copy-zone-review" type="button">Copy notes</button></div>
     <p class="review-boundary" id="zone-review-boundary">Review notes describe existing public artifact fields only.</p>
   </section>
 
@@ -249,6 +252,7 @@ def render_dashboard_html(
   const marketSelect = byId("market-select");
   const copyViewLink = byId("copy-view-link");
   const copyViewBrief = byId("copy-view-brief");
+  const copyZoneReview = byId("copy-zone-review");
   const initialViewParams = new URLSearchParams(window.location.search);
   const NS = "http://www.w3.org/2000/svg";
 
@@ -480,7 +484,23 @@ def render_dashboard_html(
     card.append(tag, title, detail, next);
     return card;
   }
-  function renderZoneReviewNotes(market) {
+  function zoneReviewLine(label, zone) {
+    if (!zone) return `${label}: no nearest concentration range is present in the selected artifact.`;
+    const distance = numeric(zone.distance_to_reference_pct) === null ? "distance unavailable" : `${fmt(zone.distance_to_reference_pct, 3)}% ${relationLabel(zone.reference_relation)}`;
+    return `${label}: ${price(zone.price_low)} - ${price(zone.price_high)} / ${distance}; ${zone.evidence_grade || "LIMITED"} evidence; depth ${fmt(zone.depth_quote, 0)}, venues ${zone.venue_count ?? "unavailable"}, HHI ${fmt(zone.hhi, 3)}; compare persistence proxy ${fmt(zone.persistence_proxy, 3)} and vacuum ${fmt(zone.vacuum_score, 3)} after refresh.`;
+  }
+  function zoneReviewText(asset, timeframe, market) {
+    const now = market?.monitoring_brief?.now || {};
+    const readout = market?.zone_readout || {};
+    return [
+      `View: ${asset?.asset || "unavailable"} / ${timeframe?.timeframe || "unavailable"} / ${market?.market_type || "unavailable"}`,
+      zoneReviewLine("Bid concentration", now.nearest_bid_concentration),
+      zoneReviewLine("Ask concentration", now.nearest_ask_concentration),
+      `Next evidence check: ${readout.next_check || market?.monitoring_brief?.next_evidence_check?.observe || "Refresh artifacts before comparing zone evidence."}`,
+      "Boundary: existing public artifact fields only; no support/resistance, signal, ranking, prediction, execution, or financial advice.",
+    ].join("\n");
+  }
+  function renderZoneReviewNotes(asset, timeframe, market) {
     const body = byId("zone-review-notes-body"); body.replaceChildren();
     const now = market?.monitoring_brief?.now || {};
     const readout = market?.zone_readout || {};
@@ -491,7 +511,19 @@ def render_dashboard_html(
     const available = rows.filter((item) => item[1]).length;
     byId("zone-review-status").textContent = available ? `${available}/2 sides available` : "No concentration sides";
     for (const [label, zone] of rows) body.appendChild(zoneReviewCard(label, zone, readout));
+    copyZoneReview.dataset.text = zoneReviewText(asset, timeframe, market);
+    byId("zone-review-copy-note").textContent = "Copy observed-zone notes";
     byId("zone-review-boundary").textContent = "Review notes describe existing public artifact fields only; no support/resistance, signal, ranking, prediction, execution, or financial advice.";
+  }
+  async function copyCurrentZoneReview() {
+    const text = copyZoneReview.dataset.text || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("zone-review-copy-note").textContent = "Notes copied";
+    } catch {
+      byId("zone-review-copy-note").textContent = "Select the notes to copy";
+    }
+    setTimeout(() => { byId("zone-review-copy-note").textContent = "Copy observed-zone notes"; }, 1800);
   }
   function mtfZoneFocus(focus) {
     if (!focus) return "unavailable";
@@ -536,7 +568,7 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderZoneReviewNotes(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
@@ -560,6 +592,7 @@ def render_dashboard_html(
   marketSelect.addEventListener("change", () => renderCurrent(true));
   copyViewLink.addEventListener("click", copyCurrentViewLink);
   copyViewBrief.addEventListener("click", copyCurrentViewBrief);
+  copyZoneReview.addEventListener("click", copyCurrentZoneReview);
   load();
 </script>
 </body>
