@@ -71,6 +71,10 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "Nearest zone checklist" in html
     assert "Focused bid/ask concentration evidence" in html
     assert "Compare these public-depth fields after refresh" in html
+    assert 'id="zone-review-notes"' in html
+    assert 'id="zone-review-notes-body"' in html
+    assert "Observed zone notes" in html
+    assert "Bid/ask review notes from selected nearest concentrations" in html
     assert 'id="zone-reading-guide"' in html
     assert "How to read observed zones" in html
     assert "Range / location" in html

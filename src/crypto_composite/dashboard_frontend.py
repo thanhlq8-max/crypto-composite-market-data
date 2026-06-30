@@ -68,6 +68,14 @@ def render_dashboard_html(
     .brief-note { color: var(--muted); font-size: .68rem; }
     .checklist-panel { margin-bottom: 11px; }
     .checklist-note { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
+    .review-panel { margin-bottom: 11px; }
+    .zone-review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .zone-review-card { padding: 14px 15px; border: 1px solid rgba(148, 163, 184, .15); border-radius: 13px; background: rgba(5, 12, 19, .35); }
+    .zone-review-card span { color: var(--muted); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .zone-review-card strong { display: block; margin: 8px 0 5px; color: #eff6ff; font-size: .96rem; }
+    .zone-review-card p { font-size: .79rem; }
+    .zone-review-card small { display: block; margin-top: 8px; color: #93a7bb; line-height: 1.45; }
+    .review-boundary { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
     .guide-panel { margin-bottom: 11px; }
     .guide-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
     .guide-card { padding: 13px 14px; border: 1px solid rgba(148, 163, 184, .15); border-radius: 13px; background: rgba(5, 12, 19, .35); }
@@ -102,7 +110,7 @@ def render_dashboard_html(
     pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
     .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
-    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid, .guide-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid, .guide-grid, .zone-review-grid { grid-template-columns: 1fr; } }
     @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
     @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
@@ -156,6 +164,14 @@ def render_dashboard_html(
       <tbody id="zone-checklist-body"><tr><td class="empty" colspan="8">Loading nearest zone checklist...</td></tr></tbody>
     </table></div>
     <p class="checklist-note" id="zone-checklist-note">Compare these public-depth fields after refresh; descriptive context only.</p>
+  </section>
+
+  <section class="panel review-panel" id="zone-review-notes" aria-label="Observed zone review notes">
+    <div class="panel-head"><div><h2>Observed zone notes</h2><p>Bid/ask review notes from selected nearest concentrations</p></div><p id="zone-review-status"></p></div>
+    <div class="zone-review-grid" id="zone-review-notes-body">
+      <section class="zone-review-card"><span>Loading</span><strong>Waiting for zone context</strong><p>Nearest bid/ask concentration notes load with the selected artifact.</p></section>
+    </div>
+    <p class="review-boundary" id="zone-review-boundary">Review notes describe existing public artifact fields only.</p>
   </section>
 
   <section class="panel guide-panel" id="zone-reading-guide" aria-label="How to read observed zones">
@@ -445,6 +461,38 @@ def render_dashboard_html(
       cell.appendChild(pill); row.appendChild(cell); body.appendChild(row);
     }
   }
+  function zoneReviewCard(label, zone, readout) {
+    const card = document.createElement("section"); card.className = "zone-review-card";
+    const tag = document.createElement("span"); tag.textContent = label;
+    const title = document.createElement("strong");
+    const detail = document.createElement("p");
+    const next = document.createElement("small");
+    if (!zone) {
+      title.textContent = "No nearest concentration";
+      detail.textContent = `No ${label.toLowerCase()} range is present in the selected artifact.`;
+      next.textContent = readout.next_check || "Refresh artifacts before comparing zone evidence.";
+    } else {
+      const distance = numeric(zone.distance_to_reference_pct) === null ? "distance unavailable" : `${fmt(zone.distance_to_reference_pct, 3)}% ${relationLabel(zone.reference_relation)}`;
+      title.textContent = `${price(zone.price_low)} - ${price(zone.price_high)} / ${distance}`;
+      detail.textContent = `${zone.evidence_grade || "LIMITED"} evidence; depth ${fmt(zone.depth_quote, 0)}, venues ${zone.venue_count ?? "unavailable"}, HHI ${fmt(zone.hhi, 3)}.`;
+      next.textContent = `Next: compare depth quote, venue mix, persistence proxy ${fmt(zone.persistence_proxy, 3)}, and vacuum ${fmt(zone.vacuum_score, 3)} after refresh.`;
+    }
+    card.append(tag, title, detail, next);
+    return card;
+  }
+  function renderZoneReviewNotes(market) {
+    const body = byId("zone-review-notes-body"); body.replaceChildren();
+    const now = market?.monitoring_brief?.now || {};
+    const readout = market?.zone_readout || {};
+    const rows = [
+      ["Bid concentration", now.nearest_bid_concentration],
+      ["Ask concentration", now.nearest_ask_concentration],
+    ];
+    const available = rows.filter((item) => item[1]).length;
+    byId("zone-review-status").textContent = available ? `${available}/2 sides available` : "No concentration sides";
+    for (const [label, zone] of rows) body.appendChild(zoneReviewCard(label, zone, readout));
+    byId("zone-review-boundary").textContent = "Review notes describe existing public artifact fields only; no support/resistance, signal, ranking, prediction, execution, or financial advice.";
+  }
   function mtfZoneFocus(focus) {
     if (!focus) return "unavailable";
     const range = numeric(focus.price_low) === null || numeric(focus.price_high) === null ? null : `${price(focus.price_low)} - ${price(focus.price_high)}`;
@@ -488,7 +536,7 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderZoneReviewNotes(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
