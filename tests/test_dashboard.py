@@ -62,6 +62,12 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert 'id="mtf-zone-map"' in html
     assert "Multi-timeframe zone map" in html
     assert 'id="copy-view-link"' in html
+    assert 'id="view-brief"' in html
+    assert 'id="copy-view-brief"' in html
+    assert "Current view brief" in html
+    assert "Shareable observed-zone summary" in html
+    assert "observed public-data context only" in html
+    assert "no signal, ranking, prediction, execution, or financial advice" in html
     assert "initialViewParams" in html
     assert "searchParams.set(\"asset\"" in html
     assert "searchParams.set(\"timeframe\"" in html
