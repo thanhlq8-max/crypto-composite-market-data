@@ -21,7 +21,7 @@ A GitHub Pages demo built from checked-in synthetic sample artifacts is availabl
 
 [https://thanhlq8-max.github.io/crypto-composite-market-data/](https://thanhlq8-max.github.io/crypto-composite-market-data/)
 
-The demo is a static artifact-inspection page. It does not call live exchange APIs, use private account APIs, rank assets, generate predictions, place orders, or provide financial advice.
+The demo is a static artifact-inspection page. The dashboard view can be shared with `asset`, `timeframe`, and `market` query parameters, for example `dashboard.html?asset=BTC-USDT&timeframe=15m&market=spot_usdt`. It does not call live exchange APIs, use private account APIs, rank assets, generate predictions, place orders, or provide financial advice.
 
 ## Why this exists
 
@@ -361,7 +361,7 @@ Endpoints:
 /api/artifact?path=<relative-json-path>
 ```
 
-Dashboard V3 adds a practical monitoring brief organized as DID / DOING / NEXT / Confidence-Risk, a multi-timeframe zone map for the configured M5/M15/H1 profile, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
+Dashboard V3 adds a practical monitoring brief organized as DID / DOING / NEXT / Confidence-Risk, a multi-timeframe zone map for the configured M5/M15/H1 profile, shareable asset/timeframe/market view links, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
 
 Export the same dashboard as static HTML for GitHub Pages or offline sharing:
 
