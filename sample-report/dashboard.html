@@ -47,6 +47,10 @@
     .flow-item:nth-child(2)::after { background: var(--cyan); } .flow-item:nth-child(3)::after { background: var(--amber); } .flow-item:nth-child(4)::after { background: #c79cff; }
     .flow-item strong { display: block; margin: 10px 0 4px; font-size: .95rem; }
     .flow-item p { font-size: .81rem; }
+    .brief-panel { margin-bottom: 11px; }
+    .brief-panel pre { max-height: none; margin-top: 0; color: #d4e7ff; }
+    .brief-copy-row { display: flex; justify-content: flex-end; align-items: center; gap: 9px; margin-top: 10px; }
+    .brief-note { color: var(--muted); font-size: .68rem; }
     .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr); gap: 11px; }
     .panel { min-width: 0; padding: 18px; border-radius: 16px; overflow: hidden; }
     .panel.full { grid-column: 1 / -1; }
@@ -116,6 +120,12 @@
     <article class="flow-item"><span class="metric-label">Confidence / Risk</span><strong id="confidence-title">Unavailable</strong><p id="confidence-detail">No evidence quality context loaded.</p></article>
   </section>
 
+  <section class="panel brief-panel" id="view-brief" aria-label="Current view brief">
+    <div class="panel-head"><div><h2>Current view brief</h2><p>Shareable observed-zone summary for the selected filters</p></div><p id="brief-status"></p></div>
+    <pre id="view-brief-text">Loading current view brief...</pre>
+    <div class="brief-copy-row"><span id="brief-copy-note" class="brief-note">Copy public-data brief</span><button id="copy-view-brief" type="button">Copy brief</button></div>
+  </section>
+
   <section class="panel mtf-panel" id="mtf-zone-map" aria-label="Multi-timeframe zone map">
     <div class="panel-head"><div><h2>Multi-timeframe zone map</h2><p>Nearest public-depth concentrations across the selected asset profile</p></div><p id="mtf-zone-summary"></p></div>
     <div class="table-wrap"><table>
@@ -180,6 +190,7 @@
   const timeframeSelect = byId("timeframe-select");
   const marketSelect = byId("market-select");
   const copyViewLink = byId("copy-view-link");
+  const copyViewBrief = byId("copy-view-brief");
   const initialViewParams = new URLSearchParams(window.location.search);
   const NS = "http://www.w3.org/2000/svg";
 
@@ -245,6 +256,39 @@
       byId("view-link-note").textContent = "Use the browser address bar";
     }
     setTimeout(() => { byId("view-link-note").textContent = "Share current filters"; }, 1800);
+  }
+  function briefLines(asset, timeframe, market) {
+    const profile = state.snapshot?.profile || {};
+    const profileTimeframes = Array.isArray(profile.timeframes) ? profile.timeframes.join(",") : "";
+    const marketBrief = market?.monitoring_brief || {};
+    const readout = market?.zone_readout || {};
+    const confidence = marketBrief?.confidence_risk || {};
+    const viewLine = `View: ${asset?.asset || "unavailable"} / ${timeframe?.timeframe || "unavailable"} / ${market?.market_type || "unavailable"}`;
+    const profileLine = profile.primary_timeframe ? `Profile: primary ${profile.primary_timeframe}${profileTimeframes ? ` / MTF ${profileTimeframes}` : ""}${profile.refresh_seconds ? ` / refresh ${profile.refresh_seconds}s` : ""}` : null;
+    const zoneLine = `Zones: ${readout.title || "zone readout unavailable"}`;
+    const detailLine = readout.detail || "Generate or refresh a composite orderbook ladder before comparing public-depth zones.";
+    const nextLine = `Next evidence check: ${readout.next_check || marketBrief?.next_evidence_check?.observe || "Refresh artifacts before comparing zone evidence."}`;
+    const statusLine = `Status: OHLCV ${confidence.ohlcv_status || market?.ohlcv_status || "unavailable"} / book ${confidence.book_status || market?.orderbook?.status || "unavailable"}`;
+    const limitLine = `Limit: ${readout.limitation || "Single generated snapshot; no future-reaction or hidden-liquidity inference."}`;
+    const linkLine = `View link: ${currentViewUrl().toString()}`;
+    const boundaryLine = "Boundary: observed public-data context only; no signal, ranking, prediction, execution, or financial advice.";
+    return [viewLine, profileLine, zoneLine, detailLine, nextLine, statusLine, limitLine, linkLine, boundaryLine].filter(Boolean);
+  }
+  function renderViewBrief(asset, timeframe, market) {
+    const lines = briefLines(asset, timeframe, market);
+    byId("view-brief-text").textContent = lines.join("\n");
+    byId("brief-status").textContent = market?.zone_readout ? "Ready to share" : "Limited context";
+    byId("brief-copy-note").textContent = "Copy public-data brief";
+  }
+  async function copyCurrentViewBrief() {
+    const text = byId("view-brief-text").textContent || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("brief-copy-note").textContent = "Brief copied";
+    } catch {
+      byId("brief-copy-note").textContent = "Select the brief text to copy";
+    }
+    setTimeout(() => { byId("brief-copy-note").textContent = "Copy public-data brief"; }, 1800);
   }
   function syncFilters(level) {
     const assets = state.snapshot?.assets || [];
@@ -375,7 +419,7 @@
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
@@ -398,6 +442,7 @@
   timeframeSelect.addEventListener("change", () => { syncFilters("timeframe"); renderCurrent(true); });
   marketSelect.addEventListener("change", () => renderCurrent(true));
   copyViewLink.addEventListener("click", copyCurrentViewLink);
+  copyViewBrief.addEventListener("click", copyCurrentViewBrief);
   load();
 </script>
 </body>

@@ -21,7 +21,7 @@ crypto-composite dashboard-export \
   --artifact-base-url artifacts
 ```
 
-The dashboard cards, charts, filters, zones, shareable view links, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
+The dashboard cards, charts, filters, zones, current-view brief, shareable view links, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
 
 The frontend preserves the selected view in query parameters:
 
@@ -138,6 +138,7 @@ The frontend reads the API at runtime and displays:
 - a copyable view link for the current asset, timeframe, and market filters;
 - composite reference price, venue coverage, dispersion, and artifact freshness;
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
+- a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
 - a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
@@ -191,6 +192,8 @@ Each market context also includes `zone_readout`, a compact dashboard-facing sum
 - `evidence_mix`: count of total, corroborated, concentrated, and limited zones.
 
 `zone_readout` is an interpretation aid for public artifact inspection. It does not add scoring, ranking, prediction, or execution semantics.
+
+The frontend current-view brief is a display-only composition of existing snapshot fields. It does not create new analytical scores, directional bias, ranking, prediction, execution guidance, or financial advice.
 
 At the asset level, the snapshot also includes `mtf_zone_map` for the configured profile:
 
