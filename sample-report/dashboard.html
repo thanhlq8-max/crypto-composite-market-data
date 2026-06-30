@@ -32,6 +32,9 @@
     select { min-width: 136px; padding: 9px 32px 9px 10px; }
     button { padding: 7px 10px; cursor: pointer; font-size: .76rem; font-weight: 750; }
     button:hover { border-color: #6482a0; }
+    .view-tools { display: grid; align-content: end; gap: 5px; }
+    .view-tools button { min-height: 38px; }
+    .view-link-note { color: var(--muted); font-size: .66rem; text-align: right; }
     .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin: 18px 0; }
     .card, .panel, .flow-item { border: 1px solid var(--line); background: var(--surface); box-shadow: 0 20px 60px rgba(0, 0, 0, .2); }
     .card { min-height: 116px; padding: 17px; border-radius: 15px; }
@@ -92,6 +95,10 @@
       <label>Asset<select id="asset-select"></select></label>
       <label>Timeframe<select id="timeframe-select"></select></label>
       <label>Market<select id="market-select"></select></label>
+      <div class="view-tools">
+        <button id="copy-view-link" type="button">Copy view link</button>
+        <span id="view-link-note" class="view-link-note">Share current filters</span>
+      </div>
     </div>
   </header>
 
@@ -172,6 +179,8 @@
   const assetSelect = byId("asset-select");
   const timeframeSelect = byId("timeframe-select");
   const marketSelect = byId("market-select");
+  const copyViewLink = byId("copy-view-link");
+  const initialViewParams = new URLSearchParams(window.location.search);
   const NS = "http://www.w3.org/2000/svg";
 
   function numeric(value) {
@@ -200,25 +209,60 @@
     return response.json();
   }
   function options(select, values, selected) { select.replaceChildren(); for (const value of values) { const option = document.createElement("option"); option.value = value; option.textContent = value; option.selected = value === selected; select.appendChild(option); } }
+  function chooseAvailable(values, requested, fallback) {
+    if (requested && values.includes(requested)) return requested;
+    if (fallback && values.includes(fallback)) return fallback;
+    return values[0] || "";
+  }
   function context() {
     const asset = (state.snapshot?.assets || []).find((item) => String(item.asset) === assetSelect.value);
     const timeframe = asset?.timeframes?.find((item) => item.timeframe === timeframeSelect.value);
     const market = timeframe?.markets?.find((item) => item.market_type === marketSelect.value);
     return { asset, timeframe, market };
   }
+  function currentViewUrl() {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    if (assetSelect.value) url.searchParams.set("asset", assetSelect.value);
+    if (timeframeSelect.value) url.searchParams.set("timeframe", timeframeSelect.value);
+    if (marketSelect.value) url.searchParams.set("market", marketSelect.value);
+    return url;
+  }
+  function updateViewLink(writeHistory = false) {
+    const url = currentViewUrl();
+    copyViewLink.dataset.url = url.toString();
+    if (writeHistory && window.history?.replaceState) window.history.replaceState(null, "", url);
+    byId("view-link-note").textContent = "Share current filters";
+  }
+  async function copyCurrentViewLink() {
+    const url = copyViewLink.dataset.url || currentViewUrl().toString();
+    try {
+      await navigator.clipboard.writeText(url);
+      byId("view-link-note").textContent = "Link copied";
+    } catch {
+      if (window.history?.replaceState) window.history.replaceState(null, "", url);
+      byId("view-link-note").textContent = "Use the browser address bar";
+    }
+    setTimeout(() => { byId("view-link-note").textContent = "Share current filters"; }, 1800);
+  }
   function syncFilters(level) {
     const assets = state.snapshot?.assets || [];
-    const assetValue = level === "asset" ? assetSelect.value : (assetSelect.value || String(assets[0]?.asset || ""));
-    options(assetSelect, assets.map((item) => String(item.asset)), assetValue);
+    const assetValues = assets.map((item) => String(item.asset));
+    const requestedAsset = level === undefined ? initialViewParams.get("asset") : assetSelect.value;
+    options(assetSelect, assetValues, chooseAvailable(assetValues, requestedAsset, assetSelect.value));
     const asset = assets.find((item) => String(item.asset) === assetSelect.value) || assets[0];
     const timeframes = asset?.timeframes || [];
     const primary = state.snapshot?.profile?.primary_timeframe;
     const preferredTimeframe = timeframes.some((item) => item.timeframe === primary) ? primary : timeframes[0]?.timeframe;
-    const timeframeValue = level === "timeframe" ? timeframeSelect.value : (timeframeSelect.value || preferredTimeframe || "");
-    options(timeframeSelect, timeframes.map((item) => item.timeframe), timeframeValue);
+    const timeframeValues = timeframes.map((item) => item.timeframe);
+    const requestedTimeframe = level === undefined ? initialViewParams.get("timeframe") : (level === "timeframe" ? timeframeSelect.value : preferredTimeframe);
+    options(timeframeSelect, timeframeValues, chooseAvailable(timeframeValues, requestedTimeframe, preferredTimeframe));
     const timeframe = timeframes.find((item) => item.timeframe === timeframeSelect.value) || timeframes[0];
     const markets = timeframe?.markets || [];
-    options(marketSelect, markets.map((item) => item.market_type), marketSelect.value || markets[0]?.market_type || "");
+    const marketValues = markets.map((item) => item.market_type);
+    const requestedMarket = level === undefined ? initialViewParams.get("market") : marketSelect.value;
+    options(marketSelect, marketValues, chooseAvailable(marketValues, requestedMarket, markets[0]?.market_type));
   }
   function renderCards(market) {
     const latest = market?.latest_bar || {};
@@ -331,7 +375,7 @@
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent() { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
@@ -350,9 +394,10 @@
       byId("evidence-method").textContent = Object.entries(snapshot.methodology.evidence_grades).map(([grade, definition]) => `${grade}: ${definition}`).join("\n\n");
     } catch (error) { byId("service-state").textContent = "Dashboard unavailable"; byId("service-state").className = "badge error"; byId("methodology").textContent = error.message; }
   }
-  assetSelect.addEventListener("change", () => { syncFilters("asset"); renderCurrent(); });
-  timeframeSelect.addEventListener("change", () => { syncFilters("timeframe"); renderCurrent(); });
-  marketSelect.addEventListener("change", renderCurrent);
+  assetSelect.addEventListener("change", () => { syncFilters("asset"); renderCurrent(true); });
+  timeframeSelect.addEventListener("change", () => { syncFilters("timeframe"); renderCurrent(true); });
+  marketSelect.addEventListener("change", () => renderCurrent(true));
+  copyViewLink.addEventListener("click", copyCurrentViewLink);
   load();
 </script>
 </body>

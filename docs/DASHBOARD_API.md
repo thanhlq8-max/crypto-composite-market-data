@@ -21,7 +21,15 @@ crypto-composite dashboard-export \
   --artifact-base-url artifacts
 ```
 
-The dashboard cards, charts, filters, zones, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
+The dashboard cards, charts, filters, zones, shareable view links, and methodology work without the local API. `--artifact-base-url` is optional and only enables JSON inspector links when the artifact files are published beside the HTML output.
+
+The frontend preserves the selected view in query parameters:
+
+```text
+dashboard.html?asset=BTC-USDT&timeframe=15m&market=spot_usdt
+```
+
+The dashboard only applies query values that exist in the loaded artifact snapshot. Invalid asset, timeframe, or market values are ignored and the normal artifact-derived defaults are used instead.
 
 When `data_quality.json` contains a timeframe-level `note`, the dashboard displays that note verbatim near the load status. This keeps synthetic, reviewed, or otherwise qualified sources visibly labeled without inferring a source type.
 
@@ -127,6 +135,7 @@ The object-list contract replaces the earlier string-list response. Consumers mu
 The frontend reads the API at runtime and displays:
 
 - asset, timeframe, and market-type filters;
+- a copyable view link for the current asset, timeframe, and market filters;
 - composite reference price, venue coverage, dispersion, and artifact freshness;
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
