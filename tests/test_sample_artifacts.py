@@ -47,6 +47,12 @@ def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
         for asset in snapshot["assets"]
     ] == [["15m", "5m", "1h"], ["15m", "5m", "1h"]]
     for asset in snapshot["assets"]:
+        mtf_map = asset["mtf_zone_map"]
+        assert mtf_map["primary_timeframe"] == "15m"
+        assert mtf_map["timeframe_count"] == 3
+        assert {row["timeframe"] for row in mtf_map["rows"]} == {"5m", "15m", "1h"}
+        assert any(row["timeframe"] == "15m" and row["is_primary"] for row in mtf_map["rows"])
+        assert all("nearest_bid" in row and "nearest_ask" in row for row in mtf_map["rows"])
         for timeframe in asset["timeframes"]:
             for market in timeframe["markets"]:
                 assert market["zone_readout"]["title"].endswith("zones corroborated")

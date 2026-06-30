@@ -129,6 +129,7 @@ The frontend reads the API at runtime and displays:
 - asset, timeframe, and market-type filters;
 - composite reference price, venue coverage, dispersion, and artifact freshness;
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
+- a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
 - an observed-zone readout that summarizes corroborated zone count, nearest bid/ask concentration ranges, the next refresh check, and the single-snapshot limitation;
@@ -181,6 +182,15 @@ Each market context also includes `zone_readout`, a compact dashboard-facing sum
 - `evidence_mix`: count of total, corroborated, concentrated, and limited zones.
 
 `zone_readout` is an interpretation aid for public artifact inspection. It does not add scoring, ranking, prediction, or execution semantics.
+
+At the asset level, the snapshot also includes `mtf_zone_map` for the configured profile:
+
+- `primary_timeframe`: the locked primary timeframe from `dashboard_profile.json`, when present;
+- `timeframe_count`: number of timeframe contexts available for the asset;
+- `rows`: an object list keyed by timeframe and market type, with `is_primary`, evidence counts, nearest bid/ask concentration summaries, and the next evidence check; and
+- `boundary`: the explicit monitor-only boundary for cross-timeframe interpretation.
+
+`mtf_zone_map` is a convenience view over existing per-market observed zones. It does not create cross-timeframe scoring, asset ranking, directional bias, prediction, or execution guidance.
 
 These grades do not estimate future price reaction. `persistence` and `spoof_risk_proxy` remain engine proxies. A single artifact snapshot cannot establish a zone lifecycle.
 

@@ -270,6 +270,67 @@ def _zone_readout(zones: list[dict[str, Any]], monitoring_brief: dict[str, Any])
     }
 
 
+def _zone_map_focus(zone: dict[str, Any] | None) -> dict[str, Any] | None:
+    if zone is None:
+        return None
+    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else None
+    relation = zone.get("reference_relation") if isinstance(zone.get("reference_relation"), str) else None
+    distance = _finite_number(zone.get("distance_to_reference_pct"))
+    relation_text = _relation_text(relation)
+    distance_text = f"{distance:.3f}% {relation_text}" if distance is not None else relation_text
+    return {
+        "price_low": zone.get("price_low"),
+        "price_high": zone.get("price_high"),
+        "reference_relation": relation,
+        "distance_to_reference_pct": distance,
+        "evidence_grade": grade,
+        "summary": f"{distance_text} / {grade}" if grade else distance_text,
+    }
+
+
+def _mtf_zone_map(timeframe_rows: list[dict[str, Any]], primary_timeframe: str | None) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    for timeframe_row in timeframe_rows:
+        timeframe = timeframe_row.get("timeframe")
+        markets = timeframe_row.get("markets")
+        if not isinstance(markets, list):
+            continue
+        for market in markets:
+            if not isinstance(market, dict):
+                continue
+            readout = market.get("zone_readout")
+            readout = readout if isinstance(readout, dict) else {}
+            mix = readout.get("evidence_mix")
+            mix = mix if isinstance(mix, dict) else {}
+            brief = market.get("monitoring_brief")
+            brief = brief if isinstance(brief, dict) else {}
+            now = brief.get("now")
+            now = now if isinstance(now, dict) else {}
+            rows.append(
+                {
+                    "timeframe": timeframe,
+                    "market_type": market.get("market_type"),
+                    "is_primary": timeframe == primary_timeframe,
+                    "zone_count": mix.get("total_zones"),
+                    "corroborated": mix.get("corroborated"),
+                    "concentrated": mix.get("concentrated"),
+                    "limited": mix.get("limited"),
+                    "nearest_bid": _zone_map_focus(now.get("nearest_bid_concentration")),
+                    "nearest_ask": _zone_map_focus(now.get("nearest_ask_concentration")),
+                    "next_check": readout.get("next_check"),
+                }
+            )
+    return {
+        "primary_timeframe": primary_timeframe,
+        "timeframe_count": len(timeframe_rows),
+        "rows": rows,
+        "boundary": (
+            "Cross-timeframe map is descriptive public-artifact context only; no signal, ranking, "
+            "prediction, or execution instruction."
+        ),
+    }
+
+
 def _monitoring_brief(
     timeframe: str,
     bars: list[dict[str, Any]],
@@ -452,6 +513,7 @@ def _build_asset(
         "asset": asset,
         "artifact_path": str(asset_root.relative_to(root)).replace("\\", "/") or ".",
         "timeframes": timeframe_rows,
+        "mtf_zone_map": _mtf_zone_map(timeframe_rows, primary_timeframe),
     }
 
 

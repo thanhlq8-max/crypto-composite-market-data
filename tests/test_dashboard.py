@@ -59,6 +59,8 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert 'id="profile-note"' in html
     assert 'id="zone-readout"' in html
     assert "Observed zone readout" in html
+    assert 'id="mtf-zone-map"' in html
+    assert "Multi-timeframe zone map" in html
     assert "\u00c2" not in html
     assert ">Buy<" not in html
     assert ">Sell<" not in html
@@ -149,7 +151,8 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
     (tmp_path / "run_summary.json").write_text(json.dumps({"asset": "BTC-USDT"}), encoding="utf-8")
 
     snapshot = build_dashboard_snapshot(tmp_path)
-    timeframe = snapshot["assets"][0]["timeframes"][0]
+    asset = snapshot["assets"][0]
+    timeframe = asset["timeframes"][0]
     market = next(item for item in timeframe["markets"] if item["market_type"] == "spot_usdt")
 
     assert market["observed_zones"][0]["kind"] == "BID_LIQUIDITY_CONCENTRATION"
@@ -197,6 +200,17 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
     )
     assert timeframe["source_note"] == "Reviewed fixture; not live data."
     assert timeframe["spot_perp_dislocation"]["basis_pct"] == pytest.approx(0.4950495)
+    assert asset["mtf_zone_map"]["primary_timeframe"] is None
+    assert asset["mtf_zone_map"]["timeframe_count"] == 1
+    spot_row = next(row for row in asset["mtf_zone_map"]["rows"] if row["market_type"] == "spot_usdt")
+    assert spot_row["timeframe"] == "15m"
+    assert spot_row["corroborated"] == 1
+    assert spot_row["nearest_bid"]["summary"] == (
+        "0.990% below reference / CORROBORATED"
+    )
+    assert spot_row["nearest_ask"]["summary"] == (
+        "0.990% above reference / CONCENTRATED"
+    )
     assert snapshot["mode"] == "OBSERVED_PUBLIC_DATA"
 
 
@@ -230,7 +244,11 @@ def test_dashboard_snapshot_uses_profile_primary_timeframe_order(tmp_path: Path)
 
     assert snapshot["profile"]["primary_timeframe"] == "15m"
     assert snapshot["profile"]["refresh_seconds"] == 60
-    assert [item["timeframe"] for item in snapshot["assets"][0]["timeframes"]] == ["15m", "5m", "1h"]
+    asset = snapshot["assets"][0]
+    assert [item["timeframe"] for item in asset["timeframes"]] == ["15m", "5m", "1h"]
+    assert asset["mtf_zone_map"]["primary_timeframe"] == "15m"
+    assert [item["timeframe"] for item in asset["mtf_zone_map"]["rows"]] == ["15m", "5m", "1h"]
+    assert [item["is_primary"] for item in asset["mtf_zone_map"]["rows"]] == [True, False, False]
 
 
 def test_dashboard_snapshot_endpoint_returns_object(tmp_path: Path) -> None:
