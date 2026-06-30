@@ -66,6 +66,8 @@ def render_dashboard_html(
     .brief-panel pre { max-height: none; margin-top: 0; color: #d4e7ff; }
     .brief-copy-row { display: flex; justify-content: flex-end; align-items: center; gap: 9px; margin-top: 10px; }
     .brief-note { color: var(--muted); font-size: .68rem; }
+    .checklist-panel { margin-bottom: 11px; }
+    .checklist-note { margin-top: 10px; color: #93a7bb; font-size: .76rem; }
     .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr); gap: 11px; }
     .panel { min-width: 0; padding: 18px; border-radius: 16px; overflow: hidden; }
     .panel.full { grid-column: 1 / -1; }
@@ -139,6 +141,15 @@ def render_dashboard_html(
     <div class="panel-head"><div><h2>Current view brief</h2><p>Shareable observed-zone summary for the selected filters</p></div><p id="brief-status"></p></div>
     <pre id="view-brief-text">Loading current view brief...</pre>
     <div class="brief-copy-row"><span id="brief-copy-note" class="brief-note">Copy public-data brief</span><button id="copy-view-brief" type="button">Copy brief</button></div>
+  </section>
+
+  <section class="panel checklist-panel" id="zone-evidence-checklist" aria-label="Nearest zone checklist">
+    <div class="panel-head"><div><h2>Nearest zone checklist</h2><p>Focused bid/ask concentration evidence for the selected filters</p></div><p id="zone-checklist-status"></p></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Focus</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Evidence</th></tr></thead>
+      <tbody id="zone-checklist-body"><tr><td class="empty" colspan="8">Loading nearest zone checklist...</td></tr></tbody>
+    </table></div>
+    <p class="checklist-note" id="zone-checklist-note">Compare these public-depth fields after refresh; descriptive context only.</p>
   </section>
 
   <section class="panel mtf-panel" id="mtf-zone-map" aria-label="Multi-timeframe zone map">
@@ -391,6 +402,33 @@ def render_dashboard_html(
     byId("depth-imbalance").textContent = numeric(book.depth_imbalance) === null ? "" : `imbalance ${fmt(book.depth_imbalance, 3)}`;
   }
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
+  function renderZoneChecklist(market) {
+    const body = byId("zone-checklist-body"); body.replaceChildren();
+    const now = market?.monitoring_brief?.now || {};
+    const readout = market?.zone_readout || {};
+    const rows = [
+      ["Bid concentration", now.nearest_bid_concentration],
+      ["Ask concentration", now.nearest_ask_concentration],
+    ].filter((item) => item[1]);
+    byId("zone-checklist-status").textContent = rows.length ? `${rows.length} focus rows` : "No focus rows";
+    byId("zone-checklist-note").textContent = `${readout.next_check || "Refresh artifacts before comparing zone evidence."} Descriptive context only; no signal, ranking, prediction, execution, or financial advice.`;
+    if (!rows.length) { const row = document.createElement("tr"); const cell = addCell(row, "No nearest bid/ask concentration ranges are present in this artifact.", "empty"); cell.colSpan = 8; body.appendChild(row); return; }
+    for (const [label, zone] of rows) {
+      const row = document.createElement("tr");
+      addCell(row, label);
+      addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`);
+      addCell(row, relationLabel(zone.reference_relation));
+      addCell(row, `${fmt(zone.distance_to_reference_pct, 3)}%`);
+      addCell(row, fmt(zone.depth_quote, 0));
+      addCell(row, zone.venue_count ?? "unavailable");
+      addCell(row, fmt(zone.hhi, 3));
+      const cell = document.createElement("td"); const pill = document.createElement("span");
+      pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`;
+      pill.textContent = zone.evidence_grade || "LIMITED";
+      pill.title = zone.evidence_definition || "";
+      cell.appendChild(pill); row.appendChild(cell); body.appendChild(row);
+    }
+  }
   function mtfZoneFocus(focus) {
     if (!focus) return "unavailable";
     const range = numeric(focus.price_low) === null || numeric(focus.price_high) === null ? null : `${price(focus.price_low)} - ${price(focus.price_high)}`;
@@ -434,7 +472,7 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {

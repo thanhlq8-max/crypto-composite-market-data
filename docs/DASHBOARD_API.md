@@ -139,6 +139,7 @@ The frontend reads the API at runtime and displays:
 - composite reference price, venue coverage, dispersion, and artifact freshness;
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
+- a nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
 - a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
@@ -194,6 +195,8 @@ Each market context also includes `zone_readout`, a compact dashboard-facing sum
 `zone_readout` is an interpretation aid for public artifact inspection. It does not add scoring, ranking, prediction, or execution semantics.
 
 The frontend current-view brief is a display-only composition of existing snapshot fields. It does not create new analytical scores, directional bias, ranking, prediction, execution guidance, or financial advice.
+
+The frontend nearest zone checklist is also display-only. It reads the nearest bid/ask concentration ranges already present in `monitoring_brief.now`, then shows the fields a user should compare after the next artifact refresh. It does not rank zones, estimate future reaction, or create execution semantics.
 
 At the asset level, the snapshot also includes `mtf_zone_map` for the configured profile:
 
