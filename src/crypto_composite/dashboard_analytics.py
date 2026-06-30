@@ -206,6 +206,70 @@ def _nearest_concentration(zones: list[dict[str, Any]], side: str) -> dict[str, 
     return min(candidates, key=lambda zone: float(zone["distance_to_reference_pct"]), default=None)
 
 
+def _relation_text(value: Any) -> str:
+    if value == "BELOW_REFERENCE":
+        return "below reference"
+    if value == "ABOVE_REFERENCE":
+        return "above reference"
+    if value == "CONTAINS_REFERENCE":
+        return "at reference"
+    return "near reference"
+
+
+def _zone_focus_text(zone: dict[str, Any] | None, label: str) -> str | None:
+    if zone is None:
+        return None
+    distance = _finite_number(zone.get("distance_to_reference_pct"))
+    distance_text = f"{distance:.3f}% " if distance is not None else ""
+    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    return f"{label} {distance_text}{_relation_text(zone.get('reference_relation'))} ({grade})."
+
+
+def _zone_readout(zones: list[dict[str, Any]], monitoring_brief: dict[str, Any]) -> dict[str, Any]:
+    confidence = monitoring_brief.get("confidence_risk")
+    confidence = confidence if isinstance(confidence, dict) else {}
+    grade_counts = confidence.get("evidence_grade_counts")
+    grade_counts = grade_counts if isinstance(grade_counts, dict) else {}
+    total = len(zones)
+    corroborated = int(grade_counts.get("CORROBORATED", 0) or 0)
+    limited = int(grade_counts.get("LIMITED", 0) or 0)
+    now = monitoring_brief.get("now")
+    now = now if isinstance(now, dict) else {}
+    next_check = monitoring_brief.get("next_evidence_check")
+    next_check = next_check if isinstance(next_check, dict) else {}
+
+    if total == 0:
+        title = "No practical public-depth zones"
+        detail = "Generate or refresh a composite orderbook ladder before comparing concentration and vacuum ranges."
+    else:
+        title = f"{corroborated}/{total} zones corroborated"
+        focus = [
+            _zone_focus_text(now.get("nearest_bid_concentration"), "Nearest bid concentration"),
+            _zone_focus_text(now.get("nearest_ask_concentration"), "Nearest ask concentration"),
+        ]
+        focus = [item for item in focus if item]
+        if focus:
+            detail = " ".join(focus)
+        else:
+            detail = "Observed zones exist, but no nearest bid/ask concentration range has enough context."
+        if limited:
+            detail = f"{detail} {limited} limited zone(s) need stronger venue coverage before interpretation."
+
+    return {
+        "title": title,
+        "detail": detail,
+        "next_check": next_check.get("observe") or "Refresh artifacts before comparing zone evidence.",
+        "limitation": confidence.get("snapshot_limit")
+        or "Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+        "evidence_mix": {
+            "total_zones": total,
+            "corroborated": corroborated,
+            "concentrated": int(grade_counts.get("CONCENTRATED", 0) or 0),
+            "limited": limited,
+        },
+    }
+
+
 def _monitoring_brief(
     timeframe: str,
     bars: list[dict[str, Any]],
@@ -350,6 +414,14 @@ def _build_asset(
             ladder = ladders.get(market_type)
             ladder = ladder if isinstance(ladder, dict) else None
             zones = _observed_zones(ladder)
+            monitoring_brief = _monitoring_brief(
+                timeframe,
+                bars,
+                latest,
+                status_by_market.get(market_type),
+                ladder,
+                zones,
+            )
             markets.append(
                 {
                     "market_type": market_type,
@@ -361,14 +433,8 @@ def _build_asset(
                     "latest_bar": latest,
                     "orderbook": ladder,
                     "observed_zones": zones,
-                    "monitoring_brief": _monitoring_brief(
-                        timeframe,
-                        bars,
-                        latest,
-                        status_by_market.get(market_type),
-                        ladder,
-                        zones,
-                    ),
+                    "monitoring_brief": monitoring_brief,
+                    "zone_readout": _zone_readout(zones, monitoring_brief),
                 }
             )
         quality = quality_by_timeframe.get(timeframe)
