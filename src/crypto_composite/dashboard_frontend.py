@@ -134,6 +134,7 @@ def render_dashboard_html(
       <label>Market<select id="market-select"></select></label>
       <div class="view-tools">
         <button id="copy-view-link" type="button">Copy view link</button>
+        <button id="copy-view-packet" type="button">Copy packet</button>
         <span id="view-link-note" class="view-link-note">Share current filters</span>
       </div>
     </div>
@@ -251,6 +252,7 @@ def render_dashboard_html(
   const timeframeSelect = byId("timeframe-select");
   const marketSelect = byId("market-select");
   const copyViewLink = byId("copy-view-link");
+  const copyViewPacket = byId("copy-view-packet");
   const copyViewBrief = byId("copy-view-brief");
   const copyZoneReview = byId("copy-zone-review");
   const initialViewParams = new URLSearchParams(window.location.search);
@@ -319,6 +321,28 @@ def render_dashboard_html(
     }
     setTimeout(() => { byId("view-link-note").textContent = "Share current filters"; }, 1800);
   }
+  function viewPacketText(asset, timeframe, market) {
+    const zoneLines = zoneReviewText(asset, timeframe, market)
+      .split("\n")
+      .filter((line) => !line.startsWith("View:"));
+    return [
+      "Dashboard view packet",
+      ...briefLines(asset, timeframe, market),
+      "",
+      "Observed-zone notes:",
+      ...zoneLines,
+    ].join("\n");
+  }
+  async function copyCurrentViewPacket() {
+    const text = copyViewPacket.dataset.text || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("view-link-note").textContent = "Packet copied";
+    } catch {
+      byId("view-link-note").textContent = "Select dashboard text to copy";
+    }
+    setTimeout(() => { byId("view-link-note").textContent = "Share current filters"; }, 1800);
+  }
   function briefLines(asset, timeframe, market) {
     const profile = state.snapshot?.profile || {};
     const profileTimeframes = Array.isArray(profile.timeframes) ? profile.timeframes.join(",") : "";
@@ -339,6 +363,7 @@ def render_dashboard_html(
   function renderViewBrief(asset, timeframe, market) {
     const lines = briefLines(asset, timeframe, market);
     byId("view-brief-text").textContent = lines.join("\n");
+    copyViewPacket.dataset.text = viewPacketText(asset, timeframe, market);
     byId("brief-status").textContent = market?.zone_readout ? "Ready to share" : "Limited context";
     byId("brief-copy-note").textContent = "Copy public-data brief";
   }
@@ -591,6 +616,7 @@ def render_dashboard_html(
   timeframeSelect.addEventListener("change", () => { syncFilters("timeframe"); renderCurrent(true); });
   marketSelect.addEventListener("change", () => renderCurrent(true));
   copyViewLink.addEventListener("click", copyCurrentViewLink);
+  copyViewPacket.addEventListener("click", copyCurrentViewPacket);
   copyViewBrief.addEventListener("click", copyCurrentViewBrief);
   copyZoneReview.addEventListener("click", copyCurrentZoneReview);
   load();
