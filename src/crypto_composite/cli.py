@@ -27,6 +27,7 @@ from crypto_composite.pipeline import (
     DEFAULT_VENUES,
     run_composite,
 )
+from crypto_composite.research_report import write_research_report
 from crypto_composite.universe import run_universe
 
 
@@ -120,6 +121,11 @@ def main() -> None:
     report = sub.add_parser("report", help="Write a static HTML artifact quality report.")
     report.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
     report.add_argument("--out-file", required=True, help="HTML report file to write.")
+
+    research_report = sub.add_parser("research-report", help="Write a static research dataset report and JSON summary.")
+    research_report.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
+    research_report.add_argument("--out-file", required=True, help="HTML research report file to write.")
+    research_report.add_argument("--summary-file", required=True, help="Machine-readable research summary JSON file to write.")
 
     sample_report = sub.add_parser("sample-report", help="Validate sample artifacts and write offline HTML inspection files.")
     sample_report.add_argument("--artifact-root", default="examples/sample_artifacts", help="Existing artifact root to inspect.")
@@ -247,6 +253,11 @@ def main() -> None:
         report_result = write_static_report(args.artifact_root, args.out_file)
         print(json.dumps(report_result, indent=2, sort_keys=True))
         if report_result["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "research-report":
+        research_result = write_research_report(args.artifact_root, args.out_file, args.summary_file)
+        print(json.dumps(research_result, indent=2, sort_keys=True))
+        if research_result["status"] == "ERROR":
             parser.exit(1)
 
 

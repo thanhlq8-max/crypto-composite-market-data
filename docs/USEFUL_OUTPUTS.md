@@ -22,6 +22,12 @@ This project is valuable when it helps users answer data-quality and market-data
 - Is depth concentrated on one venue or distributed across venues?
 - Is the ladder based on enough venues to be treated as a composite artifact?
 
+### Research handoff
+
+- Which generated assets, timeframes, market types, and JSON files are available for review?
+- Which microstructure rows can be handed to notebooks or a static public demo?
+- Which observed public-depth ranges have corroborated, concentrated, or limited evidence?
+
 ### Multi-symbol monitoring
 
 - Which assets produced complete artifacts?

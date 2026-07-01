@@ -44,7 +44,7 @@ jobs:
             --artifact-root _site/artifacts \
             --out-dir _site \
             --artifact-base-url artifacts
-          cp _site/artifact_report.html _site/index.html
+          cp _site/research_report.html _site/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
