@@ -24,10 +24,21 @@ def test_run_sample_report_uses_existing_artifact_tools(monkeypatch, tmp_path: P
         calls.append(("dashboard", kwargs["out_file"]))
         return {"status": "OK", "dashboard_path": str(kwargs["out_file"]), "errors": [], "warnings": []}
 
+    def fake_write_research_report(root: object, out_file: object, summary_file: object) -> dict:
+        calls.append(("research", (out_file, summary_file)))
+        return {
+            "status": "OK",
+            "report_path": str(out_file),
+            "summary_path": str(summary_file),
+            "errors": [],
+            "warnings": [],
+        }
+
     monkeypatch.setattr(sample_workflow, "validate_artifact_root", fake_validate_artifact_root)
     monkeypatch.setattr(sample_workflow, "score_artifact_root", fake_score_artifact_root)
     monkeypatch.setattr(sample_workflow, "write_static_report", fake_write_static_report)
     monkeypatch.setattr(sample_workflow, "write_dashboard_export", fake_write_dashboard_export)
+    monkeypatch.setattr(sample_workflow, "write_research_report", fake_write_research_report)
 
     result = sample_workflow.run_sample_report(
         artifact_root="examples/sample_artifacts",
@@ -39,8 +50,10 @@ def test_run_sample_report_uses_existing_artifact_tools(monkeypatch, tmp_path: P
     assert result["artifact_base_url"] == "artifacts"
     assert result["report_path"] == str(tmp_path / "artifact_report.html")
     assert result["dashboard_path"] == str(tmp_path / "dashboard.html")
+    assert result["research_report_path"] == str(tmp_path / "research_report.html")
+    assert result["research_summary_path"] == str(tmp_path / "research_summary.json")
     assert result["errors"] == []
-    assert [name for name, _ in calls] == ["validate", "score", "report", "dashboard"]
+    assert [name for name, _ in calls] == ["validate", "score", "report", "dashboard", "research"]
 
 
 def test_run_sample_report_returns_error_when_a_step_fails(monkeypatch, tmp_path: Path) -> None:
@@ -51,6 +64,11 @@ def test_run_sample_report_returns_error_when_a_step_fails(monkeypatch, tmp_path
         sample_workflow,
         "write_dashboard_export",
         lambda **kwargs: {"status": "ERROR", "error": "DASHBOARD_FAILED", "errors": [], "warnings": []},
+    )
+    monkeypatch.setattr(
+        sample_workflow,
+        "write_research_report",
+        lambda root, out_file, summary_file: {"status": "ERROR", "error": "RESEARCH_FAILED", "errors": [], "warnings": []},
     )
 
     result = sample_workflow.run_sample_report(out_dir=tmp_path)

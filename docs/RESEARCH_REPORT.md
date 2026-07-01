@@ -1,0 +1,60 @@
+# Static research dataset report
+
+`crypto-composite research-report` writes a static HTML research report and a machine-readable JSON summary from an existing artifact root.
+
+The command is designed for public demo artifacts, reproducible research intake, notebook handoff, and quick review of generated multi-exchange market-data datasets. It does not fetch live exchange data and does not create asset rankings, trading signals, predictions, execution instructions, profitability claims, or financial advice.
+
+## Usage
+
+```bash
+crypto-composite research-report \
+  --artifact-root artifacts-universe \
+  --out-file research_report.html \
+  --summary-file research_summary.json
+```
+
+For the checked-in synthetic sample:
+
+```bash
+crypto-composite research-report \
+  --artifact-root examples/sample_artifacts \
+  --out-file sample-report/research_report.html \
+  --summary-file sample-report/research_summary.json
+```
+
+## What the report shows
+
+- Dataset scope: assets, timeframes, market types, primary timeframe, refresh metadata, and JSON artifact count.
+- Quality gate: current validator and artifact quality status.
+- Market microstructure metrics: latest composite close, venue count, OHLCV coverage, price dispersion, public orderbook coverage, bid/ask depth totals, and depth imbalance.
+- Observed zone evidence: corroborated, concentrated, and limited public-depth bucket counts plus nearest bid/ask concentration ranges.
+- Public demo artifacts: links to the source JSON files behind the report.
+- Caveats: single-snapshot and public-data-only limitations.
+
+## Output files
+
+```text
+research_report.html
+research_summary.json
+```
+
+`research_summary.json` is intended for downstream notebooks, static-site checks, and reproducible review. It keeps artifact rows as object lists rather than prose-only blobs.
+
+## Input files
+
+The command reads the same artifact structures used by `validate-artifacts`, `score-artifacts`, and the dashboard snapshot builder:
+
+```text
+universe_summary.json
+run_summary.json
+data_quality.json
+composite_ohlcv.json
+composite_orderbook_ladder.json
+dashboard_profile.json
+```
+
+## Boundary
+
+Observed zones are public orderbook bucket diagnostics. They do not prove support/resistance, hidden liquidity, market-maker intent, or future price reaction.
+
+The report is a research dataset artifact. It is not a signal engine, prediction system, strategy system, order system, or financial-advice document.

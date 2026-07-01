@@ -2,11 +2,13 @@
 
 `crypto-composite sample-report` is an offline first-run workflow for source checkouts.
 
-It reads an existing artifact root, validates the artifact structure, computes the artifact quality score, and writes two local HTML inspection files:
+It reads an existing artifact root, validates the artifact structure, computes the artifact quality score, and writes local inspection files:
 
 ```text
 sample-report/artifact_report.html
 sample-report/dashboard.html
+sample-report/research_report.html
+sample-report/research_summary.json
 ```
 
 The default input is the checked-in `examples/sample_artifacts` directory.
@@ -46,6 +48,8 @@ The command prints JSON with:
 - quality score result;
 - static artifact report path;
 - static dashboard path;
+- static research report path;
+- machine-readable research summary path;
 - public-data-only boundary text.
 
 ## GitHub Pages demo use
@@ -59,7 +63,7 @@ crypto-composite sample-report \
   --artifact-base-url artifacts
 ```
 
-It then copies `_site/artifact_report.html` to `_site/index.html` as the Pages landing page.
+It then copies `_site/research_report.html` to `_site/index.html` as the Pages landing page.
 
 See [GITHUB_PAGES_DEMO.md](GITHUB_PAGES_DEMO.md) for the full deployment and local reproduction flow.
 

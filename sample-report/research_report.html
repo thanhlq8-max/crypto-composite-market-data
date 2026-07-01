@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crypto Composite Research Dataset Report</title>
+  <style>
+    :root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px; background: Canvas; color: CanvasText; }
+    main { max-width: 1180px; margin: 0 auto; }
+    h1, h2 { letter-spacing: -0.02em; }
+    .card { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 14px; padding: 20px; margin: 18px 0; background: color-mix(in srgb, Canvas 94%, CanvasText 6%); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .metric { border: 1px solid color-mix(in srgb, CanvasText 14%, transparent); border-radius: 12px; padding: 14px; }
+    .metric strong { display: block; font-size: 1.45rem; margin-top: 6px; overflow-wrap: anywhere; }
+    .badge { display: inline-block; border-radius: 999px; padding: 4px 9px; font-weight: 700; }
+    .ok { background: color-mix(in srgb, green 24%, transparent); }
+    .warn { background: color-mix(in srgb, orange 28%, transparent); }
+    .error { background: color-mix(in srgb, red 25%, transparent); }
+    .boundary { font-weight: 700; }
+    .note { color: color-mix(in srgb, CanvasText 72%, transparent); }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border-bottom: 1px solid color-mix(in srgb, CanvasText 16%, transparent); padding: 10px; text-align: left; vertical-align: top; }
+    th { font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    pre { overflow-x: auto; border-radius: 12px; padding: 14px; background: color-mix(in srgb, CanvasText 9%, transparent); }
+    a { color: LinkText; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Crypto Composite Research Dataset Report</h1>
+  <p class="boundary">Static research dataset report only. No trading signal, ranking, prediction, execution instruction, profitability claim, or financial advice.</p>
+
+  <section class="card">
+    <h2>Executive Summary</h2>
+    <ul><li><strong>Dataset scope.</strong> 2 assets, timeframes 15m, 5m, 1h, market types spot_usdt, and 22 JSON artifacts are available in this artifact root.</li><li><strong>Research utility.</strong> The report exposes 6 market microstructure rows and 6 observed-zone evidence rows for audit, notebook intake, and public demo sharing.</li><li><strong>Quality gate.</strong> Current quality status is OK, grade A, score 98.3.</li><li><strong>Boundary.</strong> No trading signal, ranking, prediction, execution instruction, profitability claim, or financial advice is produced.</li></ul>
+  </section>
+
+  <section class="card">
+    <h2>Dataset coverage</h2>
+    <div class="grid">
+      <div class="metric">Status<strong><span class="badge ok">OK</span></strong></div>
+      <div class="metric">Assets<strong>2</strong></div>
+      <div class="metric">Timeframes<strong>15m, 5m, 1h</strong></div>
+      <div class="metric">Markets<strong>spot_usdt</strong></div>
+      <div class="metric">Primary timeframe<strong>15m</strong></div>
+      <div class="metric">Refresh seconds<strong>60</strong></div>
+    </div>
+    <p class="note">Companion machine-readable summary: <a href="research_summary.json">research_summary.json</a>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Market microstructure metrics</h2>
+    <p class="note">Rows describe generated composite OHLCV and public orderbook ladder fields. They are audit metrics, not asset rankings.</p>
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>OHLCV status</th><th>Latest close</th><th>Dispersion</th><th>Book status</th><th>Bid/ask depth</th><th>Imbalance</th></tr></thead>
+      <tbody><tr><td>BTC-USDT</td><td>15m</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>101.0</td><td>0.04%</td><td>COMPOSITE_BOOK_OK</td><td>1100.0 / 990.0</td><td>0.0526</td></tr><tr><td>BTC-USDT</td><td>5m</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>101.202</td><td>0.05%</td><td>COMPOSITE_BOOK_OK</td><td>605.0 / 544.0</td><td>0.0526</td></tr><tr><td>BTC-USDT</td><td>1h</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>100.495</td><td>0.055%</td><td>COMPOSITE_BOOK_OK</td><td>2640.0 / 2376.0</td><td>0.0526</td></tr><tr><td>ETH-USDT</td><td>15m</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>50.5</td><td>0.06%</td><td>COMPOSITE_BOOK_OK</td><td>880.0 / 850.0</td><td>0.0173</td></tr><tr><td>ETH-USDT</td><td>5m</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>50.6515</td><td>0.07%</td><td>COMPOSITE_BOOK_OK</td><td>528.0 / 510.0</td><td>0.0173</td></tr><tr><td>ETH-USDT</td><td>1h</td><td>spot_usdt</td><td>COMPOSITE_DATA_OK</td><td>50.096</td><td>0.08%</td><td>COMPOSITE_BOOK_OK</td><td>1848.0 / 1785.0</td><td>0.0173</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Observed zone evidence</h2>
+    <p class="note">Observed ranges are public orderbook bucket diagnostics. They do not prove hidden liquidity or future price reaction.</p>
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>Evidence mix</th><th>Nearest bid concentration</th><th>Nearest ask concentration</th><th>Next evidence check</th><th>Limitation</th></tr></thead>
+      <tbody><tr><td>BTC-USDT</td><td>15m</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>99.0 - 100.0; relation BELOW_REFERENCE; distance 0.99%; depth 1000.0; venues 3; evidence CORROBORATED</td><td>102.0 - 103.0; relation ABOVE_REFERENCE; distance 0.99%; depth 900.0; venues 2; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr><tr><td>BTC-USDT</td><td>5m</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>99.198 - 100.2; relation BELOW_REFERENCE; distance 0.99%; depth 550.0; venues 3; evidence CORROBORATED</td><td>102.204 - 103.206; relation ABOVE_REFERENCE; distance 0.99%; depth 495.0; venues 2; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr><tr><td>BTC-USDT</td><td>1h</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>98.505 - 99.5; relation BELOW_REFERENCE; distance 0.99%; depth 2400.0; venues 3; evidence CORROBORATED</td><td>101.49 - 102.485; relation ABOVE_REFERENCE; distance 0.99%; depth 2160.0; venues 2; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr><tr><td>ETH-USDT</td><td>15m</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>50.0 - 50.5; relation CONTAINS_REFERENCE; distance 0.0%; depth 800.0; venues 3; evidence CORROBORATED</td><td>50.5 - 51.0; relation CONTAINS_REFERENCE; distance 0.0%; depth 780.0; venues 3; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr><tr><td>ETH-USDT</td><td>5m</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>50.15 - 50.6515; relation CONTAINS_REFERENCE; distance 0.0%; depth 480.0; venues 3; evidence CORROBORATED</td><td>50.6515 - 51.153; relation CONTAINS_REFERENCE; distance 0.0%; depth 468.0; venues 3; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr><tr><td>ETH-USDT</td><td>1h</td><td>spot_usdt</td><td>total 4; corroborated 2; concentrated 0; limited 2</td><td>49.6 - 50.096; relation CONTAINS_REFERENCE; distance 0.0%; depth 1680.0; venues 3; evidence CORROBORATED</td><td>50.096 - 50.592; relation CONTAINS_REFERENCE; distance 0.0%; depth 1638.0; venues 3; evidence CORROBORATED</td><td>Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.</td><td>Single generated snapshot; no future-reaction or hidden-liquidity inference.</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Public demo artifacts</h2>
+    <p class="note">These JSON files are the reproducible source artifacts behind the report.</p>
+    <table>
+      <thead><tr><th>Artifact</th><th>Bytes</th><th>Type</th></tr></thead>
+      <tbody><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv.json">BTC-USDT/composite_ohlcv.json</a></td><td>11464</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv_15m.json">BTC-USDT/composite_ohlcv_15m.json</a></td><td>3480</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv_1h.json">BTC-USDT/composite_ohlcv_1h.json</a></td><td>3545</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_ohlcv_5m.json">BTC-USDT/composite_ohlcv_5m.json</a></td><td>3568</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder.json">BTC-USDT/composite_orderbook_ladder.json</a></td><td>9567</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder_15m.json">BTC-USDT/composite_orderbook_ladder_15m.json</a></td><td>2908</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder_1h.json">BTC-USDT/composite_orderbook_ladder_1h.json</a></td><td>2952</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/composite_orderbook_ladder_5m.json">BTC-USDT/composite_orderbook_ladder_5m.json</a></td><td>2938</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/data_quality.json">BTC-USDT/data_quality.json</a></td><td>1290</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/BTC-USDT/run_summary.json">BTC-USDT/run_summary.json</a></td><td>1156</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/dashboard_profile.json">dashboard_profile.json</a></td><td>370</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv.json">ETH-USDT/composite_ohlcv.json</a></td><td>11429</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv_15m.json">ETH-USDT/composite_ohlcv_15m.json</a></td><td>3458</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv_1h.json">ETH-USDT/composite_ohlcv_1h.json</a></td><td>3546</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_ohlcv_5m.json">ETH-USDT/composite_ohlcv_5m.json</a></td><td>3554</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder.json">ETH-USDT/composite_orderbook_ladder.json</a></td><td>9762</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder_15m.json">ETH-USDT/composite_orderbook_ladder_15m.json</a></td><td>2965</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder_1h.json">ETH-USDT/composite_orderbook_ladder_1h.json</a></td><td>3001</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/composite_orderbook_ladder_5m.json">ETH-USDT/composite_orderbook_ladder_5m.json</a></td><td>3015</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/data_quality.json">ETH-USDT/data_quality.json</a></td><td>1289</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/ETH-USDT/run_summary.json">ETH-USDT/run_summary.json</a></td><td>1155</td><td>JSON artifact</td></tr><tr><td><a href="../examples/sample_artifacts/universe_summary.json">universe_summary.json</a></td><td>1896</td><td>JSON artifact</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Caveats and assumptions</h2>
+    <pre>[
+  "Static report over generated artifacts; refresh artifacts before comparing a newer market state.",
+  "Observed zones are public orderbook bucket diagnostics, not support/resistance, hidden-liquidity proof, or future-reaction evidence.",
+  "Research dataset report only; no trading signal, ranking, prediction, execution instruction, position sizing, profitability claim, or financial advice."
+]</pre>
+  </section>
+</main>
+</body>
+</html>

@@ -7,7 +7,7 @@
 
 Public multi-exchange crypto market-data composite toolkit.
 
-`crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX, Bybit and optional Coinbase Exchange / Kraken spot endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, and data-quality reporting.
+`crypto-composite-market-data` builds reproducible JSON artifacts from public Binance, OKX, Bybit and optional Coinbase Exchange / Kraken spot endpoints. It focuses on market-data normalization, timestamp-aligned OHLCV composition, composite orderbook ladder buckets, multi-symbol universe runs, local artifact inspection, static research reports, and data-quality reporting.
 
 ![Read-only artifact dashboard showing synthetic BTC-USDT and ETH-USDT data-quality coverage](https://raw.githubusercontent.com/thanhlq8-max/crypto-composite-market-data/main/docs/assets/dashboard-overview.png)
 
@@ -21,7 +21,7 @@ A GitHub Pages demo built from checked-in synthetic sample artifacts is availabl
 
 [https://thanhlq8-max.github.io/crypto-composite-market-data/](https://thanhlq8-max.github.io/crypto-composite-market-data/)
 
-The demo is a static artifact-inspection page. The dashboard view can be shared with `asset`, `timeframe`, and `market` query parameters, for example `dashboard.html?asset=BTC-USDT&timeframe=15m&market=spot_usdt`. It does not call live exchange APIs, use private account APIs, rank assets, generate predictions, place orders, or provide financial advice.
+The demo opens on a static research dataset report with a companion JSON summary. The dashboard view can still be shared with `asset`, `timeframe`, and `market` query parameters, for example `dashboard.html?asset=BTC-USDT&timeframe=15m&market=spot_usdt`. It does not call live exchange APIs, use private account APIs, rank assets, generate predictions, place orders, or provide financial advice.
 
 ## Why this exists
 
@@ -55,6 +55,7 @@ See [Why composite public market data](docs/WHY_COMPOSITE_MARKET_DATA.md) for th
 - Reports venue coverage, price dispersion and composite status.
 - Runs explicit multi-symbol universes and writes per-asset artifact folders.
 - Serves a read-only local artifact dashboard API.
+- Writes static research dataset reports and companion summary JSON.
 - Writes reproducible JSON artifacts for research, dashboards and downstream analytics.
 
 ## What it does not do
@@ -107,6 +108,8 @@ This writes:
 ```text
 sample-report/artifact_report.html
 sample-report/dashboard.html
+sample-report/research_report.html
+sample-report/research_summary.json
 ```
 
 See [docs/SAMPLE_REPORT.md](docs/SAMPLE_REPORT.md).
@@ -328,6 +331,21 @@ crypto-composite report --artifact-root artifacts-universe --out-file report.htm
 The report summarizes quality score, venue coverage, composite OHLCV status, orderbook status, price dispersion, validator warnings/errors, and JSON artifact links. It is an inspection page only; it is not a trading signal, prediction, execution instruction, or financial-advice document.
 
 See [docs/STATIC_REPORT.md](docs/STATIC_REPORT.md).
+
+## Static research dataset report
+
+Generate a shareable research dataset report and companion JSON summary:
+
+```bash
+crypto-composite research-report \
+  --artifact-root artifacts-universe \
+  --out-file research_report.html \
+  --summary-file research_summary.json
+```
+
+The report focuses on dataset coverage, market microstructure metrics, observed public-depth evidence, source artifacts, and limitations. It is built for reproducible research intake and public demos, not asset ranking, trading signals, predictions, execution, or financial advice.
+
+See [docs/RESEARCH_REPORT.md](docs/RESEARCH_REPORT.md).
 
 ## CSV export
 

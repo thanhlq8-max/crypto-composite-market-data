@@ -8,6 +8,7 @@ from crypto_composite.artifact_quality import score_artifact_root
 from crypto_composite.artifact_report import write_static_report
 from crypto_composite.artifact_validator import validate_artifact_root
 from crypto_composite.dashboard import write_dashboard_export
+from crypto_composite.research_report import write_research_report
 
 SAMPLE_ARTIFACT_ROOT = "examples/sample_artifacts"
 SAMPLE_REPORT_OUT_DIR = "sample-report"
@@ -44,8 +45,8 @@ def run_sample_report(
 
     This workflow is intentionally offline. It reads an existing artifact root,
     runs the current validator and quality scorer, and writes HTML inspection
-    files. It does not fetch exchange data, call private APIs, create orders,
-    rank assets, or generate trading advice.
+    files and a static research dataset report. It does not fetch exchange data,
+    call private APIs, create orders, rank assets, or generate trading advice.
     """
     root = Path(artifact_root)
     target_dir = Path(out_dir)
@@ -53,6 +54,8 @@ def run_sample_report(
 
     report_path = target_dir / "artifact_report.html"
     dashboard_path = target_dir / "dashboard.html"
+    research_report_path = target_dir / "research_report.html"
+    research_summary_path = target_dir / "research_summary.json"
     dashboard_artifact_base_url = artifact_base_url
     if dashboard_artifact_base_url is None:
         dashboard_artifact_base_url = _relative_artifact_base_url(root, target_dir)
@@ -65,8 +68,9 @@ def run_sample_report(
         out_file=dashboard_path,
         artifact_base_url=dashboard_artifact_base_url,
     )
+    research_report = write_research_report(root, research_report_path, research_summary_path)
 
-    parts = [validation, quality, report, dashboard]
+    parts = [validation, quality, report, dashboard, research_report]
     status = _status_from_parts(parts)
     errors: list[Any] = []
     warnings: list[Any] = []
@@ -82,11 +86,14 @@ def run_sample_report(
         "out_dir": str(target_dir),
         "report_path": str(report_path),
         "dashboard_path": str(dashboard_path),
+        "research_report_path": str(research_report_path),
+        "research_summary_path": str(research_summary_path),
         "artifact_base_url": dashboard_artifact_base_url,
         "validation": validation,
         "quality": quality,
         "report": report,
         "dashboard": dashboard,
+        "research_report": research_report,
         "errors": errors,
         "warnings": warnings,
         "boundaries": [NO_SIGNAL_BOUNDARY],
