@@ -143,7 +143,7 @@ The frontend reads the API at runtime and displays:
 - a nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
 - copyable observed zone notes that turn the selected nearest bid/ask concentrations into short review text using range, distance, evidence grade, depth quote, venue count, HHI, persistence proxy, vacuum value, and refresh comparison fields;
 - a how-to-read guide for observed zones, covering range/location, evidence grade, depth-quality fields, refresh comparison, and interpretation limits;
-- a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe and nearest public-depth concentrations;
+- a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe, nearest public-depth concentrations, and copyable MTF zone map text;
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
 - an observed-zone readout that summarizes corroborated zone count, nearest bid/ask concentration ranges, the next refresh check, and the single-snapshot limitation;
@@ -215,6 +215,8 @@ At the asset level, the snapshot also includes `mtf_zone_map` for the configured
 - `boundary`: the explicit monitor-only boundary for cross-timeframe interpretation.
 
 `mtf_zone_map` is a convenience view over existing per-market observed zones. It does not create cross-timeframe scoring, asset ranking, directional bias, prediction, or execution guidance.
+
+The frontend MTF zone map copy text is display-only. It combines `dashboard_profile.json` metadata and existing `mtf_zone_map.rows` into shareable text; it does not add scoring, ranking, prediction, support/resistance logic, or execution guidance.
 
 These grades do not estimate future price reaction. `persistence` and `spoof_risk_proxy` remain engine proxies. A single artifact snapshot cannot establish a zone lifecycle.
 

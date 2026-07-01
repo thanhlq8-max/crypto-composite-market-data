@@ -194,6 +194,7 @@ def render_dashboard_html(
       <thead><tr><th>Timeframe</th><th>Market</th><th>Primary</th><th>Zones</th><th>Nearest bid concentration</th><th>Nearest ask concentration</th><th>Next check</th></tr></thead>
       <tbody id="mtf-zone-body"><tr><td class="empty" colspan="7">Loading multi-timeframe zone map...</td></tr></tbody>
     </table></div>
+    <div class="review-copy-row"><span id="mtf-zone-copy-note" class="review-note">Copy MTF zone map</span><button id="copy-mtf-zone-map" type="button">Copy MTF map</button></div>
     <p class="mtf-boundary" id="mtf-zone-boundary">Cross-timeframe context is descriptive artifact evidence only.</p>
   </section>
 
@@ -255,6 +256,7 @@ def render_dashboard_html(
   const copyViewPacket = byId("copy-view-packet");
   const copyViewBrief = byId("copy-view-brief");
   const copyZoneReview = byId("copy-zone-review");
+  const copyMtfZoneMap = byId("copy-mtf-zone-map");
   const initialViewParams = new URLSearchParams(window.location.search);
   const NS = "http://www.w3.org/2000/svg";
 
@@ -559,12 +561,34 @@ def render_dashboard_html(
     const corroborated = numeric(item?.corroborated), total = numeric(item?.zone_count);
     return corroborated === null || total === null ? "unavailable" : `${fmt(corroborated, 0)}/${fmt(total, 0)} corroborated`;
   }
+  function mtfZoneMapText(asset) {
+    const map = asset?.mtf_zone_map || {};
+    const rows = Array.isArray(map.rows) ? map.rows : [];
+    const profile = state.snapshot?.profile || {};
+    const profileLine = [
+      profile.primary_timeframe ? `primary ${profile.primary_timeframe}` : null,
+      profile.timeframes?.length ? `MTF ${profile.timeframes.join(",")}` : null,
+      profile.refresh_seconds ? `refresh ${profile.refresh_seconds}s` : null,
+    ].filter(Boolean).join(" / ");
+    const lines = [
+      `MTF zone map: ${asset?.asset || "unavailable"}`,
+      profileLine ? `Profile: ${profileLine}` : null,
+      rows.length ? `Rows: ${rows.length} market-timeframe rows` : "Rows: unavailable",
+    ].filter(Boolean);
+    for (const item of rows) {
+      lines.push(`${item.timeframe || "unavailable"} / ${item.market_type || "unavailable"}${item.is_primary ? " / primary" : ""}: zones ${mtfZoneCount(item)}; bid ${mtfZoneFocus(item.nearest_bid)}; ask ${mtfZoneFocus(item.nearest_ask)}; next ${item.next_check || "Refresh artifacts before comparing zone evidence."}`);
+    }
+    lines.push(`Boundary: ${map.boundary || "Cross-timeframe context is descriptive artifact evidence only; no signal, ranking, prediction, or execution instruction."}`);
+    return lines.join("\n");
+  }
   function renderMtfZoneMap(asset) {
     const body = byId("mtf-zone-body"); body.replaceChildren();
     const map = asset?.mtf_zone_map || {};
     const rows = Array.isArray(map.rows) ? map.rows : [];
     byId("mtf-zone-summary").textContent = rows.length ? `${rows.length} market-timeframe rows` : "No rows";
     byId("mtf-zone-boundary").textContent = map.boundary || "Cross-timeframe context is descriptive artifact evidence only.";
+    copyMtfZoneMap.dataset.text = mtfZoneMapText(asset);
+    byId("mtf-zone-copy-note").textContent = "Copy MTF zone map";
     if (!rows.length) { const row = document.createElement("tr"); const cell = addCell(row, "No multi-timeframe zone rows are present in this artifact.", "empty"); cell.colSpan = 7; body.appendChild(row); return; }
     for (const item of rows) {
       const row = document.createElement("tr");
@@ -577,6 +601,16 @@ def render_dashboard_html(
       addCell(row, item.next_check || "Refresh artifacts before comparing zone evidence.");
       body.appendChild(row);
     }
+  }
+  async function copyCurrentMtfZoneMap() {
+    const text = copyMtfZoneMap.dataset.text || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("mtf-zone-copy-note").textContent = "MTF map copied";
+    } catch {
+      byId("mtf-zone-copy-note").textContent = "Select MTF map text to copy";
+    }
+    setTimeout(() => { byId("mtf-zone-copy-note").textContent = "Copy MTF zone map"; }, 1800);
   }
   function renderZones(market) {
     const body = byId("zone-body"); body.replaceChildren(); const zones = market?.observed_zones || []; byId("zone-count").textContent = `${zones.length} shown`;
@@ -619,6 +653,7 @@ def render_dashboard_html(
   copyViewPacket.addEventListener("click", copyCurrentViewPacket);
   copyViewBrief.addEventListener("click", copyCurrentViewBrief);
   copyZoneReview.addEventListener("click", copyCurrentZoneReview);
+  copyMtfZoneMap.addEventListener("click", copyCurrentMtfZoneMap);
   load();
 </script>
 </body>
