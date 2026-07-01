@@ -61,6 +61,10 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "Observed zone readout" in html
     assert 'id="mtf-zone-map"' in html
     assert "Multi-timeframe zone map" in html
+    assert 'id="copy-mtf-zone-map"' in html
+    assert "Copy MTF map" in html
+    assert "Copy MTF zone map" in html
+    assert "MTF zone map:" in html
     assert 'id="copy-view-link"' in html
     assert 'id="copy-view-packet"' in html
     assert "Copy packet" in html
