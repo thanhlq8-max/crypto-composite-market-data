@@ -95,6 +95,10 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "no signal, ranking, prediction, execution, or financial advice" in html
     assert "initialViewParams" in html
     assert "Dashboard view packet" in html
+    assert 'id="copy-zone-table"' in html
+    assert "Copy zones table" in html
+    assert "Copy observed-zones table" in html
+    assert "Observed zones table:" in html
     assert "searchParams.set(\"asset\"" in html
     assert "searchParams.set(\"timeframe\"" in html
     assert "searchParams.set(\"market\"" in html

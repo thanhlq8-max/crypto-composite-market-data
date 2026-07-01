@@ -147,7 +147,7 @@ The frontend reads the API at runtime and displays:
 - a composite close chart with observed public-depth bands;
 - a public orderbook depth profile;
 - an observed-zone readout that summarizes corroborated zone count, nearest bid/ask concentration ranges, the next refresh check, and the single-snapshot limitation;
-- practical concentration and maximum-vacuum zones with exact reference relation and distance;
+- copyable practical concentration and maximum-vacuum zones with exact reference relation, distance, depth quote, venue count, HHI, persistence proxy, vacuum value, and evidence grade;
 - spot/perpetual composite-close dislocation context;
 - artifact paths and sizes; and
 - a read-only JSON inspector.
@@ -204,6 +204,8 @@ The frontend view packet is also display-only. It combines the current-view brie
 The frontend nearest zone checklist is also display-only. It reads the nearest bid/ask concentration ranges already present in `monitoring_brief.now`, then shows and copies the fields a user should compare after the next artifact refresh. It does not rank zones, estimate future reaction, or create execution semantics.
 
 The frontend observed zone notes are copyable, display-only review text over the same nearest bid/ask concentration objects. They do not create new scoring, support/resistance logic, signal logic, prediction, ranking, or execution guidance.
+
+The frontend observed-zones table copy text is also display-only. It serializes the currently displayed practical concentration and maximum-vacuum rows for sharing; it does not add support/resistance logic, hidden-liquidity claims, scoring, ranking, prediction, or execution guidance.
 
 The frontend how-to-read guide is static dashboard guidance. It does not inspect hidden data or add new calculations; it explains how to read existing public artifact fields without turning them into support/resistance claims, signals, rankings, predictions, or execution guidance.
 
