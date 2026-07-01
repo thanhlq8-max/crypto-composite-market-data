@@ -328,15 +328,33 @@ def render_dashboard_html(
     setTimeout(() => { byId("view-link-note").textContent = "Share current filters"; }, 1800);
   }
   function viewPacketText(asset, timeframe, market) {
+    const checklistLines = zoneChecklistText(asset, timeframe, market)
+      .split("\n")
+      .filter((line) => !line.startsWith("Nearest zone checklist:"));
     const zoneLines = zoneReviewText(asset, timeframe, market)
       .split("\n")
       .filter((line) => !line.startsWith("View:"));
+    const mtfLines = mtfZoneMapText(asset)
+      .split("\n")
+      .filter((line) => !line.startsWith("MTF zone map:"));
+    const zoneTableLines = zoneTableText(asset, timeframe, market)
+      .split("\n")
+      .filter((line) => !line.startsWith("Observed zones table:"));
     return [
       "Dashboard view packet",
       ...briefLines(asset, timeframe, market),
       "",
+      "Nearest-zone checklist:",
+      ...checklistLines,
+      "",
       "Observed-zone notes:",
       ...zoneLines,
+      "",
+      "Multi-timeframe zone map:",
+      ...mtfLines,
+      "",
+      "Observed-zones table:",
+      ...zoneTableLines,
     ].join("\n");
   }
   async function copyCurrentViewPacket() {
