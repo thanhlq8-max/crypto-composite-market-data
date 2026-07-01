@@ -72,6 +72,12 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert 'id="copy-view-brief"' in html
     assert "Current view brief" in html
     assert "Shareable observed-zone summary" in html
+    assert 'id="lfx-mission-control"' in html
+    assert 'id="mission-control-body"' in html
+    assert 'id="copy-mission-control"' in html
+    assert "LFX mission control" in html
+    assert "Copy mission-control readout" in html
+    assert "LFX mission control:" in html
     assert 'id="zone-evidence-checklist"' in html
     assert 'id="zone-checklist-body"' in html
     assert 'id="copy-zone-checklist"' in html
@@ -95,6 +101,7 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "no signal, ranking, prediction, execution, or financial advice" in html
     assert "initialViewParams" in html
     assert "Dashboard view packet" in html
+    assert "LFX mission control:" in html
     assert "Nearest-zone checklist:" in html
     assert "Multi-timeframe zone map:" in html
     assert "Observed-zones table:" in html
@@ -106,6 +113,9 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "searchParams.set(\"timeframe\"" in html
     assert "searchParams.set(\"market\"" in html
     assert "Share current filters" in html
+    assert 'id="lfx-contract"' in html
+    assert 'id="lfx-alignment"' in html
+    assert "LFX-2 alignment contract" in html
     assert "\u00c2" not in html
     assert ">Buy<" not in html
     assert ">Sell<" not in html
@@ -243,6 +253,20 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
     assert market["zone_readout"]["next_check"] == (
         "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote."
     )
+    assert market["lfx_mission_control"]["status"] == "ADAPTED_MONITOR_ONLY"
+    assert [row["panel"] for row in market["lfx_mission_control"]["rows"]] == [
+        "MM Mission",
+        "TRADER Mode",
+        "NEXT Scenario",
+        "DID / Past",
+        "DOING / Now",
+        "KEY Zones",
+        "INV / Release",
+        "Confidence / Risk",
+    ]
+    assert market["lfx_mission_control"]["rows"][0]["title"] == "Compare both-side concentration ranges"
+    assert market["lfx_mission_control"]["rows"][1]["title"] == "OBSERVE PUBLIC ZONES"
+    assert "Public depth imbalance" in market["lfx_mission_control"]["rows"][6]["title"]
     assert timeframe["source_note"] == "Reviewed fixture; not live data."
     assert timeframe["spot_perp_dislocation"]["basis_pct"] == pytest.approx(0.4950495)
     assert asset["mtf_zone_map"]["primary_timeframe"] is None
@@ -289,6 +313,18 @@ def test_dashboard_snapshot_uses_profile_primary_timeframe_order(tmp_path: Path)
 
     assert snapshot["profile"]["primary_timeframe"] == "15m"
     assert snapshot["profile"]["refresh_seconds"] == 60
+    assert snapshot["lfx_alignment"]["status"] == "ADAPTED_MONITOR_ONLY"
+    assert snapshot["lfx_alignment"]["profile"]["primary_timeframe"] == "15m"
+    assert [row["panel"] for row in snapshot["lfx_alignment"]["display_contract"]] == [
+        "MM Mission",
+        "TRADER Mode",
+        "NEXT Scenario",
+        "DID / Past",
+        "DOING / Now",
+        "KEY Zones",
+        "INV / Release",
+        "Confidence / Risk",
+    ]
     asset = snapshot["assets"][0]
     assert [item["timeframe"] for item in asset["timeframes"]] == ["15m", "5m", "1h"]
     assert asset["mtf_zone_map"]["primary_timeframe"] == "15m"

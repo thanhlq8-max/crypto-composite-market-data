@@ -26,6 +26,8 @@ crypto-composite research-report \
 
 - Dataset scope: assets, timeframes, market types, primary timeframe, refresh metadata, and JSON artifact count.
 - Quality gate: current validator and artifact quality status.
+- LFX-2 alignment contract: monitor-only MM Mission / TRADER Mode / NEXT Scenario / DID / DOING / KEY Zones / INV-Release / Confidence-Risk mapping to artifact fields.
+- LFX mission-control artifact readout: one object-list row per display panel, asset, timeframe, and market type.
 - Market microstructure metrics: latest composite close, venue count, OHLCV coverage, price dispersion, public orderbook coverage, bid/ask depth totals, and depth imbalance.
 - Observed zone evidence: corroborated, concentrated, and limited public-depth bucket counts plus nearest bid/ask concentration ranges.
 - Public demo artifacts: links to the source JSON files behind the report.
@@ -39,6 +41,8 @@ research_summary.json
 ```
 
 `research_summary.json` is intended for downstream notebooks, static-site checks, and reproducible review. It keeps artifact rows as object lists rather than prose-only blobs.
+
+The JSON summary includes `lfx_alignment` so downstream users can verify which LFX-2 monitor-only display contract is being applied. It also includes `lfx_mission_control` as a flat object list for notebooks, static-site checks, and public demos.
 
 ## Input files
 

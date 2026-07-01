@@ -27,6 +27,12 @@ def test_build_research_summary_uses_checked_in_sample_artifacts() -> None:
     assert summary["dataset"]["profile_timeframes"] == ["5m", "15m", "1h"]
     assert summary["dataset"]["refresh_seconds"] == 60
     assert summary["dataset"]["market_types"] == ["spot_usdt"]
+    assert summary["lfx_alignment"]["status"] == "ADAPTED_MONITOR_ONLY"
+    assert summary["lfx_alignment"]["profile"]["primary_timeframe"] == "15m"
+    assert any(row["panel"] == "NEXT Scenario" for row in summary["lfx_alignment"]["display_contract"])
+    assert any(row["panel"] == "MM Mission" for row in summary["lfx_alignment"]["display_contract"])
+    assert len(summary["lfx_mission_control"]) == 48
+    assert summary["lfx_mission_control"][0]["panel"] == "MM Mission"
     assert len(summary["market_microstructure_metrics"]) == 6
     assert len(summary["observed_zone_evidence"]) == 6
     assert isinstance(summary["artifacts"], list)
@@ -57,6 +63,8 @@ def test_write_research_report_creates_html_and_summary_json(tmp_path: Path) -> 
     assert "Crypto Composite Research Dataset Report" in html
     assert "Executive Summary" in html
     assert "Market microstructure metrics" in html
+    assert "LFX-2 alignment contract" in html
+    assert "LFX mission-control artifact readout" in html
     assert "Observed zone evidence" in html
     assert "Public demo artifacts" in html
     assert "No trading signal" in html
@@ -67,6 +75,8 @@ def test_write_research_report_creates_html_and_summary_json(tmp_path: Path) -> 
     assert "ENTRY" not in html.upper()
     assert isinstance(summary["market_microstructure_metrics"], list)
     assert isinstance(summary["observed_zone_evidence"], list)
+    assert isinstance(summary["lfx_mission_control"], list)
+    assert isinstance(summary["lfx_alignment"]["display_contract"], list)
     assert isinstance(summary["observed_zone_evidence"][0]["observed_zones"], list)
 
 

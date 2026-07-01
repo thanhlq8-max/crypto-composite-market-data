@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from crypto_composite.dashboard_profile import read_dashboard_profile
+from crypto_composite.lfx_alignment import build_lfx_alignment
 
 
 EVIDENCE_METHOD = {
@@ -270,6 +271,197 @@ def _zone_readout(zones: list[dict[str, Any]], monitoring_brief: dict[str, Any])
     }
 
 
+def _ratio_pct_text(value: Any) -> str:
+    number = _finite_number(value)
+    return "unavailable" if number is None else f"{number * 100:+.3f}%"
+
+
+def _value_pct_text(value: Any) -> str:
+    number = _finite_number(value)
+    return "unavailable" if number is None else f"{number:.4f}%"
+
+
+def _number_text(value: Any, digits: int = 2) -> str:
+    number = _finite_number(value)
+    return "unavailable" if number is None else f"{number:.{digits}f}"
+
+
+def _zone_range_text(zone: dict[str, Any] | None) -> str:
+    if zone is None:
+        return "unavailable"
+    low = _finite_number(zone.get("price_low"))
+    high = _finite_number(zone.get("price_high"))
+    if low is None or high is None:
+        price_text = "range unavailable"
+    else:
+        price_text = f"{low:.2f} - {high:.2f}"
+    distance = _finite_number(zone.get("distance_to_reference_pct"))
+    distance_text = (
+        f"{distance:.3f}% {_relation_text(zone.get('reference_relation'))}"
+        if distance is not None
+        else "distance unavailable"
+    )
+    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    return f"{price_text}; {distance_text}; {grade}"
+
+
+def _mission_row(panel: str, title: str, detail: str, basis: list[str]) -> dict[str, Any]:
+    return {
+        "panel": panel,
+        "title": title,
+        "detail": detail,
+        "artifact_basis": basis,
+    }
+
+
+def _next_scenario_title(kind: Any) -> str:
+    if kind == "RESTORE_OHLCV_COVERAGE":
+        return "Restore OHLCV coverage"
+    if kind == "GENERATE_BOOK_CONTEXT":
+        return "Generate public book context"
+    if kind == "RESTORE_BOOK_COVERAGE":
+        return "Restore public book coverage"
+    if kind == "REFRESH_ZONE_EVIDENCE":
+        return "Compare zone evidence after refresh"
+    if kind == "REFRESH_BOOK_CONTEXT":
+        return "Check for practical depth context"
+    return "Evidence check unavailable"
+
+
+def _lfx_mission_control(monitoring_brief: dict[str, Any], zone_readout: dict[str, Any]) -> dict[str, Any]:
+    """Build adapted LFX-2 v8.1-D display rows from public artifact evidence."""
+    past = monitoring_brief.get("past")
+    past = past if isinstance(past, dict) else {}
+    now = monitoring_brief.get("now")
+    now = now if isinstance(now, dict) else {}
+    book = now.get("book")
+    book = book if isinstance(book, dict) else {}
+    next_check = monitoring_brief.get("next_evidence_check")
+    next_check = next_check if isinstance(next_check, dict) else {}
+    confidence = monitoring_brief.get("confidence_risk")
+    confidence = confidence if isinstance(confidence, dict) else {}
+    evidence_mix = zone_readout.get("evidence_mix")
+    evidence_mix = evidence_mix if isinstance(evidence_mix, dict) else {}
+    total_zones = int(evidence_mix.get("total_zones", 0) or 0)
+    corroborated = int(evidence_mix.get("corroborated", 0) or 0)
+    bid = now.get("nearest_bid_concentration")
+    bid = bid if isinstance(bid, dict) else None
+    ask = now.get("nearest_ask_concentration")
+    ask = ask if isinstance(ask, dict) else None
+    kind = next_check.get("kind")
+
+    if kind in {"RESTORE_OHLCV_COVERAGE", "RESTORE_BOOK_COVERAGE"}:
+        mission_title = "Restore public-data coverage"
+        trader_title = "VERIFY DATA"
+    elif kind == "GENERATE_BOOK_CONTEXT":
+        mission_title = "Generate public-depth context"
+        trader_title = "VERIFY DATA"
+    elif bid is not None and ask is not None:
+        mission_title = "Compare both-side concentration ranges"
+        trader_title = "OBSERVE PUBLIC ZONES"
+    elif bid is not None or ask is not None:
+        mission_title = "Review available concentration side"
+        trader_title = "OBSERVE PUBLIC ZONES"
+    else:
+        mission_title = "Wait for practical depth evidence"
+        trader_title = "WAIT FOR REFRESH"
+
+    timeframe = past.get("timeframe") if isinstance(past.get("timeframe"), str) else "timeframe unavailable"
+    bar_count = past.get("bar_count")
+    close_change = _finite_number(past.get("close_change_pct"))
+    if close_change is None:
+        did_title = "Composite history unavailable"
+    else:
+        did_title = f"Composite close {close_change:+.3f}%"
+
+    focus_parts = [
+        f"Bid {_zone_range_text(bid)}" if bid is not None else None,
+        f"Ask {_zone_range_text(ask)}" if ask is not None else None,
+    ]
+    focus_text = "; ".join(item for item in focus_parts if item) or "nearest concentration unavailable"
+    book_status = book.get("status") or "book status unavailable"
+    depth_detail = (
+        f"{book_status}; coverage {_ratio_pct_text(book.get('coverage'))}; "
+        f"depth bid {_number_text(book.get('bid_depth_total'), 0)} vs "
+        f"ask {_number_text(book.get('ask_depth_total'), 0)}; "
+        f"imbalance {_ratio_pct_text(book.get('depth_imbalance'))}; dispersion {_value_pct_text(now.get('price_dispersion_pct'))}."
+    )
+    status_title = " / ".join(
+        str(item) for item in [confidence.get("ohlcv_status"), confidence.get("book_status")] if item
+    )
+    if not status_title:
+        status_title = "Quality unavailable"
+
+    rows = [
+        _mission_row(
+            "MM Mission",
+            mission_title,
+            (
+                f"{next_check.get('observe') or 'Refresh artifacts before comparing public-depth evidence.'} "
+                "Adapted mission-control text uses public artifacts only."
+            ),
+            ["next_evidence_check", "zone_readout", "book_status"],
+        ),
+        _mission_row(
+            "TRADER Mode",
+            trader_title,
+            "Review artifact evidence and quality gates only; no execution guidance.",
+            ["ohlcv_status", "book_status", "observed_zones"],
+        ),
+        _mission_row(
+            "NEXT Scenario",
+            _next_scenario_title(kind),
+            next_check.get("observe") or "Refresh artifacts before comparing zone evidence.",
+            ["next_evidence_check", "refresh_profile"],
+        ),
+        _mission_row(
+            "DID / Past",
+            did_title,
+            f"{timeframe} artifact contains {bar_count if isinstance(bar_count, int) else 'unavailable'} composite bars.",
+            ["latest_two_composite_bars", "close_change_pct"],
+        ),
+        _mission_row(
+            "DOING / Now",
+            focus_text,
+            depth_detail,
+            ["latest_bar", "public_orderbook_ladder", "nearest_concentration"],
+        ),
+        _mission_row(
+            "KEY Zones",
+            str(zone_readout.get("title") or "Zone readout unavailable"),
+            str(zone_readout.get("detail") or "Generate or refresh public-depth artifacts before review."),
+            ["observed_zones", "evidence_mix", "distance_to_reference"],
+        ),
+        _mission_row(
+            "INV / Release",
+            f"Public depth imbalance {_ratio_pct_text(book.get('depth_imbalance'))}",
+            (
+                f"Bid {_zone_range_text(bid)}; ask {_zone_range_text(ask)}. "
+                "This is a public-depth proxy only; no real inventory or release claim."
+            ),
+            ["depth_imbalance", "nearest_concentration", "price_dispersion"],
+        ),
+        _mission_row(
+            "Confidence / Risk",
+            status_title,
+            (
+                f"Book coverage {_ratio_pct_text(confidence.get('book_coverage'))}; "
+                f"{corroborated}/{total_zones} zones corroborated. "
+                f"{confidence.get('snapshot_limit') or 'Single generated snapshot only.'}"
+            ),
+            ["coverage", "venue_count", "evidence_grade_counts", "snapshot_limit"],
+        ),
+    ]
+    return {
+        "status": "ADAPTED_MONITOR_ONLY",
+        "rows": rows,
+        "boundary": (
+            "Mission-control rows are adapted display text over generated public artifacts only; "
+            "no signal, ranking, prediction, execution, or private-flow claim."
+        ),
+    }
+
+
 def _zone_map_focus(zone: dict[str, Any] | None) -> dict[str, Any] | None:
     if zone is None:
         return None
@@ -483,6 +675,7 @@ def _build_asset(
                 ladder,
                 zones,
             )
+            zone_readout = _zone_readout(zones, monitoring_brief)
             markets.append(
                 {
                     "market_type": market_type,
@@ -495,7 +688,8 @@ def _build_asset(
                     "orderbook": ladder,
                     "observed_zones": zones,
                     "monitoring_brief": monitoring_brief,
-                    "zone_readout": _zone_readout(zones, monitoring_brief),
+                    "zone_readout": zone_readout,
+                    "lfx_mission_control": _lfx_mission_control(monitoring_brief, zone_readout),
                 }
             )
         quality = quality_by_timeframe.get(timeframe)
@@ -529,6 +723,7 @@ def build_dashboard_snapshot(artifact_root: str | Path) -> dict[str, Any]:
     return {
         "mode": "OBSERVED_PUBLIC_DATA",
         "profile": profile,
+        "lfx_alignment": build_lfx_alignment(profile),
         "assets": assets,
         "methodology": {
             "zone_selection": (
