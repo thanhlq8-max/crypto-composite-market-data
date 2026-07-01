@@ -74,7 +74,11 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "Shareable observed-zone summary" in html
     assert 'id="zone-evidence-checklist"' in html
     assert 'id="zone-checklist-body"' in html
+    assert 'id="copy-zone-checklist"' in html
     assert "Nearest zone checklist" in html
+    assert "Copy checklist" in html
+    assert "Copy nearest-zone checklist" in html
+    assert "Nearest zone checklist:" in html
     assert "Focused bid/ask concentration evidence" in html
     assert "Compare these public-depth fields after refresh" in html
     assert 'id="zone-review-notes"' in html
