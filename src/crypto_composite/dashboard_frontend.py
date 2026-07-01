@@ -154,6 +154,16 @@ def render_dashboard_html(
     <article class="flow-item"><span class="metric-label">Confidence / Risk</span><strong id="confidence-title">Unavailable</strong><p id="confidence-detail">No evidence quality context loaded.</p></article>
   </section>
 
+  <section class="panel mission-panel" id="lfx-mission-control" aria-label="LFX mission control">
+    <div class="panel-head"><div><h2>LFX mission control</h2><p>Eight-row artifact readout adapted from the v8.1-D display contract</p></div><p id="mission-control-status"></p></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Display row</th><th>Current readout</th><th>Evidence note</th></tr></thead>
+      <tbody id="mission-control-body"><tr><td class="empty" colspan="3">Loading mission-control rows...</td></tr></tbody>
+    </table></div>
+    <div class="review-copy-row"><span id="mission-control-copy-note" class="review-note">Copy mission-control readout</span><button id="copy-mission-control" type="button">Copy readout</button></div>
+    <p class="review-boundary" id="mission-control-boundary">Public artifact display text only; no private-flow claim.</p>
+  </section>
+
   <section class="panel brief-panel" id="view-brief" aria-label="Current view brief">
     <div class="panel-head"><div><h2>Current view brief</h2><p>Shareable observed-zone summary for the selected filters</p></div><p id="brief-status"></p></div>
     <pre id="view-brief-text">Loading current view brief...</pre>
@@ -231,6 +241,8 @@ def render_dashboard_html(
     <article class="panel">
       <div class="panel-head"><div><h2>Methodology</h2><p>Source-backed interpretation limits</p></div></div>
       <p id="methodology">Loading methodology...</p>
+      <p id="lfx-contract" class="callout">Loading LFX-2 alignment contract...</p>
+      <details><summary>LFX-2 alignment contract</summary><pre id="lfx-alignment"></pre></details>
       <details><summary>Evidence-grade definitions</summary><pre id="evidence-method"></pre></details>
     </article>
 
@@ -257,6 +269,7 @@ def render_dashboard_html(
   const copyViewLink = byId("copy-view-link");
   const copyViewPacket = byId("copy-view-packet");
   const copyViewBrief = byId("copy-view-brief");
+  const copyMissionControl = byId("copy-mission-control");
   const copyZoneChecklist = byId("copy-zone-checklist");
   const copyZoneReview = byId("copy-zone-review");
   const copyMtfZoneMap = byId("copy-mtf-zone-map");
@@ -344,6 +357,11 @@ def render_dashboard_html(
       "Dashboard view packet",
       ...briefLines(asset, timeframe, market),
       "",
+      "LFX mission control:",
+      ...missionControlText(asset, timeframe, market)
+        .split("\n")
+        .filter((line) => !line.startsWith("LFX mission control:")),
+      "",
       "Nearest-zone checklist:",
       ...checklistLines,
       "",
@@ -400,6 +418,48 @@ def render_dashboard_html(
       byId("brief-copy-note").textContent = "Select the brief text to copy";
     }
     setTimeout(() => { byId("brief-copy-note").textContent = "Copy public-data brief"; }, 1800);
+  }
+  function missionControlRows(market) {
+    const rows = market?.lfx_mission_control?.rows;
+    return Array.isArray(rows) ? rows : [];
+  }
+  function missionControlText(asset, timeframe, market) {
+    const rows = missionControlRows(market);
+    const lines = [
+      `LFX mission control: ${asset?.asset || "unavailable"} / ${timeframe?.timeframe || "unavailable"} / ${market?.market_type || "unavailable"}`,
+      rows.length ? `Rows: ${rows.length}` : "Rows: unavailable",
+    ];
+    for (const row of rows) {
+      lines.push(`${row.panel || "unavailable"}: ${row.title || "unavailable"} | ${row.detail || "detail unavailable"}`);
+    }
+    lines.push(`Boundary: ${market?.lfx_mission_control?.boundary || "Public artifact display text only; no private-flow claim."}`);
+    return lines.join("\n");
+  }
+  function renderMissionControl(asset, timeframe, market) {
+    const body = byId("mission-control-body"); body.replaceChildren();
+    const rows = missionControlRows(market);
+    byId("mission-control-status").textContent = rows.length ? `${rows.length} rows` : "No rows";
+    byId("mission-control-boundary").textContent = market?.lfx_mission_control?.boundary || "Public artifact display text only; no private-flow claim.";
+    copyMissionControl.dataset.text = missionControlText(asset, timeframe, market);
+    byId("mission-control-copy-note").textContent = "Copy mission-control readout";
+    if (!rows.length) { const row = document.createElement("tr"); const cell = addCell(row, "No mission-control rows are present in this artifact.", "empty"); cell.colSpan = 3; body.appendChild(row); return; }
+    for (const item of rows) {
+      const row = document.createElement("tr");
+      addCell(row, item.panel || "unavailable");
+      addCell(row, item.title || "unavailable");
+      addCell(row, item.detail || "detail unavailable");
+      body.appendChild(row);
+    }
+  }
+  async function copyCurrentMissionControl() {
+    const text = copyMissionControl.dataset.text || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("mission-control-copy-note").textContent = "Readout copied";
+    } catch {
+      byId("mission-control-copy-note").textContent = "Select mission-control text to copy";
+    }
+    setTimeout(() => { byId("mission-control-copy-note").textContent = "Copy mission-control readout"; }, 1800);
   }
   function syncFilters(level) {
     const assets = state.snapshot?.assets || [];
@@ -707,7 +767,30 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(asset, timeframe, market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(asset, timeframe, market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function lfxAlignmentText(alignment) {
+    const rows = Array.isArray(alignment?.display_contract) ? alignment.display_contract : [];
+    const rules = Array.isArray(alignment?.practical_zone_rules) ? alignment.practical_zone_rules : [];
+    const forbidden = Array.isArray(alignment?.forbidden_semantics) ? alignment.forbidden_semantics : [];
+    const lines = [
+      `Source: ${alignment?.source || "LFX-2 alignment unavailable"}`,
+      `Status: ${alignment?.status || "unavailable"}`,
+      `Boundary: ${alignment?.boundary || "Public artifact review only."}`,
+      "",
+      "Display contract:",
+      ...rows.map((row) => {
+        const fields = Array.isArray(row.output_fields) ? row.output_fields.join(", ") : "";
+        return `${row.panel || "unavailable"}: ${row.question || "unavailable"} | fields ${fields || "unavailable"}`;
+      }),
+      "",
+      "Practical zone rules:",
+      ...rules.map((rule) => `- ${rule}`),
+      "",
+      "Forbidden semantics:",
+      ...forbidden.map((rule) => `- ${rule}`),
+    ];
+    return lines.join("\n");
+  }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMissionControl(asset, timeframe, market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(asset, timeframe, market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(asset, timeframe, market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
@@ -723,6 +806,8 @@ def render_dashboard_html(
       byId("service-state").textContent = profile.refresh_seconds ? `Observed artifact context loaded / ${profile.refresh_seconds}s profile` : "Observed artifact context loaded"; byId("service-state").className = "badge ok";
       syncFilters(); renderCurrent(); renderManifest();
       byId("methodology").textContent = `${snapshot.methodology.zone_selection} ${snapshot.methodology.snapshot_limit} ${snapshot.methodology.cross_venue_limit}`;
+      byId("lfx-contract").textContent = snapshot.lfx_alignment?.boundary || "LFX-style behavior surveillance is available as public artifact review only.";
+      byId("lfx-alignment").textContent = lfxAlignmentText(snapshot.lfx_alignment || {});
       byId("evidence-method").textContent = Object.entries(snapshot.methodology.evidence_grades).map(([grade, definition]) => `${grade}: ${definition}`).join("\n\n");
     } catch (error) { byId("service-state").textContent = "Dashboard unavailable"; byId("service-state").className = "badge error"; byId("methodology").textContent = error.message; }
   }
@@ -732,6 +817,7 @@ def render_dashboard_html(
   copyViewLink.addEventListener("click", copyCurrentViewLink);
   copyViewPacket.addEventListener("click", copyCurrentViewPacket);
   copyViewBrief.addEventListener("click", copyCurrentViewBrief);
+  copyMissionControl.addEventListener("click", copyCurrentMissionControl);
   copyZoneChecklist.addEventListener("click", copyCurrentZoneChecklist);
   copyZoneReview.addEventListener("click", copyCurrentZoneReview);
   copyMtfZoneMap.addEventListener("click", copyCurrentMtfZoneMap);

@@ -117,6 +117,817 @@
     ]
   },
   "errors": [],
+  "lfx_alignment": {
+    "boundary": "LFX-style behavior surveillance is implemented as public artifact review only; it does not infer real market-maker intent or issue trade instructions.",
+    "display_contract": [
+      {
+        "artifact_basis": [
+          "artifact status",
+          "zone evidence mix",
+          "public-depth context"
+        ],
+        "output_fields": [
+          "lfx_mission_control.rows"
+        ],
+        "panel": "MM Mission",
+        "question": "What public-artifact job is most important for this view?"
+      },
+      {
+        "artifact_basis": [
+          "OHLCV status",
+          "book status",
+          "observed zone availability"
+        ],
+        "output_fields": [
+          "lfx_mission_control.rows"
+        ],
+        "panel": "TRADER Mode",
+        "question": "Which review posture fits the current artifact quality?"
+      },
+      {
+        "artifact_basis": [
+          "OHLCV status",
+          "book status",
+          "zone evidence mix",
+          "refresh profile"
+        ],
+        "output_fields": [
+          "monitoring_brief.next_evidence_check",
+          "zone_readout.next_check",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "NEXT Scenario",
+        "question": "What evidence should be checked after the next refresh?"
+      },
+      {
+        "artifact_basis": [
+          "latest two composite bars",
+          "observed close change",
+          "bar count"
+        ],
+        "output_fields": [
+          "monitoring_brief.past",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "DID / Past",
+        "question": "What already happened in the generated artifact?"
+      },
+      {
+        "artifact_basis": [
+          "latest composite bar",
+          "public orderbook ladder",
+          "nearest bid/ask concentration"
+        ],
+        "output_fields": [
+          "monitoring_brief.now",
+          "observed_zones",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "DOING / Now",
+        "question": "What public-data context is visible now?"
+      },
+      {
+        "artifact_basis": [
+          "top depth bucket",
+          "maximum vacuum bucket",
+          "evidence grade",
+          "distance to reference"
+        ],
+        "output_fields": [
+          "observed_zones",
+          "mtf_zone_map",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "KEY Zones",
+        "question": "Which practical public-depth ranges deserve review?"
+      },
+      {
+        "artifact_basis": [
+          "depth imbalance",
+          "nearest bid/ask concentration",
+          "price dispersion"
+        ],
+        "output_fields": [
+          "monitoring_brief.now",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "INV / Release",
+        "question": "What public imbalance and reference context is visible?"
+      },
+      {
+        "artifact_basis": [
+          "coverage",
+          "venue count",
+          "price dispersion",
+          "single-snapshot limitation"
+        ],
+        "output_fields": [
+          "monitoring_brief.confidence_risk",
+          "methodology",
+          "lfx_mission_control.rows"
+        ],
+        "panel": "Confidence / Risk",
+        "question": "How reliable is the current artifact context?"
+      }
+    ],
+    "forbidden_semantics": [
+      "No BUY or SELL command.",
+      "No entry, exit, stop-loss, take-profit, or position-sizing instruction.",
+      "No asset ranking, prediction, strategy backtest, or automated execution.",
+      "No route or target creator unless generated public artifacts explicitly contain that evidence.",
+      "No claim of real market-maker inventory, real retail positioning, hidden liquidity, or future price reaction.",
+      "No RSI, overbought/oversold, or mean-reversion-by-distance logic."
+    ],
+    "practical_zone_rules": [
+      "Render practical concentration and maximum-vacuum public-depth ranges instead of raw zone spam.",
+      "Prefer M15 as the primary operating timeframe when the artifact profile declares it.",
+      "Use M5, M15, and H1 as descriptive multi-timeframe context when present.",
+      "Treat H4/D1 concepts as structural-only unless generated artifacts explicitly provide those timeframes.",
+      "Use density or confluence wording as reference context only; it must not create a route, target, or signal.",
+      "Use counterflow or route-origin wording as evidence-check text only; public artifacts do not prove private flow.",
+      "Keep NEXT wording conditional and evidence-focused, not predictive.",
+      "Use operating language and review checklists instead of trade-command language."
+    ],
+    "profile": {
+      "primary_timeframe": "15m",
+      "refresh_seconds": 60,
+      "timeframes": [
+        "5m",
+        "15m",
+        "1h"
+      ]
+    },
+    "source": "LFX-2 v8.1-D Counterflow Route-Origin Text, adapted to public crypto artifact inspection.",
+    "status": "ADAPTED_MONITOR_ONLY"
+  },
+  "lfx_mission_control": [
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "15m",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "15m",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "15m",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "15m artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "15m",
+      "title": "Composite close +0.298%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 1100 vs ask 990; imbalance +5.263%; dispersion 0.0400%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "15m",
+      "title": "Bid 99.00 - 100.00; 0.990% below reference; CORROBORATED; Ask 102.00 - 103.00; 0.990% above reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.990% below reference (CORROBORATED). Nearest ask concentration 0.990% above reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "15m",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 99.00 - 100.00; 0.990% below reference; CORROBORATED; ask 102.00 - 103.00; 0.990% above reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "15m",
+      "title": "Public depth imbalance +5.263%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "15m",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "5m",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "5m",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "5m",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "5m artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "5m",
+      "title": "Composite close +0.298%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 605 vs ask 544; imbalance +5.263%; dispersion 0.0500%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "5m",
+      "title": "Bid 99.20 - 100.20; 0.990% below reference; CORROBORATED; Ask 102.20 - 103.21; 0.990% above reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.990% below reference (CORROBORATED). Nearest ask concentration 0.990% above reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "5m",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 99.20 - 100.20; 0.990% below reference; CORROBORATED; ask 102.20 - 103.21; 0.990% above reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "5m",
+      "title": "Public depth imbalance +5.263%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "5m",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "1h",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "1h",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "1h",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "1h artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "1h",
+      "title": "Composite close +0.298%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 2640 vs ask 2376; imbalance +5.263%; dispersion 0.0550%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "1h",
+      "title": "Bid 98.50 - 99.50; 0.990% below reference; CORROBORATED; Ask 101.49 - 102.48; 0.990% above reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.990% below reference (CORROBORATED). Nearest ask concentration 0.990% above reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "1h",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 98.50 - 99.50; 0.990% below reference; CORROBORATED; ask 101.49 - 102.48; 0.990% above reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "1h",
+      "title": "Public depth imbalance +5.263%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "BTC-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "1h",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "15m",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "15m",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "15m",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "15m artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "15m",
+      "title": "Composite close +0.598%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 880 vs ask 850; imbalance +1.734%; dispersion 0.0600%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "15m",
+      "title": "Bid 50.00 - 50.50; 0.000% at reference; CORROBORATED; Ask 50.50 - 51.00; 0.000% at reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.000% at reference (CORROBORATED). Nearest ask concentration 0.000% at reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "15m",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 50.00 - 50.50; 0.000% at reference; CORROBORATED; ask 50.50 - 51.00; 0.000% at reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "15m",
+      "title": "Public depth imbalance +1.734%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "15m",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "5m",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "5m",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "5m",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "5m artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "5m",
+      "title": "Composite close +0.598%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 528 vs ask 510; imbalance +1.734%; dispersion 0.0700%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "5m",
+      "title": "Bid 50.15 - 50.65; 0.000% at reference; CORROBORATED; Ask 50.65 - 51.15; 0.000% at reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.000% at reference (CORROBORATED). Nearest ask concentration 0.000% at reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "5m",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 50.15 - 50.65; 0.000% at reference; CORROBORATED; ask 50.65 - 51.15; 0.000% at reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "5m",
+      "title": "Public depth imbalance +1.734%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "5m",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "zone_readout",
+        "book_status"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote. Adapted mission-control text uses public artifacts only.",
+      "market_type": "spot_usdt",
+      "panel": "MM Mission",
+      "timeframe": "1h",
+      "title": "Compare both-side concentration ranges"
+    },
+    {
+      "artifact_basis": [
+        "ohlcv_status",
+        "book_status",
+        "observed_zones"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Review artifact evidence and quality gates only; no execution guidance.",
+      "market_type": "spot_usdt",
+      "panel": "TRADER Mode",
+      "timeframe": "1h",
+      "title": "OBSERVE PUBLIC ZONES"
+    },
+    {
+      "artifact_basis": [
+        "next_evidence_check",
+        "refresh_profile"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Compare the nearest concentration ranges, contributing venues, majority share, and depth quote.",
+      "market_type": "spot_usdt",
+      "panel": "NEXT Scenario",
+      "timeframe": "1h",
+      "title": "Compare zone evidence after refresh"
+    },
+    {
+      "artifact_basis": [
+        "latest_two_composite_bars",
+        "close_change_pct"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "1h artifact contains 4 composite bars.",
+      "market_type": "spot_usdt",
+      "panel": "DID / Past",
+      "timeframe": "1h",
+      "title": "Composite close +0.598%"
+    },
+    {
+      "artifact_basis": [
+        "latest_bar",
+        "public_orderbook_ladder",
+        "nearest_concentration"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "COMPOSITE_BOOK_OK; coverage +100.000%; depth bid 1848 vs ask 1785; imbalance +1.734%; dispersion 0.0800%.",
+      "market_type": "spot_usdt",
+      "panel": "DOING / Now",
+      "timeframe": "1h",
+      "title": "Bid 49.60 - 50.10; 0.000% at reference; CORROBORATED; Ask 50.10 - 50.59; 0.000% at reference; CORROBORATED"
+    },
+    {
+      "artifact_basis": [
+        "observed_zones",
+        "evidence_mix",
+        "distance_to_reference"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Nearest bid concentration 0.000% at reference (CORROBORATED). Nearest ask concentration 0.000% at reference (CORROBORATED). 2 limited zone(s) need stronger venue coverage before interpretation.",
+      "market_type": "spot_usdt",
+      "panel": "KEY Zones",
+      "timeframe": "1h",
+      "title": "2/4 zones corroborated"
+    },
+    {
+      "artifact_basis": [
+        "depth_imbalance",
+        "nearest_concentration",
+        "price_dispersion"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Bid 49.60 - 50.10; 0.000% at reference; CORROBORATED; ask 50.10 - 50.59; 0.000% at reference; CORROBORATED. This is a public-depth proxy only; no real inventory or release claim.",
+      "market_type": "spot_usdt",
+      "panel": "INV / Release",
+      "timeframe": "1h",
+      "title": "Public depth imbalance +1.734%"
+    },
+    {
+      "artifact_basis": [
+        "coverage",
+        "venue_count",
+        "evidence_grade_counts",
+        "snapshot_limit"
+      ],
+      "asset": "ETH-USDT",
+      "boundary": "Mission-control rows are adapted display text over generated public artifacts only; no signal, ranking, prediction, execution, or private-flow claim.",
+      "detail": "Book coverage +100.000%; 2/4 zones corroborated. Single generated snapshot; no future-reaction or hidden-liquidity inference.",
+      "market_type": "spot_usdt",
+      "panel": "Confidence / Risk",
+      "timeframe": "1h",
+      "title": "COMPOSITE_DATA_OK / COMPOSITE_BOOK_OK"
+    }
+  ],
   "limitations": [
     "Static report over generated artifacts; refresh artifacts before comparing a newer market state.",
     "Observed zones are public orderbook bucket diagnostics, not support/resistance, hidden-liquidity proof, or future-reaction evidence.",

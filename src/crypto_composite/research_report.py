@@ -10,6 +10,7 @@ from typing import Any
 from crypto_composite.artifact_quality import score_artifact_root
 from crypto_composite.artifact_validator import validate_artifact_root
 from crypto_composite.dashboard_analytics import build_dashboard_snapshot
+from crypto_composite.lfx_alignment import build_lfx_alignment
 
 
 NO_SIGNAL_BOUNDARY = (
@@ -211,6 +212,34 @@ def _observed_zone_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def _mission_control_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for asset in _as_list(snapshot.get("assets")):
+        asset_obj = _as_mapping(asset)
+        asset_name = asset_obj.get("asset")
+        for timeframe in _as_list(asset_obj.get("timeframes")):
+            timeframe_obj = _as_mapping(timeframe)
+            timeframe_name = timeframe_obj.get("timeframe")
+            for market in _as_list(timeframe_obj.get("markets")):
+                market_obj = _as_mapping(market)
+                mission_control = _as_mapping(market_obj.get("lfx_mission_control"))
+                for row in _as_list(mission_control.get("rows")):
+                    item = _as_mapping(row)
+                    rows.append(
+                        {
+                            "asset": asset_name,
+                            "timeframe": timeframe_name,
+                            "market_type": market_obj.get("market_type"),
+                            "panel": item.get("panel"),
+                            "title": item.get("title"),
+                            "detail": item.get("detail"),
+                            "artifact_basis": _as_list(item.get("artifact_basis")),
+                            "boundary": mission_control.get("boundary"),
+                        }
+                    )
+    return rows
+
+
 def _dataset_scope(snapshot: dict[str, Any], artifacts: list[dict[str, Any]]) -> dict[str, Any]:
     assets = [_as_mapping(asset) for asset in _as_list(snapshot.get("assets"))]
     asset_names = _unique_strings([asset.get("asset") for asset in assets])
@@ -250,6 +279,7 @@ def build_research_summary(artifact_root: str | Path) -> dict[str, Any]:
 
     microstructure_rows = _market_microstructure_rows(snapshot)
     zone_rows = _observed_zone_rows(snapshot)
+    mission_rows = _mission_control_rows(snapshot)
     errors = list(_as_list(validation.get("errors"))) + list(_as_list(quality.get("errors"))) + snapshot_errors
     warnings = list(_as_list(validation.get("warnings"))) + list(_as_list(quality.get("warnings")))
     status = _status_from(
@@ -274,6 +304,8 @@ def build_research_summary(artifact_root: str | Path) -> dict[str, Any]:
         },
         "validation": validation,
         "profile": _as_mapping(snapshot.get("profile")),
+        "lfx_alignment": _as_mapping(snapshot.get("lfx_alignment")) or build_lfx_alignment(_as_mapping(snapshot.get("profile"))),
+        "lfx_mission_control": mission_rows,
         "market_microstructure_metrics": microstructure_rows,
         "observed_zone_evidence": zone_rows,
         "artifacts": artifacts,
@@ -337,6 +369,7 @@ def _summary_bullets(summary: dict[str, Any]) -> str:
     artifact_count = dataset.get("json_artifact_count")
     rows = len(_as_list(summary.get("market_microstructure_metrics")))
     zone_rows = len(_as_list(summary.get("observed_zone_evidence")))
+    mission_rows = len(_as_list(summary.get("lfx_mission_control")))
     bullets = [
         (
             "<strong>Dataset scope.</strong> "
@@ -345,8 +378,8 @@ def _summary_bullets(summary: dict[str, Any]) -> str:
         ),
         (
             "<strong>Research utility.</strong> "
-            f"The report exposes {_html_text(rows)} market microstructure rows and {_html_text(zone_rows)} observed-zone "
-            "evidence rows for audit, notebook intake, and public demo sharing."
+            f"The report exposes {_html_text(rows)} market microstructure rows, {_html_text(zone_rows)} observed-zone "
+            f"evidence rows, and {_html_text(mission_rows)} mission-control rows for audit, notebook intake, and public demo sharing."
         ),
         (
             "<strong>Quality gate.</strong> "
@@ -431,9 +464,51 @@ def _artifact_table(rows: list[Any], report_file: Path, artifact_root: Path) -> 
     return "".join(html_rows)
 
 
+def _lfx_contract_table(rows: list[Any]) -> str:
+    if not rows:
+        return '<tr><td colspan="4">No LFX alignment contract rows were found.</td></tr>'
+    html_rows: list[str] = []
+    for row in rows:
+        item = _as_mapping(row)
+        basis = ", ".join(str(value) for value in _as_list(item.get("artifact_basis")))
+        fields = ", ".join(str(value) for value in _as_list(item.get("output_fields")))
+        html_rows.append(
+            "<tr>"
+            f"<td>{_html_text(item.get('panel'))}</td>"
+            f"<td>{_html_text(item.get('question'))}</td>"
+            f"<td>{_html_text(basis)}</td>"
+            f"<td>{_html_text(fields)}</td>"
+            "</tr>"
+        )
+    return "".join(html_rows)
+
+
+def _mission_control_table(rows: list[Any]) -> str:
+    if not rows:
+        return '<tr><td colspan="7">No LFX mission-control rows were found.</td></tr>'
+    html_rows: list[str] = []
+    for row in rows:
+        item = _as_mapping(row)
+        basis = ", ".join(str(value) for value in _as_list(item.get("artifact_basis")))
+        html_rows.append(
+            "<tr>"
+            f"<td>{_html_text(item.get('asset'))}</td>"
+            f"<td>{_html_text(item.get('timeframe'))}</td>"
+            f"<td>{_html_text(item.get('market_type'))}</td>"
+            f"<td>{_html_text(item.get('panel'))}</td>"
+            f"<td>{_html_text(item.get('title'))}</td>"
+            f"<td>{_html_text(item.get('detail'))}</td>"
+            f"<td>{_html_text(basis)}</td>"
+            "</tr>"
+        )
+    return "".join(html_rows)
+
+
 def _render_html(summary: dict[str, Any], report_file: Path, summary_file: Path) -> str:
     dataset = _as_mapping(summary.get("dataset"))
+    lfx_alignment = _as_mapping(summary.get("lfx_alignment"))
     artifacts = _as_list(summary.get("artifacts"))
+    mission_rows = _as_list(summary.get("lfx_mission_control"))
     microstructure_rows = _as_list(summary.get("market_microstructure_metrics"))
     zone_rows = _as_list(summary.get("observed_zone_evidence"))
     artifact_root = Path(str(summary.get("artifact_root")))
@@ -495,6 +570,24 @@ def _render_html(summary: dict[str, Any], report_file: Path, summary_file: Path)
     <table>
       <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>OHLCV status</th><th>Latest close</th><th>Dispersion</th><th>Book status</th><th>Bid/ask depth</th><th>Imbalance</th></tr></thead>
       <tbody>{_microstructure_table(microstructure_rows)}</tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>LFX-2 alignment contract</h2>
+    <p class="note">{_html_text(lfx_alignment.get("source"))} {_html_text(lfx_alignment.get("boundary"))}</p>
+    <table>
+      <thead><tr><th>Display row</th><th>Question answered</th><th>Artifact basis</th><th>Output fields</th></tr></thead>
+      <tbody>{_lfx_contract_table(_as_list(lfx_alignment.get("display_contract")))}</tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>LFX mission-control artifact readout</h2>
+    <p class="note">Rows translate generated public artifacts into a shareable monitor-only readout. They are evidence review text, not ranking, forecast, or execution guidance.</p>
+    <table>
+      <thead><tr><th>Asset</th><th>Timeframe</th><th>Market</th><th>Display row</th><th>Current readout</th><th>Evidence note</th><th>Basis</th></tr></thead>
+      <tbody>{_mission_control_table(mission_rows)}</tbody>
     </table>
   </section>
 

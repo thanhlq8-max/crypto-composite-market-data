@@ -41,6 +41,10 @@ def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
     assert snapshot["profile"]["primary_timeframe"] == "15m"
     assert snapshot["profile"]["timeframes"] == ["5m", "15m", "1h"]
     assert snapshot["profile"]["refresh_seconds"] == 60
+    assert snapshot["lfx_alignment"]["status"] == "ADAPTED_MONITOR_ONLY"
+    assert snapshot["lfx_alignment"]["profile"]["primary_timeframe"] == "15m"
+    assert any(row["panel"] == "MM Mission" for row in snapshot["lfx_alignment"]["display_contract"])
+    assert any(row["panel"] == "KEY Zones" for row in snapshot["lfx_alignment"]["display_contract"])
     assert [asset["asset"] for asset in snapshot["assets"]] == ["BTC-USDT", "ETH-USDT"]
     assert [
         [timeframe["timeframe"] for timeframe in asset["timeframes"]]
@@ -57,6 +61,8 @@ def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
             for market in timeframe["markets"]:
                 assert market["zone_readout"]["title"].endswith("zones corroborated")
                 assert market["zone_readout"]["evidence_mix"]["total_zones"] == len(market["observed_zones"])
+                assert len(market["lfx_mission_control"]["rows"]) == 8
+                assert market["lfx_mission_control"]["rows"][0]["panel"] == "MM Mission"
                 assert "future-reaction" in market["zone_readout"]["limitation"]
 
 

@@ -25,11 +25,12 @@ The endpoint joins existing combined OHLCV, orderbook ladder, quality, run-summa
 
 1. Asset/timeframe/market filters and current composite metrics.
 2. DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk monitoring brief.
-3. Composite close chart with observed zone bands.
-4. Public-depth profile.
-5. Practical observed-zone table with reference relation, edge distance, and evidence grades.
-6. Spot/perpetual dislocation context.
-7. Methodology and artifact manifest.
+3. LFX v8.1-D mission-control table with MM Mission, TRADER Mode, NEXT Scenario, DID / Past, DOING / Now, KEY Zones, INV / Release, and Confidence / Risk rows.
+4. Composite close chart with observed zone bands.
+5. Public-depth profile.
+6. Practical observed-zone table with reference relation, edge distance, and evidence grades.
+7. Spot/perpetual dislocation context.
+8. Methodology and artifact manifest.
 
 The layout adapts the LFX-2 readability principles of time-layered context, practical-zone filtering, conditional monitoring, and explicit confidence/risk. Trading-specific MM, retail-positioning, route, entry, and prediction semantics are intentionally excluded.
 

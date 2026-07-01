@@ -138,6 +138,8 @@ The frontend reads the API at runtime and displays:
 - a copyable view link for the current asset, timeframe, and market filters;
 - composite reference price, venue coverage, dispersion, and artifact freshness;
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
+- a structured `lfx_alignment` contract that maps the allowed LFX-2 v8.1-D monitor-only rows to public artifact fields;
+- per-market `lfx_mission_control.rows` for MM Mission, TRADER Mode, NEXT Scenario, DID / Past, DOING / Now, KEY Zones, INV / Release, and Confidence / Risk;
 - a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
 - a copyable view packet that combines the current-view brief, selected view link, nearest-zone checklist, observed-zone notes, multi-timeframe zone map, observed-zones table, next evidence checks, and interpretation boundaries;
 - a copyable nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
