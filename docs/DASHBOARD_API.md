@@ -140,7 +140,7 @@ The frontend reads the API at runtime and displays:
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
 - a copyable view packet that combines the current-view brief, selected view link, observed-zone notes, next evidence check, and interpretation boundary;
-- a nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
+- a copyable nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
 - copyable observed zone notes that turn the selected nearest bid/ask concentrations into short review text using range, distance, evidence grade, depth quote, venue count, HHI, persistence proxy, vacuum value, and refresh comparison fields;
 - a how-to-read guide for observed zones, covering range/location, evidence grade, depth-quality fields, refresh comparison, and interpretation limits;
 - a multi-timeframe zone map for the selected asset profile, including the locked primary timeframe, nearest public-depth concentrations, and copyable MTF zone map text;
@@ -201,7 +201,7 @@ The frontend current-view brief is a display-only composition of existing snapsh
 
 The frontend view packet is also display-only. It combines the current-view brief and observed zone notes for sharing; it does not add new calculations or interpretation beyond those two visible sections.
 
-The frontend nearest zone checklist is also display-only. It reads the nearest bid/ask concentration ranges already present in `monitoring_brief.now`, then shows the fields a user should compare after the next artifact refresh. It does not rank zones, estimate future reaction, or create execution semantics.
+The frontend nearest zone checklist is also display-only. It reads the nearest bid/ask concentration ranges already present in `monitoring_brief.now`, then shows and copies the fields a user should compare after the next artifact refresh. It does not rank zones, estimate future reaction, or create execution semantics.
 
 The frontend observed zone notes are copyable, display-only review text over the same nearest bid/ask concentration objects. They do not create new scoring, support/resistance logic, signal logic, prediction, ranking, or execution guidance.
 

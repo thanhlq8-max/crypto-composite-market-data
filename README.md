@@ -361,7 +361,7 @@ Endpoints:
 /api/artifact?path=<relative-json-path>
 ```
 
-Dashboard V3 adds a practical monitoring brief organized as DID / DOING / NEXT / Confidence-Risk, a copyable current-view brief, a copyable view packet, a nearest zone checklist, copyable observed zone notes, a how-to-read observed-zone guide, a multi-timeframe zone map with copyable MTF text for the configured M5/M15/H1 profile, shareable asset/timeframe/market view links, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
+Dashboard V3 adds a practical monitoring brief organized as DID / DOING / NEXT / Confidence-Risk, a copyable current-view brief, a copyable view packet, a copyable nearest zone checklist, copyable observed zone notes, a how-to-read observed-zone guide, a multi-timeframe zone map with copyable MTF text for the configured M5/M15/H1 profile, shareable asset/timeframe/market view links, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
 
 Export the same dashboard as static HTML for GitHub Pages or offline sharing:
 

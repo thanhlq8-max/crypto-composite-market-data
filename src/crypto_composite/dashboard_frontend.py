@@ -166,6 +166,7 @@ def render_dashboard_html(
       <thead><tr><th>Focus</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Evidence</th></tr></thead>
       <tbody id="zone-checklist-body"><tr><td class="empty" colspan="8">Loading nearest zone checklist...</td></tr></tbody>
     </table></div>
+    <div class="review-copy-row"><span id="zone-checklist-copy-note" class="review-note">Copy nearest-zone checklist</span><button id="copy-zone-checklist" type="button">Copy checklist</button></div>
     <p class="checklist-note" id="zone-checklist-note">Compare these public-depth fields after refresh; descriptive context only.</p>
   </section>
 
@@ -255,6 +256,7 @@ def render_dashboard_html(
   const copyViewLink = byId("copy-view-link");
   const copyViewPacket = byId("copy-view-packet");
   const copyViewBrief = byId("copy-view-brief");
+  const copyZoneChecklist = byId("copy-zone-checklist");
   const copyZoneReview = byId("copy-zone-review");
   const copyMtfZoneMap = byId("copy-mtf-zone-map");
   const initialViewParams = new URLSearchParams(window.location.search);
@@ -465,16 +467,37 @@ def render_dashboard_html(
     byId("depth-imbalance").textContent = numeric(book.depth_imbalance) === null ? "" : `imbalance ${fmt(book.depth_imbalance, 3)}`;
   }
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
-  function renderZoneChecklist(market) {
-    const body = byId("zone-checklist-body"); body.replaceChildren();
+  function zoneChecklistRows(market) {
     const now = market?.monitoring_brief?.now || {};
-    const readout = market?.zone_readout || {};
-    const rows = [
+    return [
       ["Bid concentration", now.nearest_bid_concentration],
       ["Ask concentration", now.nearest_ask_concentration],
     ].filter((item) => item[1]);
+  }
+  function zoneChecklistLine(label, zone) {
+    if (!zone) return `${label}: unavailable`;
+    return `${label}: ${price(zone.price_low)} - ${price(zone.price_high)}; location ${relationLabel(zone.reference_relation)}; distance ${fmt(zone.distance_to_reference_pct, 3)}%; depth ${fmt(zone.depth_quote, 0)}; venues ${zone.venue_count ?? "unavailable"}; HHI ${fmt(zone.hhi, 3)}; evidence ${zone.evidence_grade || "LIMITED"}.`;
+  }
+  function zoneChecklistText(asset, timeframe, market) {
+    const rows = zoneChecklistRows(market);
+    const readout = market?.zone_readout || {};
+    const lines = [
+      `Nearest zone checklist: ${asset?.asset || "unavailable"} / ${timeframe?.timeframe || "unavailable"} / ${market?.market_type || "unavailable"}`,
+      rows.length ? `Focus rows: ${rows.length}` : "Focus rows: unavailable",
+    ];
+    for (const [label, zone] of rows) lines.push(zoneChecklistLine(label, zone));
+    lines.push(`Next evidence check: ${readout.next_check || market?.monitoring_brief?.next_evidence_check?.observe || "Refresh artifacts before comparing zone evidence."}`);
+    lines.push("Boundary: existing public artifact fields only; no signal, ranking, prediction, execution, or financial advice.");
+    return lines.join("\n");
+  }
+  function renderZoneChecklist(asset, timeframe, market) {
+    const body = byId("zone-checklist-body"); body.replaceChildren();
+    const readout = market?.zone_readout || {};
+    const rows = zoneChecklistRows(market);
     byId("zone-checklist-status").textContent = rows.length ? `${rows.length} focus rows` : "No focus rows";
     byId("zone-checklist-note").textContent = `${readout.next_check || "Refresh artifacts before comparing zone evidence."} Descriptive context only; no signal, ranking, prediction, execution, or financial advice.`;
+    copyZoneChecklist.dataset.text = zoneChecklistText(asset, timeframe, market);
+    byId("zone-checklist-copy-note").textContent = "Copy nearest-zone checklist";
     if (!rows.length) { const row = document.createElement("tr"); const cell = addCell(row, "No nearest bid/ask concentration ranges are present in this artifact.", "empty"); cell.colSpan = 8; body.appendChild(row); return; }
     for (const [label, zone] of rows) {
       const row = document.createElement("tr");
@@ -491,6 +514,16 @@ def render_dashboard_html(
       pill.title = zone.evidence_definition || "";
       cell.appendChild(pill); row.appendChild(cell); body.appendChild(row);
     }
+  }
+  async function copyCurrentZoneChecklist() {
+    const text = copyZoneChecklist.dataset.text || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      byId("zone-checklist-copy-note").textContent = "Checklist copied";
+    } catch {
+      byId("zone-checklist-copy-note").textContent = "Select checklist text to copy";
+    }
+    setTimeout(() => { byId("zone-checklist-copy-note").textContent = "Copy nearest-zone checklist"; }, 1800);
   }
   function zoneReviewCard(label, zone, readout) {
     const card = document.createElement("section"); card.className = "zone-review-card";
@@ -627,7 +660,7 @@ def render_dashboard_html(
     if (!band) { node.className = "empty"; node.textContent = "Both spot and perpetual composite bars are required."; return; }
     node.className = ""; const title = document.createElement("strong"); title.textContent = `${price(band.price_low)} - ${price(band.price_high)}`; const detail = document.createElement("p"); detail.textContent = `Observed basis ${fmt(band.basis_pct, 4)}%. ${band.interpretation}`; node.append(title, detail);
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(asset, timeframe, market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
@@ -652,6 +685,7 @@ def render_dashboard_html(
   copyViewLink.addEventListener("click", copyCurrentViewLink);
   copyViewPacket.addEventListener("click", copyCurrentViewPacket);
   copyViewBrief.addEventListener("click", copyCurrentViewBrief);
+  copyZoneChecklist.addEventListener("click", copyCurrentZoneChecklist);
   copyZoneReview.addEventListener("click", copyCurrentZoneReview);
   copyMtfZoneMap.addEventListener("click", copyCurrentMtfZoneMap);
   load();
