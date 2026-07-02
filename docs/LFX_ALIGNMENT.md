@@ -13,7 +13,7 @@ It does not port the TradingView Pine implementation, XAUUSD-specific assumption
 | NEXT Scenario | OHLCV status, book status, zone evidence mix, refresh profile | `monitoring_brief.next_evidence_check`, `zone_readout.next_check`, `lfx_mission_control.rows` |
 | DID / Past | Latest two composite OHLCV bars and observed close change | `monitoring_brief.past`, `lfx_mission_control.rows` |
 | DOING / Now | Latest composite bar, public orderbook ladder, nearest bid/ask concentration | `monitoring_brief.now`, `observed_zones`, `lfx_mission_control.rows` |
-| KEY Zones | Top depth bucket, maximum vacuum bucket, evidence grade, distance to reference | `observed_zones`, `mtf_zone_map`, `lfx_mission_control.rows` |
+| KEY Zones | Top depth bucket, maximum vacuum bucket, evidence grade, distance to reference, zone role | `observed_zones`, `observed_zones[].lfx_zone_review`, `mtf_zone_map`, `lfx_mission_control.rows` |
 | INV / Release | Depth imbalance, nearest bid/ask concentration, price dispersion | `monitoring_brief.now`, `lfx_mission_control.rows` |
 | Confidence / Risk | Coverage, venue count, price dispersion, single-snapshot limitation | `monitoring_brief.confidence_risk`, `methodology`, `lfx_mission_control.rows` |
 
@@ -22,8 +22,10 @@ The same contract is exposed as structured JSON under:
 ```text
 dashboard snapshot: lfx_alignment
 dashboard snapshot: assets[].timeframes[].markets[].lfx_mission_control.rows
+dashboard snapshot: assets[].timeframes[].markets[].observed_zones[].lfx_zone_review
 research_summary.json: lfx_alignment
 research_summary.json: lfx_mission_control
+research_summary.json: observed_zone_evidence[].observed_zones[].lfx_zone_review
 ```
 
 ## Practical-zone rules
@@ -36,6 +38,19 @@ research_summary.json: lfx_mission_control
 - Use counterflow or route-origin wording as evidence-check text only; public artifacts do not prove private flow.
 - Keep NEXT wording conditional and evidence-focused, not predictive.
 - Use operating language and review checklists instead of trade-command language.
+
+## Zone-level review object
+
+Each observed zone carries `lfx_zone_review`:
+
+- `role`: concentration, vacuum, or context reference.
+- `review_value`: corroborated, concentrated, or limited public reference.
+- `density_context`: density/confluence reference only.
+- `counterflow_check`: public fields to compare after refresh before changing the review note.
+- `refresh_check`: the exact zone fields to recheck.
+- `boundary`: descriptive public-depth context only.
+
+This object implements LFX-style zone role and density-reference readability without route locks, target locks, private flow, or future reaction claims.
 
 ## Boundary
 

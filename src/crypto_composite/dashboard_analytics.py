@@ -107,10 +107,69 @@ def _zone_reference_context(level: dict[str, Any], ladder: dict[str, Any]) -> tu
     return "CONTAINS_REFERENCE", 0.0
 
 
+def _lfx_zone_role(kind: Any) -> tuple[str, str, str]:
+    if kind in {"BID_LIQUIDITY_CONCENTRATION", "ASK_LIQUIDITY_CONCENTRATION"}:
+        return (
+            "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "Concentration reference",
+            "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+        )
+    if kind in {"BID_PUBLIC_DEPTH_VACUUM", "ASK_PUBLIC_DEPTH_VACUUM"}:
+        return (
+            "PUBLIC_DEPTH_VACUUM_REF",
+            "Vacuum reference",
+            "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+        )
+    return (
+        "PUBLIC_DEPTH_CONTEXT_REF",
+        "Public-depth reference",
+        "Track public artifact fields after refresh.",
+    )
+
+
+def _review_value(grade: Any) -> str:
+    if grade == "CORROBORATED":
+        return "CORROBORATED_REFERENCE"
+    if grade == "CONCENTRATED":
+        return "CONCENTRATED_REFERENCE"
+    return "LIMITED_REFERENCE"
+
+
+def _lfx_zone_review(zone: dict[str, Any]) -> dict[str, Any]:
+    role, role_label, refresh_check = _lfx_zone_role(zone.get("kind"))
+    relation = zone.get("reference_relation")
+    distance = _finite_number(zone.get("distance_to_reference_pct"))
+    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    return {
+        "status": "PUBLIC_ARTIFACT_REVIEW_ONLY",
+        "role": role,
+        "role_label": role_label,
+        "review_value": _review_value(grade),
+        "proximity": {
+            "reference_relation": relation,
+            "distance_to_reference_pct": distance,
+            "description": _relation_text(relation),
+        },
+        "density_context": (
+            "Density/confluence reference only; this does not create a route, target, or signal."
+        ),
+        "counterflow_check": (
+            "On the next artifact refresh, compare opposite-side concentration, depth imbalance, "
+            "venue mix, and persistence proxy before changing the review note."
+        ),
+        "refresh_check": refresh_check,
+        "quality_note": EVIDENCE_METHOD.get(grade, EVIDENCE_METHOD["LIMITED"]),
+        "boundary": (
+            "Zone review text is descriptive public-depth context only; no support/resistance, "
+            "hidden-liquidity, private-flow, route, target, or future-reaction claim."
+        ),
+    }
+
+
 def _zone(level: dict[str, Any], ladder: dict[str, Any], kind: str, label: str) -> dict[str, Any]:
     grade, majority_share = _evidence_grade(level, ladder)
     reference_relation, distance_to_reference_pct = _zone_reference_context(level, ladder)
-    return {
+    zone = {
         "kind": kind,
         "label": label,
         "side": level.get("side"),
@@ -129,6 +188,8 @@ def _zone(level: dict[str, Any], ladder: dict[str, Any], kind: str, label: str) 
         "evidence_grade": grade,
         "evidence_definition": EVIDENCE_METHOD[grade],
     }
+    zone["lfx_zone_review"] = _lfx_zone_review(zone)
+    return zone
 
 
 def _vacuum_level(levels: Any, excluded: dict[str, Any] | None) -> dict[str, Any] | None:

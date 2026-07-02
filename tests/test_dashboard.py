@@ -105,6 +105,7 @@ def test_render_dashboard_html_reads_object_artifact_contract() -> None:
     assert "Nearest-zone checklist:" in html
     assert "Multi-timeframe zone map:" in html
     assert "Observed-zones table:" in html
+    assert "LFX review" in html
     assert 'id="copy-zone-table"' in html
     assert "Copy zones table" in html
     assert "Copy observed-zones table" in html
@@ -212,11 +213,17 @@ def test_dashboard_snapshot_builds_observed_zones_and_dislocation(tmp_path: Path
 
     assert market["observed_zones"][0]["kind"] == "BID_LIQUIDITY_CONCENTRATION"
     assert market["observed_zones"][0]["evidence_grade"] == "CORROBORATED"
+    assert market["observed_zones"][0]["lfx_zone_review"]["role"] == "PUBLIC_DEPTH_CONCENTRATION_REF"
+    assert market["observed_zones"][0]["lfx_zone_review"]["review_value"] == "CORROBORATED_REFERENCE"
+    assert "Density/confluence reference only" in market["observed_zones"][0]["lfx_zone_review"]["density_context"]
     assert market["observed_zones"][0]["reference_relation"] == "BELOW_REFERENCE"
     assert market["observed_zones"][0]["distance_to_reference_pct"] == pytest.approx(0.990099)
     assert market["observed_zones"][1]["kind"] == "BID_PUBLIC_DEPTH_VACUUM"
     assert market["observed_zones"][1]["evidence_grade"] == "LIMITED"
+    assert market["observed_zones"][1]["lfx_zone_review"]["role"] == "PUBLIC_DEPTH_VACUUM_REF"
+    assert market["observed_zones"][1]["lfx_zone_review"]["review_value"] == "LIMITED_REFERENCE"
     assert market["observed_zones"][2]["evidence_grade"] == "CONCENTRATED"
+    assert market["observed_zones"][2]["lfx_zone_review"]["review_value"] == "CONCENTRATED_REFERENCE"
     assert market["observed_zones"][2]["reference_relation"] == "ABOVE_REFERENCE"
     assert market["observed_zones"][2]["distance_to_reference_pct"] == pytest.approx(0.990099)
     assert market["monitoring_brief"]["past"] == {

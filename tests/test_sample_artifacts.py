@@ -63,6 +63,8 @@ def test_checked_in_sample_dashboard_uses_locked_mtf_profile() -> None:
                 assert market["zone_readout"]["evidence_mix"]["total_zones"] == len(market["observed_zones"])
                 assert len(market["lfx_mission_control"]["rows"]) == 8
                 assert market["lfx_mission_control"]["rows"][0]["panel"] == "MM Mission"
+                assert all("lfx_zone_review" in zone for zone in market["observed_zones"])
+                assert all(zone["lfx_zone_review"]["status"] == "PUBLIC_ARTIFACT_REVIEW_ONLY" for zone in market["observed_zones"])
                 assert "future-reaction" in market["zone_readout"]["limitation"]
 
 

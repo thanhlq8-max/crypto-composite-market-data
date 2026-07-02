@@ -961,6 +961,7 @@
         "hhi": 0.5,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 103.0,
@@ -977,6 +978,7 @@
         "hhi": 0.3334,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 100.0,
@@ -1014,6 +1016,7 @@
         "hhi": 0.5,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 103.206,
@@ -1030,6 +1033,7 @@
         "hhi": 0.3334,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 100.2,
@@ -1067,6 +1071,7 @@
         "hhi": 0.5,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 102.485,
@@ -1083,6 +1088,7 @@
         "hhi": 0.3334,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 99.5,
@@ -1120,6 +1126,7 @@
         "hhi": 0.3333,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 51.0,
@@ -1136,6 +1143,7 @@
         "hhi": 0.3337,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 50.5,
@@ -1173,6 +1181,7 @@
         "hhi": 0.3333,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 51.153,
@@ -1189,6 +1198,7 @@
         "hhi": 0.3337,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 50.6515,
@@ -1226,6 +1236,7 @@
         "hhi": 0.3333,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 50.592,
@@ -1242,6 +1253,7 @@
         "hhi": 0.3337,
         "kind": null,
         "label": null,
+        "lfx_zone_review": {},
         "majority_venue_share": null,
         "persistence_proxy": null,
         "price_high": 50.096,
@@ -1272,6 +1284,22 @@
         "hhi": 0.5,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "above reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "ABOVE_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.61,
         "price_high": 103.0,
@@ -1288,6 +1316,22 @@
         "hhi": 0.3334,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "below reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "BELOW_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.67,
         "price_high": 100.0,
@@ -1306,6 +1350,22 @@
           "hhi": 0.3334,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.67,
           "price_high": 100.0,
@@ -1322,6 +1382,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 99.0,
@@ -1338,6 +1414,22 @@
           "hhi": 0.5,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.61,
           "price_high": 103.0,
@@ -1354,6 +1446,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 104.0,
@@ -1385,6 +1493,22 @@
         "hhi": 0.5,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "above reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "ABOVE_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.61,
         "price_high": 103.206,
@@ -1401,6 +1525,22 @@
         "hhi": 0.3334,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "below reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "BELOW_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.67,
         "price_high": 100.2,
@@ -1419,6 +1559,22 @@
           "hhi": 0.3334,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.67,
           "price_high": 100.2,
@@ -1435,6 +1591,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 99.198,
@@ -1451,6 +1623,22 @@
           "hhi": 0.5,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.61,
           "price_high": 103.206,
@@ -1467,6 +1655,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 104.208,
@@ -1498,6 +1702,22 @@
         "hhi": 0.5,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "above reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "ABOVE_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.61,
         "price_high": 102.485,
@@ -1514,6 +1734,22 @@
         "hhi": 0.3334,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "below reference",
+            "distance_to_reference_pct": 0.990099,
+            "reference_relation": "BELOW_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.67,
         "price_high": 99.5,
@@ -1532,6 +1768,22 @@
           "hhi": 0.3334,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.67,
           "price_high": 99.5,
@@ -1548,6 +1800,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 98.505,
@@ -1564,6 +1832,22 @@
           "hhi": 0.5,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.61,
           "price_high": 102.485,
@@ -1580,6 +1864,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 1.980198,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 103.48,
@@ -1611,6 +1911,22 @@
         "hhi": 0.3333,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.64,
         "price_high": 51.0,
@@ -1627,6 +1943,22 @@
         "hhi": 0.3337,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.66,
         "price_high": 50.5,
@@ -1645,6 +1977,22 @@
           "hhi": 0.3337,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.66,
           "price_high": 50.5,
@@ -1661,6 +2009,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 50.0,
@@ -1677,6 +2041,22 @@
           "hhi": 0.3333,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.64,
           "price_high": 51.0,
@@ -1693,6 +2073,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 51.5,
@@ -1724,6 +2120,22 @@
         "hhi": 0.3333,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.64,
         "price_high": 51.153,
@@ -1740,6 +2152,22 @@
         "hhi": 0.3337,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.66,
         "price_high": 50.6515,
@@ -1758,6 +2186,22 @@
           "hhi": 0.3337,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.66,
           "price_high": 50.6515,
@@ -1774,6 +2218,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 50.15,
@@ -1790,6 +2250,22 @@
           "hhi": 0.3333,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.64,
           "price_high": 51.153,
@@ -1806,6 +2282,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 51.6545,
@@ -1837,6 +2329,22 @@
         "hhi": 0.3333,
         "kind": "ASK_LIQUIDITY_CONCENTRATION",
         "label": "Ask liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.64,
         "price_high": 50.592,
@@ -1853,6 +2361,22 @@
         "hhi": 0.3337,
         "kind": "BID_LIQUIDITY_CONCENTRATION",
         "label": "Bid liquidity concentration",
+        "lfx_zone_review": {
+          "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+          "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+          "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+          "proximity": {
+            "description": "at reference",
+            "distance_to_reference_pct": 0.0,
+            "reference_relation": "CONTAINS_REFERENCE"
+          },
+          "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+          "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+          "review_value": "CORROBORATED_REFERENCE",
+          "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+          "role_label": "Concentration reference",
+          "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+        },
         "majority_venue_share": null,
         "persistence_proxy": 0.66,
         "price_high": 50.096,
@@ -1871,6 +2395,22 @@
           "hhi": 0.3337,
           "kind": "BID_LIQUIDITY_CONCENTRATION",
           "label": "Bid liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.66,
           "price_high": 50.096,
@@ -1887,6 +2427,22 @@
           "hhi": 1.0,
           "kind": "BID_PUBLIC_DEPTH_VACUUM",
           "label": "Bid public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "below reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "BELOW_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 49.6,
@@ -1903,6 +2459,22 @@
           "hhi": 0.3333,
           "kind": "ASK_LIQUIDITY_CONCENTRATION",
           "label": "Ask liquidity concentration",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "at reference",
+              "distance_to_reference_pct": 0.0,
+              "reference_relation": "CONTAINS_REFERENCE"
+            },
+            "quality_note": "Book status is OK, at least two venues contribute, and no venue supplies a majority of bucket depth.",
+            "refresh_check": "Track depth quote, venue mix, HHI, and persistence proxy after refresh.",
+            "review_value": "CORROBORATED_REFERENCE",
+            "role": "PUBLIC_DEPTH_CONCENTRATION_REF",
+            "role_label": "Concentration reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.64,
           "price_high": 50.592,
@@ -1919,6 +2491,22 @@
           "hhi": 1.0,
           "kind": "ASK_PUBLIC_DEPTH_VACUUM",
           "label": "Ask public-depth vacuum",
+          "lfx_zone_review": {
+            "boundary": "Zone review text is descriptive public-depth context only; no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.",
+            "counterflow_check": "On the next artifact refresh, compare opposite-side concentration, depth imbalance, venue mix, and persistence proxy before changing the review note.",
+            "density_context": "Density/confluence reference only; this does not create a route, target, or signal.",
+            "proximity": {
+              "description": "above reference",
+              "distance_to_reference_pct": 0.990099,
+              "reference_relation": "ABOVE_REFERENCE"
+            },
+            "quality_note": "Book coverage is partial/weak or fewer than two venues contribute to the bucket.",
+            "refresh_check": "Track whether the low-depth bucket remains thin or gets refilled after refresh.",
+            "review_value": "LIMITED_REFERENCE",
+            "role": "PUBLIC_DEPTH_VACUUM_REF",
+            "role_label": "Vacuum reference",
+            "status": "PUBLIC_ARTIFACT_REVIEW_ONLY"
+          },
           "majority_venue_share": null,
           "persistence_proxy": 0.35,
           "price_high": 51.088,
