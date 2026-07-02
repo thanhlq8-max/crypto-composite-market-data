@@ -227,8 +227,8 @@ def render_dashboard_html(
         <section class="insight-card"><span>Limit</span><strong>Snapshot only</strong><p id="zone-readout-limit">No future-reaction or hidden-liquidity inference.</p></section>
       </div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Zone</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th></tr></thead>
-        <tbody id="zone-body"><tr><td class="empty" colspan="10">Loading observed zones...</td></tr></tbody>
+        <thead><tr><th>Zone</th><th>Range</th><th>Location</th><th>Distance</th><th>Depth quote</th><th>Venues</th><th>HHI</th><th>Persistence proxy</th><th>Vacuum</th><th>Evidence</th><th>LFX review</th></tr></thead>
+        <tbody id="zone-body"><tr><td class="empty" colspan="11">Loading observed zones...</td></tr></tbody>
       </table></div>
       <div class="review-copy-row"><span id="zone-table-copy-note" class="review-note">Copy observed-zones table</span><button id="copy-zone-table" type="button">Copy zones table</button></div>
       <p class="callout" id="zone-note">Zone evidence describes the current public snapshot. It does not establish support, resistance, hidden liquidity, or future reaction.</p>
@@ -726,7 +726,10 @@ def render_dashboard_html(
     setTimeout(() => { byId("mtf-zone-copy-note").textContent = "Copy MTF zone map"; }, 1800);
   }
   function zoneTableLine(zone) {
-    return `${zone.label || zone.kind || "Observed zone"}: ${price(zone.price_low)} - ${price(zone.price_high)}; location ${relationLabel(zone.reference_relation)}; distance ${fmt(zone.distance_to_reference_pct, 3)}%; depth ${fmt(zone.depth_quote, 0)}; venues ${zone.venue_count ?? "unavailable"}; HHI ${fmt(zone.hhi, 3)}; persistence ${fmt(zone.persistence_proxy, 3)}; vacuum ${fmt(zone.vacuum_score, 3)}; evidence ${zone.evidence_grade || "LIMITED"}.`;
+    const review = zone.lfx_zone_review || {};
+    const role = review.role_label || review.role || "LFX review unavailable";
+    const value = review.review_value || "value unavailable";
+    return `${zone.label || zone.kind || "Observed zone"}: ${price(zone.price_low)} - ${price(zone.price_high)}; location ${relationLabel(zone.reference_relation)}; distance ${fmt(zone.distance_to_reference_pct, 3)}%; depth ${fmt(zone.depth_quote, 0)}; venues ${zone.venue_count ?? "unavailable"}; HHI ${fmt(zone.hhi, 3)}; persistence ${fmt(zone.persistence_proxy, 3)}; vacuum ${fmt(zone.vacuum_score, 3)}; evidence ${zone.evidence_grade || "LIMITED"}; LFX review ${role} / ${value}.`;
   }
   function zoneTableText(asset, timeframe, market) {
     const zones = Array.isArray(market?.observed_zones) ? market.observed_zones : [];
@@ -749,8 +752,8 @@ def render_dashboard_html(
     byId("zone-readout-limit").textContent = readout.limitation || "Single generated snapshot; no future-reaction or hidden-liquidity inference.";
     copyZoneTable.dataset.text = zoneTableText(asset, timeframe, market);
     byId("zone-table-copy-note").textContent = "Copy observed-zones table";
-    if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 10; body.appendChild(row); return; }
-    for (const zone of zones) { const row = document.createElement("tr"); addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, relationLabel(zone.reference_relation)); addCell(row, `${fmt(zone.distance_to_reference_pct, 3)}%`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); body.appendChild(row); }
+    if (!zones.length) { const row = document.createElement("tr"); const cell = addCell(row, "No qualifying ladder buckets are present in this artifact.", "empty"); cell.colSpan = 11; body.appendChild(row); return; }
+    for (const zone of zones) { const row = document.createElement("tr"); const review = zone.lfx_zone_review || {}; addCell(row, zone.label); addCell(row, `${price(zone.price_low)} - ${price(zone.price_high)}`); addCell(row, relationLabel(zone.reference_relation)); addCell(row, `${fmt(zone.distance_to_reference_pct, 3)}%`); addCell(row, fmt(zone.depth_quote, 0)); addCell(row, zone.venue_count ?? "unavailable"); addCell(row, fmt(zone.hhi, 3)); addCell(row, fmt(zone.persistence_proxy, 3)); addCell(row, fmt(zone.vacuum_score, 3)); const cell = document.createElement("td"); const pill = document.createElement("span"); pill.className = `pill ${String(zone.evidence_grade || "limited").toLowerCase()}`; pill.textContent = zone.evidence_grade || "LIMITED"; pill.title = zone.evidence_definition || ""; cell.appendChild(pill); row.appendChild(cell); addCell(row, `${review.role_label || review.role || "unavailable"} / ${review.review_value || "unavailable"}`); body.appendChild(row); }
   }
   async function copyCurrentZoneTable() {
     const text = copyZoneTable.dataset.text || "";

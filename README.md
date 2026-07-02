@@ -57,6 +57,7 @@ See [Why composite public market data](docs/WHY_COMPOSITE_MARKET_DATA.md) for th
 - Serves a read-only local artifact dashboard API.
 - Writes static research dataset reports and companion summary JSON.
 - Exposes an adapted LFX-2 v8.1-D contract for MM Mission / TRADER Mode / NEXT Scenario / DID / DOING / KEY Zones / INV-Release / Confidence-Risk output.
+- Adds `lfx_zone_review` objects to observed zones so practical public-depth ranges carry LFX-style role, review value, density-reference context, and refresh checks.
 - Writes reproducible JSON artifacts for research, dashboards and downstream analytics.
 
 ## What it does not do
@@ -350,7 +351,7 @@ See [docs/RESEARCH_REPORT.md](docs/RESEARCH_REPORT.md).
 
 ## LFX-2 monitor-only alignment
 
-The dashboard snapshot and research summary expose an `lfx_alignment` object that maps the allowed LFX-2 v8.1-D monitor-only contract to public artifact fields: MM Mission, TRADER Mode, NEXT Scenario, DID / Past, DOING / Now, KEY Zones, INV / Release, and Confidence / Risk. Per-market `lfx_mission_control.rows` provide the current artifact-derived readout as object-list data for dashboards, reports, notebooks, and public demos.
+The dashboard snapshot and research summary expose an `lfx_alignment` object that maps the allowed LFX-2 v8.1-D monitor-only contract to public artifact fields: MM Mission, TRADER Mode, NEXT Scenario, DID / Past, DOING / Now, KEY Zones, INV / Release, and Confidence / Risk. Per-market `lfx_mission_control.rows` provide the current artifact-derived readout as object-list data for dashboards, reports, notebooks, and public demos. Each observed zone also includes `lfx_zone_review` for zone role, review value, density-reference text, and counterflow refresh checks.
 
 See [docs/LFX_ALIGNMENT.md](docs/LFX_ALIGNMENT.md).
 
@@ -386,7 +387,7 @@ Endpoints:
 /api/artifact?path=<relative-json-path>
 ```
 
-Dashboard V3 adds a practical monitoring brief, an eight-row LFX mission-control table, a copyable current-view brief, a complete copyable view packet, a copyable nearest zone checklist, copyable observed zone notes, a copyable observed-zones table, a how-to-read observed-zone guide, a multi-timeframe zone map with copyable MTF text for the configured M5/M15/H1 profile, shareable asset/timeframe/market view links, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
+Dashboard V3 adds a practical monitoring brief, an eight-row LFX mission-control table, zone-level LFX review roles, a copyable current-view brief, a complete copyable view packet, a copyable nearest zone checklist, copyable observed zone notes, a copyable observed-zones table, a how-to-read observed-zone guide, a multi-timeframe zone map with copyable MTF text for the configured M5/M15/H1 profile, shareable asset/timeframe/market view links, exact zone distance and reference location, composite price and public-depth charts, evidence-grade zones, an observed-zone readout for the nearest bid/ask concentration ranges, and spot/perpetual dislocation context. All observations are derived from generated public-data artifacts and remain non-predictive.
 
 Export the same dashboard as static HTML for GitHub Pages or offline sharing:
 

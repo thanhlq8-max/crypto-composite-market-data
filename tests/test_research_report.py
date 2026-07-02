@@ -65,6 +65,7 @@ def test_write_research_report_creates_html_and_summary_json(tmp_path: Path) -> 
     assert "Market microstructure metrics" in html
     assert "LFX-2 alignment contract" in html
     assert "LFX mission-control artifact readout" in html
+    assert "LFX role" in html
     assert "Observed zone evidence" in html
     assert "Public demo artifacts" in html
     assert "No trading signal" in html
@@ -78,6 +79,7 @@ def test_write_research_report_creates_html_and_summary_json(tmp_path: Path) -> 
     assert isinstance(summary["lfx_mission_control"], list)
     assert isinstance(summary["lfx_alignment"]["display_contract"], list)
     assert isinstance(summary["observed_zone_evidence"][0]["observed_zones"], list)
+    assert "lfx_zone_review" in summary["observed_zone_evidence"][0]["observed_zones"][0]
 
 
 def test_research_report_wording_guard_rejects_standalone_entry() -> None:

@@ -140,6 +140,7 @@ The frontend reads the API at runtime and displays:
 - DID / Past, DOING / Now, NEXT evidence, and Confidence / Risk context;
 - a structured `lfx_alignment` contract that maps the allowed LFX-2 v8.1-D monitor-only rows to public artifact fields;
 - per-market `lfx_mission_control.rows` for MM Mission, TRADER Mode, NEXT Scenario, DID / Past, DOING / Now, KEY Zones, INV / Release, and Confidence / Risk;
+- per-zone `lfx_zone_review` objects with public-depth role, review value, density-reference context, counterflow refresh check, and explicit boundary text;
 - a copyable current-view brief that combines the selected filters, profile metadata, `zone_readout`, `monitoring_brief`, and evidence limits into shareable public-data text;
 - a copyable view packet that combines the current-view brief, selected view link, nearest-zone checklist, observed-zone notes, multi-timeframe zone map, observed-zones table, next evidence checks, and interpretation boundaries;
 - a copyable nearest zone checklist that focuses the selected view on bid/ask concentration range, reference location, distance, depth quote, venues, HHI, evidence grade, and the next comparison check;
@@ -187,7 +188,16 @@ Each zone also exposes:
 - `reference_relation`: `BELOW_REFERENCE`, `ABOVE_REFERENCE`, or `CONTAINS_REFERENCE`; and
 - `distance_to_reference_pct`: the percentage distance from the reference price to the nearest zone edge, or zero when the zone contains the reference.
 
-The distance is descriptive and does not rank opportunity quality or imply future reaction.
+Each zone includes `lfx_zone_review`:
+
+- `role`: `PUBLIC_DEPTH_CONCENTRATION_REF`, `PUBLIC_DEPTH_VACUUM_REF`, or `PUBLIC_DEPTH_CONTEXT_REF`;
+- `review_value`: `CORROBORATED_REFERENCE`, `CONCENTRATED_REFERENCE`, or `LIMITED_REFERENCE`;
+- `density_context`: density/confluence wording as reference only;
+- `counterflow_check`: fields to compare after refresh before changing the review note;
+- `refresh_check`: the concrete public artifact fields to compare; and
+- `boundary`: no support/resistance, hidden-liquidity, private-flow, route, target, or future-reaction claim.
+
+The distance and LFX review fields are descriptive and do not rank opportunity quality or imply future reaction.
 
 Each market context also includes `zone_readout`, a compact dashboard-facing summary derived from the same observed zones:
 
@@ -207,7 +217,7 @@ The frontend nearest zone checklist is also display-only. It reads the nearest b
 
 The frontend observed zone notes are copyable, display-only review text over the same nearest bid/ask concentration objects. They do not create new scoring, support/resistance logic, signal logic, prediction, ranking, or execution guidance.
 
-The frontend observed-zones table copy text is also display-only. It serializes the currently displayed practical concentration and maximum-vacuum rows for sharing; it does not add support/resistance logic, hidden-liquidity claims, scoring, ranking, prediction, or execution guidance.
+The frontend observed-zones table copy text is also display-only. It serializes the currently displayed practical concentration and maximum-vacuum rows plus their `lfx_zone_review` role/value for sharing; it does not add support/resistance logic, hidden-liquidity claims, scoring, ranking, prediction, or execution guidance.
 
 The frontend how-to-read guide is static dashboard guidance. It does not inspect hidden data or add new calculations; it explains how to read existing public artifact fields without turning them into support/resistance claims, signals, rankings, predictions, or execution guidance.
 

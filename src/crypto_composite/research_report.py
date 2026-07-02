@@ -99,6 +99,7 @@ def _compact_zone(zone: Any) -> dict[str, Any] | None:
     item = _as_mapping(zone)
     if not item:
         return None
+    review = _as_mapping(item.get("lfx_zone_review"))
     return {
         "kind": item.get("kind"),
         "label": item.get("label"),
@@ -114,6 +115,7 @@ def _compact_zone(zone: Any) -> dict[str, Any] | None:
         "vacuum_score": _rounded(item.get("vacuum_score"), 4),
         "evidence_grade": item.get("evidence_grade"),
         "majority_venue_share": _rounded(item.get("majority_venue_share"), 4),
+        "lfx_zone_review": review,
     }
 
 
@@ -354,9 +356,13 @@ def _zone_text(zone: dict[str, Any] | None) -> str:
     grade = zone.get("evidence_grade")
     depth = _metric(zone.get("depth_quote"), 0)
     venue_count = zone.get("venue_count")
+    review = _as_mapping(zone.get("lfx_zone_review"))
+    role = review.get("role_label")
+    value = review.get("review_value")
     return (
         f"{low} - {high}; relation {_html_text(relation)}; distance {distance}%; "
-        f"depth {depth}; venues {_html_text(venue_count)}; evidence {_html_text(grade)}"
+        f"depth {depth}; venues {_html_text(venue_count)}; evidence {_html_text(grade)}; "
+        f"LFX role {_html_text(role)}; review value {_html_text(value)}"
     )
 
 
