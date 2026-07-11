@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Any
 
 from crypto_composite.schemas import OrderBookSnapshot, CompositeLadderLevel, CompositeOrderBookLadder
+from crypto_composite.symbol_map import venue_supports_market_type
 from crypto_composite.utils import clamp, now_ms, dataclass_to_dict
 
 
@@ -63,13 +64,14 @@ def _previous_lookup(previous_ladder: dict | None, market_type: str) -> dict[tup
 def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = None, expected_venues: list[str] | None = None, bucket_size: float | None = None, previous_ladder: dict | None = None) -> dict[str, CompositeOrderBookLadder]:
     asset = raw.get("asset", "BTC-USDT")
     expected = list(expected_venues or raw.get("venues", []) or [])
-    expected_n = max(len(expected), 1)
     books = [_to_book(x) for x in raw.get("data", {}).get("orderbooks", [])]
     by_mt: dict[str, list[OrderBookSnapshot]] = defaultdict(list)
     for b in books:
         by_mt[b.market_type].append(b)
     out: dict[str, CompositeOrderBookLadder] = {}
     for mt, xs in by_mt.items():
+        expected_for_mt = [v for v in expected if venue_supports_market_type(v, mt)]
+        expected_n = max(len(expected_for_mt), 1)
         ref = float(reference_price or (sum(b.mid for b in xs) / max(len(xs), 1) if xs else 0.0))
         bsize = float(bucket_size or max(25.0, round(ref * 0.00025 / 5.0) * 5.0 if ref else 25.0))
         buckets: dict[tuple[str, float], dict[str, float]] = defaultdict(lambda: defaultdict(float))

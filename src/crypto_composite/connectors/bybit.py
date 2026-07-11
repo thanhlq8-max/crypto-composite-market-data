@@ -1,6 +1,6 @@
 from __future__ import annotations
 from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
-from crypto_composite.schemas import *
+from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
 _INTERVAL = {"1m":"1", "5m":"5", "15m":"15", "1h":"60"}

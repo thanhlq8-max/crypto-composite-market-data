@@ -106,6 +106,7 @@ class CompositeOHLCVBar:
     coverage: float
     price_dispersion_pct: float
     data_quality: float
+    is_closed: bool = True
 
 
 @dataclass(frozen=True)

@@ -1,11 +1,22 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from statistics import median
 from typing import Any
 
 from crypto_composite.schemas import OHLCVBar, CompositeOHLCVBar, CompositeOHLCVContext
+from crypto_composite.symbol_map import venue_supports_market_type
 from crypto_composite.utils import clamp, now_ms, dataclass_to_dict
+
+_TIMEFRAME_UNIT_MS = {"m": 60_000, "h": 3_600_000, "d": 86_400_000}
+
+
+def _timeframe_ms(timeframe: str) -> int | None:
+    match = re.fullmatch(r"(\d+)([mhd])", timeframe.strip().lower())
+    if not match:
+        return None
+    return int(match.group(1)) * _TIMEFRAME_UNIT_MS[match.group(2)]
 
 
 def _to_bar(x: Any) -> OHLCVBar:
@@ -40,7 +51,8 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
     asset = raw.get("asset", "BTC-USDT")
     timeframe = raw.get("timeframe", "15m")
     expected = list(expected_venues or raw.get("venues", []) or [])
-    expected_n = max(len(expected), 1)
+    tf_ms = _timeframe_ms(timeframe)
+    built_at_ms = now_ms()
     bars = [_to_bar(x) for x in raw.get("data", {}).get("ohlcv", [])]
     grouped: dict[str, dict[int, list[OHLCVBar]]] = defaultdict(lambda: defaultdict(list))
     for b in bars:
@@ -53,6 +65,10 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
     notes: list[str] = []
 
     for mt, by_ts in grouped.items():
+        # Coverage denominator counts only venues that can serve this market type;
+        # spot-only venues must not penalize perp coverage.
+        expected_for_mt = [v for v in expected if venue_supports_market_type(v, mt)]
+        expected_n = max(len(expected_for_mt), 1)
         comp: list[CompositeOHLCVBar] = []
         for ts in sorted(by_ts):
             xs = by_ts[ts]
@@ -75,6 +91,8 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
             if med_close > 0 and len(closes) > 1:
                 dispersion = (max(closes) - min(closes)) / med_close * 100.0
             data_quality = clamp(sum(float(b.data_quality) for b in xs) / max(len(xs), 1) * (0.70 + 0.30 * coverage) - min(dispersion / 1.0, 0.20))
+            # Unknown timeframe tokens fall back to True to preserve previous status behavior.
+            is_closed = True if tf_ms is None else bool(int(ts) + tf_ms <= built_at_ms)
             comp.append(CompositeOHLCVBar(
                 asset=asset,
                 timeframe=timeframe,
@@ -93,16 +111,25 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
                 coverage=float(round(coverage, 6)),
                 price_dispersion_pct=float(round(dispersion, 6)),
                 data_quality=float(round(data_quality, 6)),
+                is_closed=is_closed,
             ))
         bars_by_market[mt] = comp
         latest = comp[-1] if comp else None
         latest_by_market[mt] = latest
-        cov = float(latest.coverage) if latest else 0.0
+        # Status and coverage are judged on the last CLOSED bar; an in-progress
+        # candle mixes venue fetch times and inflates dispersion exactly on the
+        # bar that decides status.
+        closed = [b for b in comp if b.is_closed]
+        status_bar = closed[-1] if closed else latest
+        cov = float(status_bar.coverage) if status_bar else 0.0
         coverage_by_market[mt] = cov
-        disp = float(latest.price_dispersion_pct) if latest else 999.0
+        disp = float(status_bar.price_dispersion_pct) if status_bar else 999.0
         status_by_market[mt] = _status(cov, disp)
-        if latest:
-            notes.append(f"{mt}: {status_by_market[mt]} coverage={cov:.2f} dispersion={disp:.4f}%")
+        if status_bar:
+            basis = "closed_bar" if closed else "unclosed_latest_bar"
+            notes.append(
+                f"{mt}: {status_by_market[mt]} coverage={cov:.2f} dispersion={disp:.4f}% status_basis={basis}"
+            )
         else:
             notes.append(f"{mt}: COMPOSITE_DATA_WEAK no bars")
 
@@ -130,6 +157,7 @@ def composite_to_raw_ohlcv(context: CompositeOHLCVContext, market_type: str = "s
             "composite_coverage": b.coverage,
             "price_dispersion_pct": b.price_dispersion_pct,
             "venue_weights": b.venue_weights,
+            "is_closed": b.is_closed,
         })
     return out
 

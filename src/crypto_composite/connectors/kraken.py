@@ -10,7 +10,7 @@ from crypto_composite.connectors.base import (
     require_non_empty_orderbook,
     require_timeframe,
 )
-from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
+from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
 
 _INTERVAL = {"1m": "1", "5m": "5", "15m": "15", "1h": "60"}
