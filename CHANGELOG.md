@@ -304,7 +304,7 @@ This release changes only dashboard analytics and presentation. It does not alte
 
 ### Scope
 
-This release remains public-data infrastructure. Evidence grades describe source corroboration only. It does not add trading signals, recommendations, predictions, hidden-liquidity claims, market-maker intent claims, position sizing, execution, or financial advice. The release and demo do not establish external adoption or Claude for Open Source eligibility.
+This release remains public-data infrastructure. Evidence grades describe source corroboration only. It does not add trading signals, recommendations, predictions, hidden-liquidity claims, market-maker intent claims, position sizing, execution, or financial advice. The release and demo do not establish external adoption.
 
 ## v0.7.0 - Community-ready artifact inspection
 
@@ -346,7 +346,7 @@ for artifact in payload["artifacts"]:
 
 ### Scope
 
-This release does not add connectors, trading signals, execution instructions, position sizing, predictions, profitability claims, or financial advice. The GitHub Pages workflow is manual and release preparation does not deploy it. These changes do not establish external adoption or Claude for Open Source eligibility.
+This release does not add connectors, trading signals, execution instructions, position sizing, predictions, profitability claims, or financial advice. The GitHub Pages workflow is manual and release preparation does not deploy it. These changes do not establish external adoption.
 
 ## v0.6.0 - Static HTML artifact report
 
@@ -425,7 +425,6 @@ This release validates artifact structure only. It does not add trading signals,
 
 - Added maintainer-facing release checklist.
 - Added adoption playbook for growing the project as data infrastructure.
-- Added Claude for Open Source readiness tracker.
 - Added good-first-issues backlog to make contribution entry points clearer.
 - Added `.gitignore` rules for local patch and distribution artifacts.
 - Clarified README references for contribution and roadmap materials.

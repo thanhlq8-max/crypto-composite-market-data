@@ -47,6 +47,6 @@ Do not add fabricated examples or self-created activity to this table as externa
 
 Use the **Downstream use case** issue form to collect the evidence fields above. A submitted issue is still evidence only after its public reference, reporter, package version, workflow, and outcome are verified.
 
-## Claude for Open Source
+## Community integrity
 
-The official Maintainer Track threshold and discretionary Ecosystem Impact Track are documented in [CLAUDE_FOR_OSS_READINESS.md](CLAUDE_FOR_OSS_READINESS.md). Community work should improve real usefulness and produce verifiable evidence; it must not use purchased stars, automated engagement, reciprocal star schemes, or misleading adoption claims.
+Community work should improve real usefulness and produce verifiable evidence; it must not use purchased stars, automated engagement, reciprocal star schemes, or misleading adoption claims.
