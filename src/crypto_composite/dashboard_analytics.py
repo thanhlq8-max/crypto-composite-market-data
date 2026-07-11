@@ -237,6 +237,231 @@ def _observed_zones(ladder: dict[str, Any] | None) -> list[dict[str, Any]]:
     return zones
 
 
+PRICE_ZONE_MAP_DISCLAIMER = (
+    "Observed public market data. Reaction bands count historical closed-bar swing reversals in "
+    "the loaded window; depth zones describe the current public snapshot. Descriptive context "
+    "only — not investment advice, a prediction, or an execution instruction."
+)
+
+REACTION_ZONE_TOLERANCE_PCT = 0.2
+REACTION_ZONE_MIN_TOUCHES = 2
+REACTION_ZONE_MAX_ZONES = 6
+_SWING_WINDOW = 2
+
+
+def _closed_bars(bars: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [bar for bar in bars if isinstance(bar, dict) and bar.get("is_closed", True)]
+
+
+def _swing_points(bars: list[dict[str, Any]], k: int = _SWING_WINDOW) -> list[dict[str, Any]]:
+    """Local high/low extrema of closed composite bars (±k-bar neighborhood)."""
+    points: list[dict[str, Any]] = []
+    if len(bars) < 2 * k + 1:
+        return points
+    for i in range(k, len(bars) - k):
+        window = bars[i - k : i + k + 1]
+        highs = [_finite_number(bar.get("high")) for bar in window]
+        lows = [_finite_number(bar.get("low")) for bar in window]
+        ts = bars[i].get("timestamp_ms")
+        if all(value is not None for value in highs) and highs[k] == max(highs):
+            points.append({"price": highs[k], "timestamp_ms": ts, "kind": "swing_high"})
+        if all(value is not None for value in lows) and lows[k] == min(lows):
+            points.append({"price": lows[k], "timestamp_ms": ts, "kind": "swing_low"})
+    return points
+
+
+def _reaction_zones(
+    bars: list[dict[str, Any]],
+    reference_price: float | None,
+    tolerance_pct: float = REACTION_ZONE_TOLERANCE_PCT,
+    min_touches: int = REACTION_ZONE_MIN_TOUCHES,
+    max_zones: int = REACTION_ZONE_MAX_ZONES,
+) -> list[dict[str, Any]]:
+    """Cluster closed-bar swing extrema into historical price reaction bands.
+
+    Purely descriptive: a band records where and how often closed composite
+    bars reversed inside the loaded window. It makes no claim about future
+    behavior (D10 display-layer wording; core artifacts stay unchanged).
+    """
+    closed = _closed_bars(bars)
+    points = sorted(_swing_points(closed), key=lambda p: p["price"])
+    if not points:
+        return []
+    anchor = reference_price if reference_price and reference_price > 0 else points[len(points) // 2]["price"]
+    tolerance = anchor * tolerance_pct / 100.0
+    clusters: list[list[dict[str, Any]]] = []
+    for point in points:
+        if clusters and point["price"] - clusters[-1][0]["price"] <= tolerance:
+            clusters[-1].append(point)
+        else:
+            clusters.append([point])
+    zones: list[dict[str, Any]] = []
+    for cluster in clusters:
+        if len(cluster) < min_touches:
+            continue
+        prices = [point["price"] for point in cluster]
+        stamps = [point["timestamp_ms"] for point in cluster if point["timestamp_ms"] is not None]
+        low, high = min(prices), max(prices)
+        mid = (low + high) / 2
+        relation = None
+        distance_pct = None
+        if reference_price and reference_price > 0:
+            if high < reference_price:
+                relation = "BELOW_REFERENCE"
+                distance_pct = round((reference_price - high) / reference_price * 100.0, 6)
+            elif low > reference_price:
+                relation = "ABOVE_REFERENCE"
+                distance_pct = round((low - reference_price) / reference_price * 100.0, 6)
+            else:
+                relation = "CONTAINS_REFERENCE"
+                distance_pct = 0.0
+        zones.append(
+            {
+                "kind": "PRICE_REACTION_BAND",
+                "label": "Price reaction band",
+                "price_low": round(low, 8),
+                "price_high": round(high, 8),
+                "price_mid": round(mid, 8),
+                "touch_count": len(cluster),
+                "swing_high_count": sum(1 for point in cluster if point["kind"] == "swing_high"),
+                "swing_low_count": sum(1 for point in cluster if point["kind"] == "swing_low"),
+                "first_touch_ms": min(stamps) if stamps else None,
+                "last_touch_ms": max(stamps) if stamps else None,
+                "reference_relation": relation,
+                "distance_to_reference_pct": distance_pct,
+                "basis": (
+                    f"closed-bar swing extrema clustered within {tolerance_pct}% of reference; "
+                    "historical description of the loaded window only"
+                ),
+            }
+        )
+    zones.sort(key=lambda zone: (zone["distance_to_reference_pct"] is None, zone["distance_to_reference_pct"], -zone["touch_count"]))
+    return zones[:max_zones]
+
+
+def _previous_closed_bar_delta(bars: list[dict[str, Any]]) -> dict[str, Any] | None:
+    closed = _closed_bars(bars)
+    if len(closed) < 2:
+        return None
+    latest, previous = closed[-1], closed[-2]
+    latest_close = _finite_number(latest.get("close"))
+    previous_close = _finite_number(previous.get("close"))
+    latest_quote = _finite_number(latest.get("volume_quote_total"))
+    previous_quote = _finite_number(previous.get("volume_quote_total"))
+    return {
+        "close_change_pct": (
+            round((latest_close - previous_close) / previous_close * 100.0, 6)
+            if latest_close is not None and previous_close is not None and previous_close > 0
+            else None
+        ),
+        "volume_quote_change_pct": (
+            round((latest_quote - previous_quote) / previous_quote * 100.0, 6)
+            if latest_quote is not None and previous_quote is not None and previous_quote > 0
+            else None
+        ),
+        "venue_count_previous": previous.get("venue_count"),
+        "venue_count_latest": latest.get("venue_count"),
+        "timestamp_ms_latest": latest.get("timestamp_ms"),
+    }
+
+
+def _price_text(value: Any) -> str:
+    number = _finite_number(value)
+    if number is None:
+        return "unavailable"
+    digits = 5 if abs(number) < 10 else 2
+    return f"{number:,.{digits}f}"
+
+
+def _zone_map_insights(
+    market_type: str,
+    status: Any,
+    latest: dict[str, Any] | None,
+    bars: list[dict[str, Any]],
+    ladder: dict[str, Any] | None,
+    liquidity_zones: list[dict[str, Any]],
+    reaction_zones: list[dict[str, Any]],
+    delta: dict[str, Any] | None,
+) -> list[str]:
+    lines: list[str] = []
+    closed = _closed_bars(bars)
+    status_bar = closed[-1] if closed else latest
+    if latest is not None:
+        head = f"{market_type}: composite close {_price_text(latest.get('close'))}"
+        if isinstance(status, str):
+            head += f"; status {status}"
+        if status_bar is not None:
+            coverage = _finite_number(status_bar.get("coverage"))
+            dispersion = _finite_number(status_bar.get("price_dispersion_pct"))
+            if coverage is not None and dispersion is not None:
+                head += f" (coverage {coverage:.2f}, dispersion {dispersion:.4f}% on last closed bar)"
+        lines.append(head + ".")
+    for zone in reaction_zones[:2]:
+        lines.append(
+            f"Price reacted {zone['touch_count']} times in "
+            f"{_price_text(zone['price_low'])}-{_price_text(zone['price_high'])} during the loaded window "
+            f"({zone['swing_high_count']} swing highs / {zone['swing_low_count']} swing lows)."
+        )
+    top_wall = next((zone for zone in liquidity_zones if "LIQUIDITY_CONCENTRATION" in str(zone.get("kind"))), None)
+    if top_wall is not None:
+        lines.append(
+            f"Deepest {str(top_wall.get('side') or '').lower()} concentration "
+            f"{_price_text(top_wall.get('price_low'))}-{_price_text(top_wall.get('price_high'))} holds "
+            f"{_price_text(top_wall.get('depth_quote'))} quote across {top_wall.get('venue_count')} venue(s)."
+        )
+    if ladder is not None:
+        imbalance = _finite_number(ladder.get("depth_imbalance"))
+        if imbalance is not None:
+            lines.append(f"Depth imbalance {imbalance:+.3f} between bid and ask buckets near reference.")
+    if delta is not None and delta.get("close_change_pct") is not None:
+        line = f"Last closed bar moved {delta['close_change_pct']:+.4f}% vs the prior closed bar"
+        if delta.get("venue_count_previous") != delta.get("venue_count_latest"):
+            line += f"; venue count {delta.get('venue_count_previous')} -> {delta.get('venue_count_latest')}"
+        lines.append(line + ".")
+    return lines
+
+
+def _price_zone_map(
+    timeframe: str,
+    market_type: str,
+    bars: list[dict[str, Any]],
+    latest: dict[str, Any] | None,
+    status: Any,
+    ladder: dict[str, Any] | None,
+    liquidity_zones: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Per-market price map: reaction bands, depth zones, and reference levels."""
+    reference = None
+    if ladder is not None:
+        reference = _finite_number(ladder.get("reference_price"))
+    if (reference is None or reference <= 0) and latest is not None:
+        reference = _finite_number(latest.get("close"))
+    closed = _closed_bars(bars)
+    window_lows = [_finite_number(bar.get("low")) for bar in closed]
+    window_highs = [_finite_number(bar.get("high")) for bar in closed]
+    window_lows = [value for value in window_lows if value is not None]
+    window_highs = [value for value in window_highs if value is not None]
+    reaction = _reaction_zones(bars, reference)
+    delta = _previous_closed_bar_delta(bars)
+    return {
+        "timeframe": timeframe,
+        "market_type": market_type,
+        "reference_price": reference,
+        "window": {
+            "closed_bar_count": len(closed),
+            "price_low": min(window_lows) if window_lows else None,
+            "price_high": max(window_highs) if window_highs else None,
+        },
+        "reaction_zones": reaction,
+        "liquidity_zones": liquidity_zones,
+        "previous_closed_bar_delta": delta,
+        "insights": _zone_map_insights(
+            market_type, status, latest, bars, ladder, liquidity_zones, reaction, delta
+        ),
+        "disclaimer": PRICE_ZONE_MAP_DISCLAIMER,
+    }
+
+
 def _dislocation(markets: list[dict[str, Any]]) -> dict[str, Any] | None:
     latest = {market.get("market_type"): market.get("latest_bar") for market in markets}
     spot = latest.get("spot_usdt")
@@ -751,6 +976,15 @@ def _build_asset(
                     "monitoring_brief": monitoring_brief,
                     "zone_readout": zone_readout,
                     "lfx_mission_control": _lfx_mission_control(monitoring_brief, zone_readout),
+                    "price_zone_map": _price_zone_map(
+                        timeframe,
+                        market_type,
+                        bars,
+                        latest,
+                        status_by_market.get(market_type),
+                        ladder,
+                        zones,
+                    ),
                 }
             )
         quality = quality_by_timeframe.get(timeframe)
