@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, parse_records, require_non_empty_orderbook, require_timeframe
-
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
+from crypto_composite.connectors.base import (
+    ExchangeConnector,
+    UnsupportedTimeframeError,
+    parse_book_levels,
+    parse_records,
+    require_non_empty_orderbook,
+)
 
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
@@ -16,7 +20,10 @@ class BybitConnector(ExchangeConnector):
     def _cat(self, market_type): return "linear" if market_type=="perp_usdt" else "spot"
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
-        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        interval = _INTERVAL[timeframe]
         data=self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":limit}).get("result",{}).get("list",[])
         def _bar(x):
             ts,op,hi,lo,cl,vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])

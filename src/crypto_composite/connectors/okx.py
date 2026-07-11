@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, parse_records, require_non_empty_orderbook, require_timeframe
-
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
+from crypto_composite.connectors.base import (
+    ExchangeConnector,
+    UnsupportedTimeframeError,
+    parse_book_levels,
+    parse_records,
+    require_non_empty_orderbook,
+)
 
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
@@ -16,7 +20,10 @@ class OKXConnector(ExchangeConnector):
     def _inst_type(self, market_type): return "SWAP" if market_type=="perp_usdt" else "SPOT"
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
-        bar = require_timeframe(timeframe, _BAR, venue=self.venue)
+        if timeframe not in _BAR:
+            supported = ",".join(sorted(_BAR))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        bar = _BAR[timeframe]
         data = self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":limit}).get("data",[])
         def _bar_record(x):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])

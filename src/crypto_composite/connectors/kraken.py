@@ -6,10 +6,10 @@ from crypto_composite.connectors.base import (
     ConnectorDataError,
     ConnectorInputError,
     ExchangeConnector,
+    UnsupportedTimeframeError,
     parse_book_levels,
     parse_records,
     require_non_empty_orderbook,
-    require_timeframe,
 )
 from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
@@ -52,7 +52,10 @@ class KrakenConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         self._require_spot(market_type)
-        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        interval = _INTERVAL[timeframe]
         data = self._get(f"{self.base}/OHLC", {"pair": symbol, "interval": interval})
         candles = self._pair_payload(data)
 

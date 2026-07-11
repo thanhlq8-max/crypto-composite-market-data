@@ -6,10 +6,10 @@ from typing import Any
 from crypto_composite.connectors.base import (
     ConnectorInputError,
     ExchangeConnector,
+    UnsupportedTimeframeError,
     parse_book_levels,
     parse_records,
     require_non_empty_orderbook,
-    require_timeframe,
 )
 from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
@@ -47,7 +47,10 @@ class CoinbaseConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         self._require_spot(market_type)
-        granularity = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        granularity = _INTERVAL[timeframe]
         data = self._get(f"{self.base}/products/{symbol}/candles", {"granularity": granularity})
 
         def _bar(x):

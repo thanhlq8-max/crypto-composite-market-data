@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, parse_records, require_non_empty_orderbook, require_timeframe
-
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
+from crypto_composite.connectors.base import (
+    ExchangeConnector,
+    UnsupportedTimeframeError,
+    parse_book_levels,
+    parse_records,
+    require_non_empty_orderbook,
+)
 
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
@@ -17,7 +21,10 @@ class BinanceConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         path = "/fapi/v1/klines" if market_type == "perp_usdt" else "/api/v3/klines"
-        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        interval = _INTERVAL[timeframe]
         data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":interval, "limit":limit})
         def _bar(x):
             op,hi,lo,cl,vol = map(float, [x[1],x[2],x[3],x[4],x[5]])
