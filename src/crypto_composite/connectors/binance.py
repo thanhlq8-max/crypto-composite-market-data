@@ -1,5 +1,13 @@
 from __future__ import annotations
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
+
+from crypto_composite.connectors.base import (
+    ExchangeConnector,
+    UnsupportedTimeframeError,
+    parse_book_levels,
+    parse_records,
+    require_non_empty_orderbook,
+)
+
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
@@ -13,26 +21,29 @@ class BinanceConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         path = "/fapi/v1/klines" if market_type == "perp_usdt" else "/api/v3/klines"
-        interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        interval = _INTERVAL[timeframe]
         data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":interval, "limit":limit})
-        out=[]
-        for x in data:
+        def _bar(x):
             op,hi,lo,cl,vol = map(float, [x[1],x[2],x[3],x[4],x[5]])
+            if min(op,hi,lo,cl) <= 0 or vol < 0: raise ValueError("invalid bar record")
             qv = float(x[7]) if len(x)>7 else quote_volume(cl, vol)
             tc = int(x[8]) if len(x)>8 else None
-            out.append(OHLCVBar(self.venue, market_type, symbol, timeframe, int(x[0]), op, hi, lo, cl, vol, qv, tc, 0.95))
-        return out
+            return OHLCVBar(self.venue, market_type, symbol, timeframe, int(x[0]), op, hi, lo, cl, vol, qv, tc, 0.95)
+        return parse_records(data, _bar)
 
     def fetch_recent_trades(self, symbol, market_type, limit):
         path = "/fapi/v1/aggTrades" if market_type == "perp_usdt" else "/api/v3/aggTrades"
         data = self._get(self._base(market_type)+path, {"symbol":symbol, "limit":min(limit,1000)})
-        out=[]
-        for x in data:
+        def _trade(x):
             price=float(x["p"]); qty=float(x["q"]); maker=bool(x.get("m", False))
+            if price <= 0 or qty <= 0: raise ValueError("invalid trade record")
             # Binance m=True means buyer is maker => aggressive side is sell
             side = "sell" if maker else "buy"
-            out.append(TradePrint(self.venue, market_type, symbol, int(x["T"]), price, qty, quote_volume(price, qty), side, True, str(x.get("a")), 0.9))
-        return out
+            return TradePrint(self.venue, market_type, symbol, int(x["T"]), price, qty, quote_volume(price, qty), side, True, str(x.get("a")), 0.9)
+        return parse_records(data, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
         path = "/fapi/v1/depth" if market_type == "perp_usdt" else "/api/v3/depth"

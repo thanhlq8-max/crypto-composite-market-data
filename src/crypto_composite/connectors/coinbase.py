@@ -6,9 +6,10 @@ from typing import Any
 from crypto_composite.connectors.base import (
     ConnectorInputError,
     ExchangeConnector,
+    UnsupportedTimeframeError,
     parse_book_levels,
+    parse_records,
     require_non_empty_orderbook,
-    require_timeframe,
 )
 from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
@@ -46,60 +47,69 @@ class CoinbaseConnector(ExchangeConnector):
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         self._require_spot(market_type)
-        granularity = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
+        if timeframe not in _INTERVAL:
+            supported = ",".join(sorted(_INTERVAL))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        granularity = _INTERVAL[timeframe]
         data = self._get(f"{self.base}/products/{symbol}/candles", {"granularity": granularity})
-        out = []
-        for x in sorted(data, key=lambda item: int(item[0])):
-            ts = self._time_ms(x[0])
+
+        def _bar(x):
+            # Candle timestamps must be numeric; the generic _time_ms now-fallback
+            # would silently misplace the bar in the series.
+            ts = self._time_ms(float(x[0]))
             lo = float(x[1])
             hi = float(x[2])
             op = float(x[3])
             cl = float(x[4])
             vol = float(x[5])
-            out.append(
-                OHLCVBar(
-                    self.venue,
-                    market_type,
-                    symbol,
-                    timeframe,
-                    ts,
-                    op,
-                    hi,
-                    lo,
-                    cl,
-                    vol,
-                    quote_volume(cl, vol),
-                    None,
-                    0.82,
-                )
+            if min(op, hi, lo, cl) <= 0 or vol < 0:
+                raise ValueError("invalid bar record")
+            return OHLCVBar(
+                self.venue,
+                market_type,
+                symbol,
+                timeframe,
+                ts,
+                op,
+                hi,
+                lo,
+                cl,
+                vol,
+                quote_volume(cl, vol),
+                None,
+                0.82,
             )
+
+        # Parse before sorting: a malformed record must not break the sort key.
+        out = sorted(parse_records(data, _bar), key=lambda bar: bar.timestamp_ms)
         return out[-min(limit, 300) :] if limit > 0 else out
 
     def fetch_recent_trades(self, symbol, market_type, limit):
         self._require_spot(market_type)
         data = self._get(f"{self.base}/products/{symbol}/trades", {"limit": min(limit, 1000)})
-        out = []
-        for x in data:
+
+        def _trade(x):
             price = float(x["price"])
             qty = float(x["size"])
+            if price <= 0 or qty <= 0:
+                raise ValueError("invalid trade record")
             maker_side = str(x.get("side", "")).lower()
             side = "sell" if maker_side == "buy" else "buy" if maker_side == "sell" else "unknown"
-            out.append(
-                TradePrint(
-                    self.venue,
-                    market_type,
-                    symbol,
-                    self._time_ms(x.get("time")),
-                    price,
-                    qty,
-                    quote_volume(price, qty),
-                    side,
-                    True if side in ("buy", "sell") else None,
-                    str(x.get("trade_id")) if x.get("trade_id") is not None else None,
-                    0.78,
-                )
+            return TradePrint(
+                self.venue,
+                market_type,
+                symbol,
+                self._time_ms(x.get("time")),
+                price,
+                qty,
+                quote_volume(price, qty),
+                side,
+                True if side in ("buy", "sell") else None,
+                str(x.get("trade_id")) if x.get("trade_id") is not None else None,
+                0.78,
             )
-        return out
+
+        return parse_records(data, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
         self._require_spot(market_type)

@@ -1,5 +1,13 @@
 from __future__ import annotations
-from crypto_composite.connectors.base import ExchangeConnector, parse_book_levels, require_non_empty_orderbook, require_timeframe
+
+from crypto_composite.connectors.base import (
+    ExchangeConnector,
+    UnsupportedTimeframeError,
+    parse_book_levels,
+    parse_records,
+    require_non_empty_orderbook,
+)
+
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
@@ -12,22 +20,25 @@ class OKXConnector(ExchangeConnector):
     def _inst_type(self, market_type): return "SWAP" if market_type=="perp_usdt" else "SPOT"
 
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
-        bar = require_timeframe(timeframe, _BAR, venue=self.venue)
+        if timeframe not in _BAR:
+            supported = ",".join(sorted(_BAR))
+            raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
+        bar = _BAR[timeframe]
         data = self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":limit}).get("data",[])
-        out=[]
-        for x in reversed(data):
+        def _bar_record(x):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
+            if min(op,hi,lo,cl) <= 0 or vol < 0: raise ValueError("invalid bar record")
             qv = float(x[7]) if len(x)>7 and x[7] else quote_volume(cl, vol)
-            out.append(OHLCVBar(self.venue, market_type, symbol, timeframe, ts, op, hi, lo, cl, vol, qv, None, 0.9))
-        return out
+            return OHLCVBar(self.venue, market_type, symbol, timeframe, ts, op, hi, lo, cl, vol, qv, None, 0.9)
+        return parse_records(list(reversed(data)), _bar_record)
 
     def fetch_recent_trades(self, symbol, market_type, limit):
         data = self._get(self.base+"/api/v5/market/trades", {"instId":symbol, "limit":min(limit,500)}).get("data",[])
-        out=[]
-        for x in data:
+        def _trade(x):
             price=float(x["px"]); qty=float(x["sz"]); side=x.get("side","unknown")
-            out.append(TradePrint(self.venue, market_type, symbol, int(x["ts"]), price, qty, quote_volume(price, qty), side, True if side in ("buy","sell") else None, x.get("tradeId"), 0.85))
-        return out
+            if price <= 0 or qty <= 0: raise ValueError("invalid trade record")
+            return TradePrint(self.venue, market_type, symbol, int(x["ts"]), price, qty, quote_volume(price, qty), side, True if side in ("buy","sell") else None, x.get("tradeId"), 0.85)
+        return parse_records(data, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
         items = self._get(self.base+"/api/v5/market/books", {"instId":symbol,"sz":min(depth,400)}).get("data",[])
