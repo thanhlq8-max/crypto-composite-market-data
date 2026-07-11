@@ -26,7 +26,8 @@ def dataclass_to_dict(obj: Any) -> Any:
     return obj
 
 def write_json(path: str | Path, obj: Any) -> None:
-    p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(dataclass_to_dict(obj), ensure_ascii=False, indent=2), encoding="utf-8")
 
 def read_json(path: str | Path) -> dict:
