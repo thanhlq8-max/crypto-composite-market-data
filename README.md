@@ -275,9 +275,9 @@ See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md).
 | Venues | Binance, OKX, Bybit; Coinbase Exchange and Kraken spot-only |
 | Asset format | `BASE-USDT`, for example `BTC-USDT` |
 | Market types | `spot_usdt`, `perp_usdt` |
-| Timeframes | `1m`, `5m`, `15m`, `1h` |
+| Timeframes | `1m`, `5m`, `15m`, `1h`, `4h`, `1d` (daily bars anchored to UTC midnight on every venue; Coinbase Exchange has no native `4h` granularity and skips that timeframe) |
 | Data access | Public REST endpoints only |
-| Python | 3.11, 3.12, 3.13 |
+| Python | 3.10, 3.11, 3.12, 3.13 |
 
 ## Composite OHLCV model
 
@@ -368,6 +368,20 @@ crypto-composite export-ohlcv-csv \
 The export writes one row per asset, timeframe, market type, and composite OHLCV bar. It preserves venue contribution metadata in `venue_weights_json` and remains an artifact-inspection output only.
 
 See [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md).
+
+## Parquet export
+
+The same flat rows are available as a typed Parquet file. Parquet support is an optional extra so the base install keeps its `requests`-only footprint:
+
+```bash
+pip install "crypto-composite-market-data[parquet]"
+
+crypto-composite export-ohlcv-parquet \
+  --artifact-root artifacts-universe \
+  --out-file composite_ohlcv.parquet
+```
+
+Columns match the CSV export exactly (`timestamp_ms`/`venue_count` as int64, price and quality fields as float64, the rest as strings).
 
 ## Local dashboard API
 
@@ -473,7 +487,6 @@ See:
 - [docs/PACKAGING.md](docs/PACKAGING.md)
 - [docs/COMMUNITY_GROWTH.md](docs/COMMUNITY_GROWTH.md)
 - [docs/ADOPTION_PLAYBOOK.md](docs/ADOPTION_PLAYBOOK.md)
-- [docs/CLAUDE_FOR_OSS_READINESS.md](docs/CLAUDE_FOR_OSS_READINESS.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 
 ## Artifact quality scoring

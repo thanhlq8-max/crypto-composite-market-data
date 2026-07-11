@@ -11,7 +11,10 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
-_BAR = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1H"}
+# OKX anchors plain 1D candles to Hong Kong time (UTC+8); the utc-suffixed bar
+# keeps daily bar opens aligned with the other venues' UTC midnight anchor.
+# 4H boundaries coincide for both anchors (+8h is a multiple of 4h).
+_BAR = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1H", "4h":"4H", "1d":"1Dutc"}
 
 class OKXConnector(ExchangeConnector):
     venue = "okx"
@@ -27,16 +30,20 @@ class OKXConnector(ExchangeConnector):
         data = self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":limit}).get("data",[])
         def _bar_record(x):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
-            if min(op,hi,lo,cl) <= 0 or vol < 0: raise ValueError("invalid bar record")
-            qv = float(x[7]) if len(x)>7 and x[7] else quote_volume(cl, vol)
+            if min(op, hi, lo, cl) <= 0 or vol < 0:
+                raise ValueError("invalid bar record")
+            qv = float(x[7]) if len(x) > 7 and x[7] else quote_volume(cl, vol)
             return OHLCVBar(self.venue, market_type, symbol, timeframe, ts, op, hi, lo, cl, vol, qv, None, 0.9)
         return parse_records(list(reversed(data)), _bar_record)
 
     def fetch_recent_trades(self, symbol, market_type, limit):
         data = self._get(self.base+"/api/v5/market/trades", {"instId":symbol, "limit":min(limit,500)}).get("data",[])
         def _trade(x):
-            price=float(x["px"]); qty=float(x["sz"]); side=x.get("side","unknown")
-            if price <= 0 or qty <= 0: raise ValueError("invalid trade record")
+            price = float(x["px"])
+            qty = float(x["sz"])
+            side = x.get("side", "unknown")
+            if price <= 0 or qty <= 0:
+                raise ValueError("invalid trade record")
             return TradePrint(self.venue, market_type, symbol, int(x["ts"]), price, qty, quote_volume(price, qty), side, True if side in ("buy","sell") else None, x.get("tradeId"), 0.85)
         return parse_records(data, _trade)
 
@@ -50,15 +57,20 @@ class OKXConnector(ExchangeConnector):
         return OrderBookSnapshot(self.venue, market_type, symbol, int(data.get("ts",now_ms())), bids, asks, bb, ba, (bb+ba)/2, ba-bb, min(len(bids),len(asks)), 0.85)
 
     def fetch_funding(self, symbol, market_type):
-        if market_type!="perp_usdt": return None
-        data=self._get(self.base+"/api/v5/public/funding-rate", {"instId":symbol}).get("data",[])
-        if not data: return None
-        x=data[0]
+        if market_type != "perp_usdt":
+            return None
+        data = self._get(self.base+"/api/v5/public/funding-rate", {"instId":symbol}).get("data",[])
+        if not data:
+            return None
+        x = data[0]
         return FundingSnapshot(self.venue, market_type, symbol, int(x.get("fundingTime",now_ms())), float(x.get("fundingRate",0)), int(x.get("nextFundingTime",0)) or None, 0.85)
 
     def fetch_open_interest(self, symbol, market_type):
-        if market_type!="perp_usdt": return None
-        data=self._get(self.base+"/api/v5/public/open-interest", {"instType":"SWAP","instId":symbol}).get("data",[])
-        if not data: return None
-        x=data[0]; oi=float(x.get("oi",0))
+        if market_type != "perp_usdt":
+            return None
+        data = self._get(self.base+"/api/v5/public/open-interest", {"instType":"SWAP","instId":symbol}).get("data",[])
+        if not data:
+            return None
+        x = data[0]
+        oi = float(x.get("oi", 0))
         return OpenInterestSnapshot(self.venue, market_type, symbol, int(x.get("ts",now_ms())), oi, None, 0.85)

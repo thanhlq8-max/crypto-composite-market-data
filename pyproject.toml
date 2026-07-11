@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crypto-composite-market-data"
-version = "0.18.2"
+version = "0.19.0"
 description = "Public multi-exchange crypto market-data composite toolkit."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,6 +39,11 @@ dependencies = [
   "requests>=2.31"
 ]
 
+[project.optional-dependencies]
+parquet = [
+  "pyarrow>=15"
+]
+
 [project.urls]
 Homepage = "https://github.com/thanhlq8-max/crypto-composite-market-data"
 Repository = "https://github.com/thanhlq8-max/crypto-composite-market-data"
@@ -50,14 +55,11 @@ crypto-composite = "crypto_composite.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"crypto_composite.templates" = ["*.html"]
+
 [tool.ruff]
 target-version = "py310"
-
-[tool.ruff.lint]
-# E701/E702 (one-line compound statements) match the existing compact connector
-# style; relaxing them keeps lint adoption a zero-behavior-change step.
-# Removing this exception is tracked as follow-up work in PROJECT_STATE.md.
-ignore = ["E701", "E702"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
