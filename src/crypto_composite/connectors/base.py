@@ -33,16 +33,6 @@ class ConnectorDataError(RuntimeError):
     pass
 
 
-def require_timeframe(timeframe: str, mapping: Mapping[str, str], *, venue: str) -> str:
-    """Return the exchange timeframe token or raise a domain-specific input error."""
-    if timeframe not in mapping:
-        supported = ",".join(sorted(mapping))
-        raise UnsupportedTimeframeError(
-            f"TIMEFRAME_UNSUPPORTED venue={venue} timeframe={timeframe!r} supported={supported}"
-        )
-    return mapping[timeframe]
-
-
 def parse_records(items: Sequence[Any] | None, parse_one: Callable[[Any], Any]) -> list[Any]:
     """Parse venue records one by one and skip records that fail to parse.
 
