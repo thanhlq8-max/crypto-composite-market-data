@@ -487,7 +487,6 @@ See:
 - [docs/PACKAGING.md](docs/PACKAGING.md)
 - [docs/COMMUNITY_GROWTH.md](docs/COMMUNITY_GROWTH.md)
 - [docs/ADOPTION_PLAYBOOK.md](docs/ADOPTION_PLAYBOOK.md)
-- [docs/CLAUDE_FOR_OSS_READINESS.md](docs/CLAUDE_FOR_OSS_READINESS.md)
 - [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 
 ## Artifact quality scoring
