@@ -46,10 +46,14 @@ def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str,
             if mt == "perp_usdt":
                 f = conn.fetch_funding(symbol, mt)
                 oi = conn.fetch_open_interest(symbol, mt)
-                if f: data["funding"].append(f)
-                else: missing.append(f"{venue}:{mt}:funding")
-                if oi: data["open_interest"].append(oi)
-                else: missing.append(f"{venue}:{mt}:open_interest")
+                if f:
+                    data["funding"].append(f)
+                else:
+                    missing.append(f"{venue}:{mt}:funding")
+                if oi:
+                    data["open_interest"].append(oi)
+                else:
+                    missing.append(f"{venue}:{mt}:open_interest")
             venue_had_ok = True
         except Exception as exc:
             errors.append({"venue": venue, "market_type": mt, "error": str(exc)})
@@ -79,8 +83,10 @@ def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str,
             out["data"][key].extend(records)
         out["errors"].extend(res["errors"])
         missing.extend(res["missing"])
-        if res["ok"]: venues_ok.add(res["venue"])
-        else: venues_failed.add(res["venue"])
+        if res["ok"]:
+            venues_ok.add(res["venue"])
+        else:
+            venues_failed.add(res["venue"])
     qualities = []
     for records in out["data"].values():
         for r in records:

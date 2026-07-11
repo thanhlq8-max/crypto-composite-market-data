@@ -80,7 +80,8 @@ def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = 
             venue_set.add(book.venue)
             for side_name, levels in (("bid", book.bids), ("ask", book.asks)):
                 for px, qty in levels[:100]:
-                    px = float(px); qty = float(qty)
+                    px = float(px)
+                    qty = float(qty)
                     if px <= 0 or qty <= 0:
                         continue
                     # Keep actionable near-book area; far levels remain raw connector data, not ladder context.
@@ -90,11 +91,14 @@ def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = 
                     buckets[(side_name, low)][book.venue] += px * qty
         max_depth = max((sum(v.values()) for v in buckets.values()), default=1.0)
         prev_lookup = _previous_lookup(previous_ladder, mt)
-        bid_levels=[]; ask_levels=[]
+        bid_levels = []
+        ask_levels = []
         for (side, low), venue_depth in buckets.items():
             lvl = _level_from_bucket(side, low, bsize, dict(venue_depth), max_depth, prev_lookup)
-            if side == "bid": bid_levels.append(lvl)
-            else: ask_levels.append(lvl)
+            if side == "bid":
+                bid_levels.append(lvl)
+            else:
+                ask_levels.append(lvl)
         bid_levels = sorted(bid_levels, key=lambda x: (abs(x.price_mid - ref), -x.depth_quote))[:80]
         ask_levels = sorted(ask_levels, key=lambda x: (abs(x.price_mid - ref), -x.depth_quote))[:80]
         top_bid = max(bid_levels, key=lambda x: x.depth_quote, default=None)
