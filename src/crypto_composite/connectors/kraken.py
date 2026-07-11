@@ -7,6 +7,7 @@ from crypto_composite.connectors.base import (
     ConnectorInputError,
     ExchangeConnector,
     parse_book_levels,
+    parse_records,
     require_non_empty_orderbook,
     require_timeframe,
 )
@@ -54,60 +55,63 @@ class KrakenConnector(ExchangeConnector):
         interval = require_timeframe(timeframe, _INTERVAL, venue=self.venue)
         data = self._get(f"{self.base}/OHLC", {"pair": symbol, "interval": interval})
         candles = self._pair_payload(data)
-        out = []
-        for x in candles:
+
+        def _bar(x):
             ts = self._time_ms(x[0])
             op = float(x[1])
             hi = float(x[2])
             lo = float(x[3])
             cl = float(x[4])
             vol = float(x[6])
+            if min(op, hi, lo, cl) <= 0 or vol < 0:
+                raise ValueError("invalid bar record")
             trades = int(x[7]) if len(x) > 7 else None
-            out.append(
-                OHLCVBar(
-                    self.venue,
-                    market_type,
-                    symbol,
-                    timeframe,
-                    ts,
-                    op,
-                    hi,
-                    lo,
-                    cl,
-                    vol,
-                    quote_volume(cl, vol),
-                    trades,
-                    0.82,
-                )
+            return OHLCVBar(
+                self.venue,
+                market_type,
+                symbol,
+                timeframe,
+                ts,
+                op,
+                hi,
+                lo,
+                cl,
+                vol,
+                quote_volume(cl, vol),
+                trades,
+                0.82,
             )
+
+        out = parse_records(candles, _bar)
         return out[-min(limit, 720) :] if limit > 0 else out
 
     def fetch_recent_trades(self, symbol, market_type, limit):
         self._require_spot(market_type)
         data = self._get(f"{self.base}/Trades", {"pair": symbol, "count": min(limit, 1000)})
         trades = self._pair_payload(data)
-        out = []
-        for x in trades:
+
+        def _trade(x):
             price = float(x[0])
             qty = float(x[1])
+            if price <= 0 or qty <= 0:
+                raise ValueError("invalid trade record")
             side_raw = str(x[3]).lower() if len(x) > 3 else ""
             side = "buy" if side_raw == "b" else "sell" if side_raw == "s" else "unknown"
-            out.append(
-                TradePrint(
-                    self.venue,
-                    market_type,
-                    symbol,
-                    self._time_ms(x[2] if len(x) > 2 else None),
-                    price,
-                    qty,
-                    quote_volume(price, qty),
-                    side,
-                    True if side in ("buy", "sell") else None,
-                    str(x[6]) if len(x) > 6 else None,
-                    0.78,
-                )
+            return TradePrint(
+                self.venue,
+                market_type,
+                symbol,
+                self._time_ms(x[2] if len(x) > 2 else None),
+                price,
+                qty,
+                quote_volume(price, qty),
+                side,
+                True if side in ("buy", "sell") else None,
+                str(x[6]) if len(x) > 6 else None,
+                0.78,
             )
-        return out
+
+        return parse_records(trades, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
         self._require_spot(market_type)

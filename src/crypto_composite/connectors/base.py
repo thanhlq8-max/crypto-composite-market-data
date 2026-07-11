@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 import requests
@@ -41,6 +41,21 @@ def require_timeframe(timeframe: str, mapping: Mapping[str, str], *, venue: str)
             f"TIMEFRAME_UNSUPPORTED venue={venue} timeframe={timeframe!r} supported={supported}"
         )
     return mapping[timeframe]
+
+
+def parse_records(items: Sequence[Any] | None, parse_one: Callable[[Any], Any]) -> list[Any]:
+    """Parse venue records one by one and skip records that fail to parse.
+
+    One malformed public record (cast failure, missing field, non-positive
+    price) must not discard the venue's whole market_type block.
+    """
+    out: list[Any] = []
+    for item in items or []:
+        try:
+            out.append(parse_one(item))
+        except (TypeError, ValueError, IndexError, KeyError):
+            continue
+    return out
 
 
 def parse_book_levels(levels: Sequence[Any] | None) -> list[tuple[float, float]]:
