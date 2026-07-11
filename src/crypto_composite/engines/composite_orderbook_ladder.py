@@ -103,6 +103,7 @@ def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = 
         ask_total = sum(x.depth_quote for x in ask_levels)
         imb = (bid_total - ask_total) / max(bid_total + ask_total, 1e-9)
         coverage = clamp(len(venue_set) / expected_n)
+        # Heuristic corroboration gates; basis recorded in docs/STATUS_THRESHOLDS.md.
         if coverage >= 0.67:
             status = "COMPOSITE_BOOK_OK"
         elif coverage >= 0.34:

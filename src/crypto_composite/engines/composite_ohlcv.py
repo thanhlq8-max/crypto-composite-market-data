@@ -35,6 +35,7 @@ def _qvol(b: OHLCVBar) -> float:
 
 
 def _status(coverage: float, latest_dispersion_pct: float) -> str:
+    """Heuristic corroboration gates; basis recorded in docs/STATUS_THRESHOLDS.md."""
     if coverage >= 0.67 and latest_dispersion_pct <= 0.08:
         return "COMPOSITE_DATA_OK"
     if coverage >= 0.34 and latest_dispersion_pct <= 0.20:
