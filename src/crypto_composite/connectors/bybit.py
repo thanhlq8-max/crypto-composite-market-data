@@ -11,7 +11,7 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
-_INTERVAL = {"1m":"1", "5m":"5", "15m":"15", "1h":"60"}
+_INTERVAL = {"1m":"1", "5m":"5", "15m":"15", "1h":"60", "4h":"240", "1d":"D"}
 
 class BybitConnector(ExchangeConnector):
     venue = "bybit"

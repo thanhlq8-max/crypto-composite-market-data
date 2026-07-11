@@ -11,7 +11,10 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
-_BAR = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1H"}
+# OKX anchors plain 1D candles to Hong Kong time (UTC+8); the utc-suffixed bar
+# keeps daily bar opens aligned with the other venues' UTC midnight anchor.
+# 4H boundaries coincide for both anchors (+8h is a multiple of 4h).
+_BAR = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1H", "4h":"4H", "1d":"1Dutc"}
 
 class OKXConnector(ExchangeConnector):
     venue = "okx"

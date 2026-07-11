@@ -11,7 +11,7 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import FundingSnapshot, OHLCVBar, OpenInterestSnapshot, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import quote_volume, now_ms
 
-_INTERVAL = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1h"}
+_INTERVAL = {"1m":"1m", "5m":"5m", "15m":"15m", "1h":"1h", "4h":"4h", "1d":"1d"}
 
 class BinanceConnector(ExchangeConnector):
     venue = "binance"
