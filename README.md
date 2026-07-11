@@ -369,6 +369,20 @@ The export writes one row per asset, timeframe, market type, and composite OHLCV
 
 See [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md).
 
+## Parquet export
+
+The same flat rows are available as a typed Parquet file. Parquet support is an optional extra so the base install keeps its `requests`-only footprint:
+
+```bash
+pip install "crypto-composite-market-data[parquet]"
+
+crypto-composite export-ohlcv-parquet \
+  --artifact-root artifacts-universe \
+  --out-file composite_ohlcv.parquet
+```
+
+Columns match the CSV export exactly (`timestamp_ms`/`venue_count` as int64, price and quality fields as float64, the rest as strings).
+
 ## Local dashboard API
 
 Serve a read-only local artifact API:

@@ -5,6 +5,7 @@ import json
 from typing import Iterable
 
 from crypto_composite.artifact_csv import write_composite_ohlcv_csv
+from crypto_composite.artifact_parquet import ParquetDependencyError, write_composite_ohlcv_parquet
 from crypto_composite.artifact_quality import score_artifact_root, write_quality_score
 from crypto_composite.artifact_report import write_static_report
 from crypto_composite.sample_workflow import run_sample_report
@@ -117,6 +118,13 @@ def main() -> None:
     csv_export = sub.add_parser("export-ohlcv-csv", help="Export composite OHLCV artifacts to a flat CSV file.")
     csv_export.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
     csv_export.add_argument("--out-file", required=True, help="CSV file to write.")
+
+    parquet_export = sub.add_parser(
+        "export-ohlcv-parquet",
+        help="Export composite OHLCV artifacts to a flat Parquet file (requires the [parquet] extra).",
+    )
+    parquet_export.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
+    parquet_export.add_argument("--out-file", required=True, help="Parquet file to write.")
 
     report = sub.add_parser("report", help="Write a static HTML artifact quality report.")
     report.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
@@ -237,6 +245,14 @@ def main() -> None:
             parser.exit(1)
     elif args.cmd == "export-ohlcv-csv":
         export_result = write_composite_ohlcv_csv(args.artifact_root, args.out_file)
+        print(json.dumps(export_result, indent=2, sort_keys=True))
+        if export_result["status"] == "ERROR":
+            parser.exit(1)
+    elif args.cmd == "export-ohlcv-parquet":
+        try:
+            export_result = write_composite_ohlcv_parquet(args.artifact_root, args.out_file)
+        except ParquetDependencyError as exc:
+            parser.exit(1, f"{exc}\n")
         print(json.dumps(export_result, indent=2, sort_keys=True))
         if export_result["status"] == "ERROR":
             parser.exit(1)

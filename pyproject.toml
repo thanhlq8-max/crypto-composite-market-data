@@ -39,6 +39,11 @@ dependencies = [
   "requests>=2.31"
 ]
 
+[project.optional-dependencies]
+parquet = [
+  "pyarrow>=15"
+]
+
 [project.urls]
 Homepage = "https://github.com/thanhlq8-max/crypto-composite-market-data"
 Repository = "https://github.com/thanhlq8-max/crypto-composite-market-data"
