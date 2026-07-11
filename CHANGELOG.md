@@ -2,6 +2,34 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
+## v0.19.0 - Audit fixes, hardening, and the price zone map
+
+### Fixed
+
+- Previous-ladder persistence now reads the per-timeframe artifact `composite_orderbook_ladder_{tf}.json` (keyed by market_type); the combined file's timeframe keys silently disabled persistence carry-over between runs.
+- Coverage denominators count only venues capable of each market type, so spot-only venues (Coinbase Exchange, Kraken) no longer cap perpetual coverage below the OK gate.
+- Status and coverage are judged on the last closed bar; in-progress candles mixed venue fetch times and inflated dispersion exactly on the deciding bar.
+- One malformed public record (non-positive price, missing field, cast failure) is skipped individually in connector parse loops instead of discarding the venue's whole market_type block.
+
+### Added
+
+- `4h` and `1d` timeframes on all connectors (Coinbase Exchange has no native 4h granularity and skips that timeframe); daily bars anchor to UTC midnight on every venue, live-verified across the five venues.
+- `export-ohlcv-parquet` CLI command with typed columns; `pyarrow` ships as the optional `[parquet]` extra.
+- Dashboard price zone map: per-market panel drawing historical reaction bands (clustered closed-bar swing extrema), public depth concentrations/vacuums, and reference levels on a price axis with exact price labels, plus generated insight lines and a fixed observed-data disclaimer.
+- `scripts/live_smoke.py`: manual live schema check for every venue x market_type (30/30 checks passed on 2026-07-12).
+- `docs/DATA_QUALITY_CONSTANTS.md` and `docs/STATUS_THRESHOLDS.md` documenting the heuristic basis of per-venue quality constants and status gates.
+
+### Changed
+
+- `CompositeOHLCVBar` gains additive `is_closed` (default `true`); composite notes carry `status_basis=`.
+- Connector fetches share a retrying `requests.Session` (GET-only, 429-aware) and venues are scanned concurrently with deterministic artifact ordering.
+- Dashboard HTML moved out of Python into `crypto_composite/templates/dashboard.html` (package data, byte-identical render).
+- `requires-python` lowered to `>=3.10` with a 3.10-3.13 CI matrix; ruff runs in CI with no lint exceptions; the 26 per-version release-note files are consolidated into this changelog.
+
+### Boundary
+
+This release remains public-data infrastructure. Reaction bands and depth zones are historical/snapshot descriptions with fixed disclaimers. It does not add trading signals, predictions, entry/exit instructions, position sizing, execution, hidden-liquidity claims, or financial advice.
+
 ## v0.18.2 - LFX Zone Review Objects
 
 ### Added
