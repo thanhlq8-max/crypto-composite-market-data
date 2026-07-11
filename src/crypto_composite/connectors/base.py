@@ -1,3 +1,10 @@
+"""Shared plumbing for public exchange REST connectors.
+
+The per-venue data_quality constants inside the concrete connectors are
+heuristic ordering values, not measured accuracy; their basis and boundaries
+are recorded in docs/DATA_QUALITY_CONSTANTS.md.
+"""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
