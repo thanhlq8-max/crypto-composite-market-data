@@ -54,16 +54,19 @@ def run_composite(
     composite_orderbook_by_timeframe: dict[str, Any] = {}
     quality_by_timeframe: dict[str, Any] = {}
 
-    previous_ladder: dict[str, Any] | None = None
-    previous_path = out / "composite_orderbook_ladder.json"
-    if previous_path.exists():
-        try:
-            previous_ladder = read_json(previous_path)
-        except Exception:
-            previous_ladder = None
-
     for timeframe in timeframes:
         stem = _artifact_stem(timeframe)
+        # The previous ladder must be the per-timeframe artifact: it is keyed by
+        # market_type, the shape _previous_lookup expects. The combined
+        # composite_orderbook_ladder.json is keyed by timeframe and silently
+        # breaks persistence carry-over if used here.
+        previous_ladder: dict[str, Any] | None = None
+        previous_path = out / f"composite_orderbook_ladder_{stem}.json"
+        if previous_path.exists():
+            try:
+                previous_ladder = read_json(previous_path)
+            except Exception:
+                previous_ladder = None
         raw = scan(asset, venues, market_types, timeframe, limit, depth=depth)
         composite_ohlcv = context_to_dict(build_composite_ohlcv(raw, venues))
         reference_price = latest_composite_price(composite_ohlcv) or 0.0

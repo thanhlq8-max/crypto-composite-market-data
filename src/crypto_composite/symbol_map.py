@@ -7,6 +7,20 @@ class SymbolMappingError(ValueError):
 
 SUPPORTED_MARKET_TYPES = {"spot_usdt", "perp_usdt"}
 SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase", "kraken"}
+PERP_VENUES = {"binance", "okx", "bybit"}
+
+
+def venue_supports_market_type(venue: str, market_type: str) -> bool:
+    """Return True when a venue can serve the market type.
+
+    Spot-only venues (Coinbase Exchange, Kraken) do not count toward perp
+    coverage expectations. Unknown venues are counted conservatively so custom
+    connectors keep the previous behavior.
+    """
+    v = venue.strip().lower()
+    if market_type == "perp_usdt" and v in SUPPORTED_VENUES:
+        return v in PERP_VENUES
+    return True
 
 
 def _split_asset(asset: str) -> tuple[str, str]:

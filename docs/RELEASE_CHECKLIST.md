@@ -6,7 +6,7 @@ Use this checklist before every PyPI release.
 
 - [ ] `pyproject.toml` version is bumped.
 - [ ] `src/crypto_composite/__init__.py` version matches `pyproject.toml`.
-- [ ] `RELEASE_NOTES_vX.Y.Z.md` exists.
+- [ ] `CHANGELOG.md` has an entry for the new version.
 - [ ] No local patch files are tracked.
 - [ ] `git status` is clean before tagging.
 - [ ] CI passes on Python 3.11, 3.12 and 3.13.

@@ -5,6 +5,8 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from crypto_composite.schemas import (
     FundingSnapshot,
@@ -70,13 +72,38 @@ def require_non_empty_orderbook(
         )
 
 
+RETRY_TOTAL = 3
+RETRY_BACKOFF_SECONDS = 0.5
+RETRY_STATUS_FORCELIST = (429, 500, 502, 503, 504)
+
+
+def build_retrying_session() -> requests.Session:
+    """Session with connection reuse and bounded GET retries for public endpoints."""
+    session = requests.Session()
+    retry = Retry(
+        total=RETRY_TOTAL,
+        backoff_factor=RETRY_BACKOFF_SECONDS,
+        status_forcelist=RETRY_STATUS_FORCELIST,
+        allowed_methods=frozenset({"GET"}),
+        raise_on_status=False,
+        respect_retry_after_header=True,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
 class ExchangeConnector(ABC):
     venue: str
     timeout: int = 10
 
+    def __init__(self) -> None:
+        self._session = build_retrying_session()
+
     def _get(self, url: str, params: dict | None = None):
         try:
-            r = requests.get(url, params=params or {}, timeout=self.timeout)
+            r = self._session.get(url, params=params or {}, timeout=self.timeout)
             r.raise_for_status()
             return r.json()
         except Exception as exc:
