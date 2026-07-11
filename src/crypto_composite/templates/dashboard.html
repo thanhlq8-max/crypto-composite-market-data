@@ -97,7 +97,17 @@
     pre { max-height: 380px; margin: 12px 0 0; padding: 14px; overflow: auto; border-radius: 10px; color: #b9d8ff; background: #050c13; font-size: .73rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .manifest-path { min-width: 260px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .73rem; }
     .boundary { margin-top: 14px; padding: 14px 16px; border: 1px solid rgba(87, 216, 204, .24); border-radius: 13px; color: #9db1c5; background: rgba(87, 216, 204, .055); font-size: .78rem; }
-    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid, .guide-grid, .zone-review-grid { grid-template-columns: 1fr; } }
+    .pzm-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .pzm-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .pzm-list li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #0a1724; color: #c5d2e0; font-size: .8rem; line-height: 1.5; }
+    .pzm-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; color: var(--muted); font-size: .68rem; }
+    .pzm-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 2px; vertical-align: -1px; }
+    .pzm-legend .lg-reaction::before { background: rgba(87, 216, 204, .55); }
+    .pzm-legend .lg-bid::before { background: rgba(114, 167, 255, .6); }
+    .pzm-legend .lg-ask::before { background: rgba(244, 191, 103, .6); }
+    .pzm-legend .lg-vacuum::before { background: transparent; border: 1px dashed #8fa1b5; }
+    .pzm-legend .lg-ref::before { background: #e7edf5; height: 2px; border-radius: 0; vertical-align: 3px; }
+    @media (max-width: 940px) { header { grid-template-columns: 1fr; } .filters { justify-content: flex-start; } .layout { grid-template-columns: 1fr; } .panel.full { grid-column: auto; } .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } .insight-grid, .guide-grid, .zone-review-grid, .pzm-layout { grid-template-columns: 1fr; } }
     @media (max-width: 720px) { .cards { grid-template-columns: repeat(2, 1fr); } .flow { grid-template-columns: 1fr; } }
     @media (max-width: 460px) { main { width: min(100% - 20px, 1280px); padding-top: 22px; } .cards { grid-template-columns: 1fr; } .panel { padding: 14px; } select { min-width: 0; max-width: 145px; } }
   </style>
@@ -192,6 +202,18 @@
     </table></div>
     <div class="review-copy-row"><span id="mtf-zone-copy-note" class="review-note">Copy MTF zone map</span><button id="copy-mtf-zone-map" type="button">Copy MTF map</button></div>
     <p class="mtf-boundary" id="mtf-zone-boundary">Cross-timeframe context is descriptive artifact evidence only.</p>
+  </section>
+
+  <section class="panel pzm-panel" id="price-zone-map" aria-label="Price zone map">
+    <div class="panel-head"><div><h2>Price zone map</h2><p>Reaction bands, depth concentrations, and reference levels at exact prices for the selected market</p></div><p id="pzm-summary"></p></div>
+    <div class="pzm-layout">
+      <div>
+        <svg id="pzm-chart" viewBox="0 0 760 360" role="img" aria-label="Price zone map"></svg>
+        <p class="pzm-legend"><span class="lg-reaction">Reaction band (historical)</span><span class="lg-bid">Bid concentration</span><span class="lg-ask">Ask concentration</span><span class="lg-vacuum">Depth vacuum</span><span class="lg-ref">Reference price</span></p>
+      </div>
+      <ul id="pzm-insights" class="pzm-list"><li>Loading price zone map...</li></ul>
+    </div>
+    <p class="callout" id="pzm-disclaimer"></p>
   </section>
 
   <section class="layout">
@@ -531,6 +553,82 @@
     levels.forEach((level, index) => { const width = numeric(level.depth_quote) / maxDepth * 190; const yy = 18 + index * row; const bid = level.side === "bid"; chart.appendChild(svg("rect", { x: bid ? 252 - width : 268, y: yy, width, height: Math.max(row - 3, 2), rx: 2, fill: bid ? "#72a7ff" : "#f4bf67", opacity: .72 })); chart.appendChild(svg("text", { x: 260, y: yy + row - 5, "text-anchor": "middle", class: "axis" }, price(level.price_mid))); });
     byId("depth-imbalance").textContent = numeric(book.depth_imbalance) === null ? "" : `imbalance ${fmt(book.depth_imbalance, 3)}`;
   }
+  function renderPriceZoneMap(market) {
+    const chart = byId("pzm-chart"); chart.replaceChildren();
+    const list = byId("pzm-insights"); list.replaceChildren();
+    const map = market?.price_zone_map;
+    const summary = byId("pzm-summary");
+    if (!map) {
+      summary.textContent = "";
+      byId("pzm-disclaimer").textContent = "";
+      chart.appendChild(svg("text", { x: 380, y: 180, "text-anchor": "middle", class: "axis" }, "No price zone map in this artifact"));
+      const item = document.createElement("li"); item.textContent = "Regenerate artifacts with a current build to embed the price zone map."; list.appendChild(item);
+      return;
+    }
+    byId("pzm-disclaimer").textContent = map.disclaimer || "";
+    const reaction = (map.reaction_zones || []).filter((zone) => numeric(zone.price_low) !== null && numeric(zone.price_high) !== null);
+    const liquidity = (map.liquidity_zones || []).filter((zone) => numeric(zone.price_low) !== null && numeric(zone.price_high) !== null);
+    const reference = numeric(map.reference_price);
+    summary.textContent = `${reaction.length} reaction band${reaction.length === 1 ? "" : "s"} / ${liquidity.length} depth zone${liquidity.length === 1 ? "" : "s"}`;
+    const values = [reference, numeric(map.window?.price_low), numeric(map.window?.price_high)].filter((value) => value !== null);
+    for (const zone of [...reaction, ...liquidity]) values.push(numeric(zone.price_low), numeric(zone.price_high));
+    const finite = values.filter((value) => value !== null);
+    if (!finite.length) {
+      chart.appendChild(svg("text", { x: 380, y: 180, "text-anchor": "middle", class: "axis" }, "No priced zones available"));
+    } else {
+      let min = Math.min(...finite), max = Math.max(...finite);
+      if (min === max) { min *= .999; max *= 1.001; }
+      const pad = (max - min) * .06; min -= pad; max += pad;
+      const top = 22, bottom = 338, axisX = 92, bandX = 104, bandW = 380, labelX = 494;
+      const y = (value) => bottom - (value - min) / (max - min) * (bottom - top);
+      for (let i = 0; i <= 5; i++) {
+        const value = max - i * (max - min) / 5; const yy = y(value);
+        chart.appendChild(svg("line", { x1: axisX, x2: 740, y1: yy, y2: yy, class: "gridline" }));
+        chart.appendChild(svg("text", { x: axisX - 6, y: yy + 4, "text-anchor": "end", class: "axis" }, price(value)));
+      }
+      const labels = [];
+      const drawBand = (zone, fill, opacity, dashed, labelText) => {
+        const low = numeric(zone.price_low), high = numeric(zone.price_high);
+        const yTop = y(high), yBottom = y(low);
+        const height = Math.max(yBottom - yTop, 3);
+        const attrs = { x: bandX, y: yTop, width: bandW, height, rx: 2 };
+        if (dashed) { attrs.fill = "transparent"; attrs.stroke = "#8fa1b5"; attrs["stroke-dasharray"] = "5 4"; }
+        else { attrs.fill = fill; attrs.opacity = opacity; }
+        chart.appendChild(svg("rect", attrs));
+        labels.push({ y: yTop + height / 2, text: labelText });
+      };
+      for (const zone of liquidity) {
+        const kind = String(zone.kind || "");
+        const isVacuum = kind.includes("VACUUM");
+        const bid = zone.side === "bid";
+        const label = `${isVacuum ? (bid ? "Bid vacuum" : "Ask vacuum") : (bid ? "Bid depth" : "Ask depth")} ${price(zone.price_low)}-${price(zone.price_high)}${isVacuum ? "" : ` / ${fmt(zone.depth_quote, 0)} quote / ${zone.venue_count ?? "?"} venue(s)`}`;
+        drawBand(zone, bid ? "#72a7ff" : "#f4bf67", .28, isVacuum, label);
+      }
+      for (const zone of reaction) {
+        drawBand(zone, "#57d8cc", .3, false, `Reaction ${price(zone.price_low)}-${price(zone.price_high)} / ${zone.touch_count} touches`);
+      }
+      if (reference !== null) {
+        const yy = y(reference);
+        chart.appendChild(svg("line", { x1: axisX, x2: 740, y1: yy, y2: yy, stroke: "#e7edf5", "stroke-width": 1.6, "stroke-dasharray": "7 5" }));
+        labels.push({ y: yy, text: `Reference ${price(reference)}` });
+      }
+      labels.sort((a, b) => a.y - b.y);
+      let lastY = -20;
+      for (const label of labels) {
+        const yy = Math.min(Math.max(label.y + 4, lastY + 13, top + 8), bottom + 8);
+        lastY = yy;
+        chart.appendChild(svg("text", { x: labelX, y: yy, class: "axis", stroke: "#071019", "stroke-width": 3.5, "paint-order": "stroke", "stroke-linejoin": "round" }, label.text));
+      }
+    }
+    const insights = Array.isArray(map.insights) && map.insights.length ? map.insights : ["No generated insights for this market."];
+    for (const line of insights) { const item = document.createElement("li"); item.textContent = line; list.appendChild(item); }
+    const delta = map.previous_closed_bar_delta;
+    if (delta && numeric(delta.volume_quote_change_pct) !== null) {
+      const item = document.createElement("li");
+      item.textContent = `Quote volume ${signedPercent(delta.volume_quote_change_pct, 2)} vs prior closed bar.`;
+      list.appendChild(item);
+    }
+  }
   function addCell(row, value, className) { const cell = document.createElement("td"); cell.textContent = String(value); if (className) cell.className = className; row.appendChild(cell); return cell; }
   function zoneChecklistRows(market) {
     const now = market?.monitoring_brief?.now || {};
@@ -778,7 +876,7 @@
     ];
     return lines.join("\n");
   }
-  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMissionControl(asset, timeframe, market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(asset, timeframe, market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceChart(market); renderDepthChart(market); renderZones(asset, timeframe, market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
+  function renderCurrent(writeViewHistory = false) { const { asset, timeframe, market } = context(); const sourceNote = byId("source-note"); sourceNote.textContent = timeframe?.source_note || ""; sourceNote.hidden = !timeframe?.source_note; renderCards(market); renderFlow(market); renderMissionControl(asset, timeframe, market); renderViewBrief(asset, timeframe, market); renderZoneChecklist(asset, timeframe, market); renderZoneReviewNotes(asset, timeframe, market); renderMtfZoneMap(asset); renderPriceZoneMap(market); renderPriceChart(market); renderDepthChart(market); renderZones(asset, timeframe, market); renderDislocation(timeframe); updateViewLink(writeViewHistory); }
   async function inspect(path) { const output = byId("inspector"); output.textContent = "Loading..."; try { const url = staticArtifactBase ? `${staticArtifactBase}/${path.split("/").map(encodeURIComponent).join("/")}` : `/api/artifact?path=${encodeURIComponent(path)}`; output.textContent = JSON.stringify(await getJson(url), null, 2); } catch (error) { output.textContent = `Artifact read failed: ${error.message}`; } }
   function renderManifest() { const body = byId("artifact-body"); body.replaceChildren(); const items = state.index?.artifacts || []; byId("artifact-summary").textContent = `${items.length} JSON / ${bytes(items.reduce((sum, item) => sum + Number(item.size_bytes || 0), 0))}`; for (const item of items) { const row = document.createElement("tr"); addCell(row, item.path, "manifest-path"); addCell(row, bytes(item.size_bytes)); const cell = document.createElement("td"); const button = document.createElement("button"); button.type = "button"; button.textContent = "View JSON"; button.addEventListener("click", () => inspect(item.path)); cell.appendChild(button); row.appendChild(cell); body.appendChild(row); } }
   async function load() {
