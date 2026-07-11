@@ -275,7 +275,7 @@ See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md).
 | Venues | Binance, OKX, Bybit; Coinbase Exchange and Kraken spot-only |
 | Asset format | `BASE-USDT`, for example `BTC-USDT` |
 | Market types | `spot_usdt`, `perp_usdt` |
-| Timeframes | `1m`, `5m`, `15m`, `1h` |
+| Timeframes | `1m`, `5m`, `15m`, `1h`, `4h`, `1d` (daily bars anchored to UTC midnight on every venue; Coinbase Exchange has no native `4h` granularity and skips that timeframe) |
 | Data access | Public REST endpoints only |
 | Python | 3.11, 3.12, 3.13 |
 

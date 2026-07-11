@@ -14,7 +14,7 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
 
-_INTERVAL = {"1m": "1", "5m": "5", "15m": "15", "1h": "60"}
+_INTERVAL = {"1m": "1", "5m": "5", "15m": "15", "1h": "60", "4h": "240", "1d": "1440"}
 
 
 class KrakenConnector(ExchangeConnector):

@@ -14,7 +14,10 @@ from crypto_composite.connectors.base import (
 from crypto_composite.schemas import OHLCVBar, OrderBookSnapshot, TradePrint
 from crypto_composite.utils import now_ms, quote_volume
 
-_INTERVAL = {"1m": "60", "5m": "300", "15m": "900", "1h": "3600"}
+# Coinbase Exchange has no native 4h granularity (supported: 60, 300, 900,
+# 3600, 21600, 86400 seconds); requesting 4h raises TIMEFRAME_UNSUPPORTED and
+# the venue simply does not contribute to 4h composites.
+_INTERVAL = {"1m": "60", "5m": "300", "15m": "900", "1h": "3600", "1d": "86400"}
 
 
 class CoinbaseConnector(ExchangeConnector):

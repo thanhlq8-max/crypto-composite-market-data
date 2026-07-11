@@ -9,7 +9,7 @@ Version: v0.12.0
 - Market type: `spot_usdt` only.
 - Asset input: `BASE-USDT`, for example `BTC-USDT`.
 - BTC is mapped to Kraken's XBT pair naming for public REST requests.
-- Timeframes: `1m`, `5m`, `15m`, `1h`.
+- Timeframes: `1m`, `5m`, `15m`, `1h`, `4h`, `1d`.
 - Public REST OHLCV, recent trades, and level-2 orderbook snapshots.
 
 ## Unsupported scope
