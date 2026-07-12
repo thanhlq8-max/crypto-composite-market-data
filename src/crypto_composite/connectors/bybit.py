@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from crypto_composite.connectors.base import (
+    ConnectorDataError,
     ExchangeConnector,
     UnsupportedTimeframeError,
     parse_book_levels,
@@ -19,12 +20,21 @@ class BybitConnector(ExchangeConnector):
 
     def _cat(self, market_type): return "linear" if market_type=="perp_usdt" else "spot"
 
+    def _result(self, payload):
+        """Unwrap the Bybit envelope; business errors arrive as HTTP 200 + retCode."""
+        ret_code = payload.get("retCode")
+        if ret_code is not None and int(ret_code) != 0:
+            raise ConnectorDataError(
+                f"BYBIT_API_ERROR venue={self.venue} retCode={ret_code} msg={payload.get('retMsg', '')!r}"
+            )
+        return payload.get("result", {})
+
     def fetch_ohlcv(self, symbol, market_type, timeframe, limit):
         if timeframe not in _INTERVAL:
             supported = ",".join(sorted(_INTERVAL))
             raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
         interval = _INTERVAL[timeframe]
-        data=self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":limit}).get("result",{}).get("list",[])
+        data=self._result(self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":limit})).get("list",[])
         def _bar(x):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
             if min(op, hi, lo, cl) <= 0 or vol < 0:
@@ -34,7 +44,7 @@ class BybitConnector(ExchangeConnector):
         return parse_records(list(reversed(data)), _bar)
 
     def fetch_recent_trades(self, symbol, market_type, limit):
-        data=self._get(self.base+"/v5/market/recent-trade", {"category":self._cat(market_type),"symbol":symbol,"limit":min(limit,1000)}).get("result",{}).get("list",[])
+        data=self._result(self._get(self.base+"/v5/market/recent-trade", {"category":self._cat(market_type),"symbol":symbol,"limit":min(limit,1000)})).get("list",[])
         def _trade(x):
             price = float(x["price"])
             qty = float(x["size"])
@@ -45,7 +55,7 @@ class BybitConnector(ExchangeConnector):
         return parse_records(data, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
-        data=self._get(self.base+"/v5/market/orderbook", {"category":self._cat(market_type),"symbol":symbol,"limit":min(depth,500)}).get("result",{})
+        data=self._result(self._get(self.base+"/v5/market/orderbook", {"category":self._cat(market_type),"symbol":symbol,"limit":min(depth,500)}))
         bids = parse_book_levels(data.get("b", []))
         asks = parse_book_levels(data.get("a", []))
         require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
@@ -55,7 +65,7 @@ class BybitConnector(ExchangeConnector):
     def fetch_funding(self, symbol, market_type):
         if market_type != "perp_usdt":
             return None
-        data = self._get(self.base+"/v5/market/funding/history", {"category":"linear","symbol":symbol,"limit":1}).get("result",{}).get("list",[])
+        data = self._result(self._get(self.base+"/v5/market/funding/history", {"category":"linear","symbol":symbol,"limit":1})).get("list",[])
         if not data:
             return None
         x = data[0]
@@ -64,7 +74,7 @@ class BybitConnector(ExchangeConnector):
     def fetch_open_interest(self, symbol, market_type):
         if market_type != "perp_usdt":
             return None
-        data = self._get(self.base+"/v5/market/open-interest", {"category":"linear","symbol":symbol,"intervalTime":"5min","limit":1}).get("result",{}).get("list",[])
+        data = self._result(self._get(self.base+"/v5/market/open-interest", {"category":"linear","symbol":symbol,"intervalTime":"5min","limit":1})).get("list",[])
         if not data:
             return None
         x = data[0]
