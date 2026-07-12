@@ -7,6 +7,9 @@ are recorded in docs/DATA_QUALITY_CONSTANTS.md.
 
 from __future__ import annotations
 
+import os
+import threading
+import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -88,6 +91,101 @@ RETRY_TOTAL = 3
 RETRY_BACKOFF_SECONDS = 0.5
 RETRY_STATUS_FORCELIST = (429, 500, 502, 503, 504)
 
+# Conservative default budget per venue: far below every venue's public REST
+# limit, and the burst covers a whole single-asset scan without sleeping.
+DEFAULT_RATE_LIMIT_PER_SEC = 5.0
+DEFAULT_RATE_LIMIT_BURST = 10.0
+RATE_LIMIT_ENV_VAR = "CRYPTO_COMPOSITE_RATE_LIMIT_PER_SEC"
+CACHE_TTL_ENV_VAR = "CRYPTO_COMPOSITE_CACHE_TTL_S"
+_CACHE_MAX_ENTRIES = 512
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
+class TokenBucket:
+    """Thread-safe token bucket. acquire() commits one token and returns the
+    seconds the caller must sleep before proceeding (0.0 when within budget)."""
+
+    def __init__(self, rate_per_sec: float, burst: float) -> None:
+        self.rate = float(rate_per_sec)
+        self.capacity = max(float(burst), 1.0)
+        self._tokens = self.capacity
+        self._updated = time.monotonic()
+        self._lock = threading.Lock()
+
+    def acquire(self) -> float:
+        if self.rate <= 0:
+            return 0.0
+        with self._lock:
+            now = time.monotonic()
+            self._tokens = min(self.capacity, self._tokens + (now - self._updated) * self.rate)
+            self._updated = now
+            self._tokens -= 1.0
+            if self._tokens >= 0.0:
+                return 0.0
+            # Debt model: negative balance queues callers fairly.
+            return -self._tokens / self.rate
+
+
+_VENUE_BUCKETS: dict[str, TokenBucket] = {}
+_BUCKETS_LOCK = threading.Lock()
+
+_RESPONSE_CACHE: dict[tuple, tuple[float, Any]] = {}
+_CACHE_LOCK = threading.Lock()
+
+
+def _venue_bucket(venue: str, rate_per_sec: float, burst: float) -> TokenBucket:
+    with _BUCKETS_LOCK:
+        bucket = _VENUE_BUCKETS.get(venue)
+        if bucket is None:
+            bucket = TokenBucket(rate_per_sec, burst)
+            _VENUE_BUCKETS[venue] = bucket
+        return bucket
+
+
+def reset_rate_limiters() -> None:
+    """Drop all venue buckets (test isolation / config change)."""
+    with _BUCKETS_LOCK:
+        _VENUE_BUCKETS.clear()
+
+
+def _cache_get(key: tuple) -> Any | None:
+    with _CACHE_LOCK:
+        item = _RESPONSE_CACHE.get(key)
+        if item is None:
+            return None
+        expires, payload = item
+        if time.monotonic() >= expires:
+            _RESPONSE_CACHE.pop(key, None)
+            return None
+        return payload
+
+
+def _cache_put(key: tuple, payload: Any, ttl_s: float) -> None:
+    with _CACHE_LOCK:
+        if len(_RESPONSE_CACHE) >= _CACHE_MAX_ENTRIES:
+            now = time.monotonic()
+            for stale in [k for k, (expires, _) in _RESPONSE_CACHE.items() if expires <= now]:
+                del _RESPONSE_CACHE[stale]
+            while len(_RESPONSE_CACHE) >= _CACHE_MAX_ENTRIES:
+                oldest = min(_RESPONSE_CACHE, key=lambda k: _RESPONSE_CACHE[k][0])
+                del _RESPONSE_CACHE[oldest]
+        _RESPONSE_CACHE[key] = (time.monotonic() + ttl_s, payload)
+
+
+def clear_response_cache() -> None:
+    """Drop all cached responses (test isolation / forced refresh)."""
+    with _CACHE_LOCK:
+        _RESPONSE_CACHE.clear()
+
 
 def build_retrying_session() -> requests.Session:
     """Session with connection reuse and bounded GET retries for public endpoints."""
@@ -109,17 +207,40 @@ def build_retrying_session() -> requests.Session:
 class ExchangeConnector(ABC):
     venue: str
     timeout: int = 10
+    # Per-venue request budget; env RATE_LIMIT_ENV_VAR overrides, 0 disables.
+    rate_limit_per_sec: float = DEFAULT_RATE_LIMIT_PER_SEC
+    rate_limit_burst: float = DEFAULT_RATE_LIMIT_BURST
 
-    def __init__(self) -> None:
+    def __init__(self, cache_ttl_s: float | None = None) -> None:
         self._session = build_retrying_session()
+        # Response caching is OPT-IN: a data-quality tool must not silently
+        # serve stale market data. Enable per instance or via env for
+        # repeated-scan loops (dashboard refresh, universe sweeps).
+        self._cache_ttl_s = (
+            float(cache_ttl_s) if cache_ttl_s is not None else _env_float(CACHE_TTL_ENV_VAR, 0.0)
+        )
 
     def _get(self, url: str, params: dict | None = None):
+        params = params or {}
+        cache_key = (self.venue, url, tuple(sorted((str(k), str(v)) for k, v in params.items())))
+        if self._cache_ttl_s > 0:
+            cached = _cache_get(cache_key)
+            if cached is not None:
+                return cached
+        rate = _env_float(RATE_LIMIT_ENV_VAR, self.rate_limit_per_sec)
+        if rate > 0:
+            wait = _venue_bucket(self.venue, rate, self.rate_limit_burst).acquire()
+            if wait > 0:
+                time.sleep(wait)
         try:
-            r = self._session.get(url, params=params or {}, timeout=self.timeout)
+            r = self._session.get(url, params=params, timeout=self.timeout)
             r.raise_for_status()
-            return r.json()
+            payload = r.json()
         except Exception as exc:
             raise ConnectorFetchError(f"{self.venue} fetch failed: {exc}") from exc
+        if self._cache_ttl_s > 0:
+            _cache_put(cache_key, payload, self._cache_ttl_s)
+        return payload
 
     @abstractmethod
     def fetch_ohlcv(self, symbol: str, market_type: str, timeframe: str, limit: int) -> list[OHLCVBar]: ...
