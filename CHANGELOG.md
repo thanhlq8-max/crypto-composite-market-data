@@ -2,6 +2,18 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
+## v0.22.0 - Gate.io venue and multi-asset lifecycle streaming
+
+### Added
+
+- **Gate.io connector** (optional venue, spot + USDT-settled perp): OHLCV, trades, orderbook, funding, and open interest. It is not in the default venue set, so default runs are unchanged; add it with `--venues binance,okx,bybit,gate`. Units live-verified — spot in base currency (candle row order `[ts, quote_vol, close, high, low, open, base_vol, closed]`), perp in contracts scaled to base via the cached per-contract `quanto_multiplier` (same handling as OKX SWAP); futures trade `size` is signed (negative = taker sell). Gate.io is perp-capable, so it counts toward perpetual coverage when included. See `docs/GATE_CONNECTOR.md`.
+- **Multi-asset lifecycle streaming**: `stream-depth --assets BTC-USDT,ETH-USDT,...` watches several assets in parallel. One asset still writes `zone_lifecycle.json`; multiple assets write `zone_lifecycle_{ASSET}.json` each.
+- `stream-depth --flush-interval N` rewrites every asset's artifact every N seconds during a long run so an interrupted run is not lost. Per-asset memory is bounded — buckets absent longer than 10 minutes are dropped and the total bucket count is capped (recorded in the artifact `notes`).
+
+### Boundary
+
+Public market data only. No trading signals, predictions, entry/exit instructions, position sizing, execution, hidden-liquidity or market-maker-intent claims, or financial advice.
+
 ## v0.21.0 - Depth-zone lifecycle streaming
 
 ### Added
