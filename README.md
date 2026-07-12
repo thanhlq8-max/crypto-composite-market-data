@@ -48,7 +48,7 @@ See [Why composite public market data](docs/WHY_COMPOSITE_MARKET_DATA.md) for th
 ## What it does
 
 - Fetches public OHLCV, recent trades, orderbook snapshots, funding and open-interest data.
-- Supports optional Coinbase Exchange and Kraken public spot data without private account or order APIs.
+- Supports optional Coinbase Exchange and Kraken public spot data, and Gate.io public spot + perp, without private account or order APIs.
 - Normalizes records into stable Python dataclasses.
 - Builds timestamp-aligned composite OHLCV by market type.
 - Builds public composite orderbook ladder buckets near a reference price.
@@ -272,7 +272,7 @@ See [docs/ARTIFACT_SCHEMA.md](docs/ARTIFACT_SCHEMA.md).
 
 | Area | Supported |
 |---|---|
-| Venues | Binance, OKX, Bybit; Coinbase Exchange and Kraken spot-only |
+| Venues | Binance, OKX, Bybit, Gate.io (spot + perp); Coinbase Exchange and Kraken spot-only |
 | Asset format | `BASE-USDT`, for example `BTC-USDT` |
 | Market types | `spot_usdt`, `perp_usdt` |
 | Timeframes | `1m`, `5m`, `15m`, `1h`, `4h`, `1d` (daily bars anchored to UTC midnight on every venue; Coinbase Exchange has no native `4h` granularity and skips that timeframe) |
@@ -494,6 +494,7 @@ See:
 - [docs/CSV_EXPORT.md](docs/CSV_EXPORT.md)
 - [docs/COINBASE_CONNECTOR.md](docs/COINBASE_CONNECTOR.md)
 - [docs/KRAKEN_CONNECTOR.md](docs/KRAKEN_CONNECTOR.md)
+- [docs/GATE_CONNECTOR.md](docs/GATE_CONNECTOR.md)
 - [docs/SAMPLE_REPORT.md](docs/SAMPLE_REPORT.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/DUCKDB_EXAMPLES.md](docs/DUCKDB_EXAMPLES.md)
