@@ -43,6 +43,9 @@ dependencies = [
 parquet = [
   "pyarrow>=15"
 ]
+stream = [
+  "websockets>=12"
+]
 
 [project.urls]
 Homepage = "https://github.com/thanhlq8-max/crypto-composite-market-data"

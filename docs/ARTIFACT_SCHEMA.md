@@ -88,6 +88,25 @@ artifacts-universe/
 
 The validator follows each successful `asset_results[*].artifact_dir` and validates that directory as a single-asset artifact set.
 
+## Zone lifecycle file (optional, stream-generated)
+
+`zone_lifecycle.json` is written by `crypto-composite stream-depth` (requires
+the `[stream]` extra) and is independent of the scan pipeline:
+
+- `asset`, `market_type` (always `perp_usdt`), `venues`;
+- `started_at_ms`, `window_ms`, `duration_s`, `samples`, `frames_per_venue`;
+- `reference_price` (stream-derived mid at start) and `bucket_size`
+  (same price-scaled grid as the composite ladder);
+- `buckets`: per price bucket `side`, `price_low`, `price_high`,
+  `first_seen_ms`, `last_seen_ms`, `observed_ms`, `uptime_ratio`,
+  `refill_count`, `max_depth_quote`, `avg_depth_quote`, `max_venue_count`,
+  `samples`;
+- `notes` (reconnects, silent venues) and `boundaries`.
+
+Coverage note: venue book streams carry top-of-book levels only
+(Binance partial depth 20, OKX books5, Bybit orderbook.50), so lifecycle
+buckets describe the near-book area actually visible in the streams.
+
 ## Compatibility rule
 
 Consumers should tolerate additional object fields, but must not infer missing required files or rename fields. A future breaking contract change requires release notes and an explicit schema-version strategy before implementation.

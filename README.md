@@ -383,6 +383,20 @@ crypto-composite export-ohlcv-parquet \
 
 Columns match the CSV export exactly (`timestamp_ms`/`venue_count` as int64, price and quality fields as float64, the rest as strings).
 
+## Depth-zone lifecycle streaming
+
+Watch the perp book WebSocket streams for a bounded window and record how
+long each near-book price bucket actually held depth (uptime, refills, depth
+peaks). WebSocket support is an optional extra:
+
+```bash
+pip install "crypto-composite-market-data[stream]"
+
+crypto-composite stream-depth   --asset BTC-USDT   --duration 120   --out-dir artifacts
+```
+
+The run writes `zone_lifecycle.json`. See [docs/STREAM_DEPTH.md](docs/STREAM_DEPTH.md).
+
 ## Local dashboard API
 
 Serve a read-only local artifact API:
@@ -483,6 +497,7 @@ See:
 - [docs/SAMPLE_REPORT.md](docs/SAMPLE_REPORT.md)
 - [docs/TUTORIAL_CONSUME_ARTIFACTS.md](docs/TUTORIAL_CONSUME_ARTIFACTS.md)
 - [docs/DUCKDB_EXAMPLES.md](docs/DUCKDB_EXAMPLES.md)
+- [docs/STREAM_DEPTH.md](docs/STREAM_DEPTH.md)
 - [docs/WHY_COMPOSITE_MARKET_DATA.md](docs/WHY_COMPOSITE_MARKET_DATA.md)
 - [docs/GITHUB_PAGES_DEMO.md](docs/GITHUB_PAGES_DEMO.md)
 - [docs/PACKAGING.md](docs/PACKAGING.md)
