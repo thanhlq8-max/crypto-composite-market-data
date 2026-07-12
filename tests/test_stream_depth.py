@@ -7,9 +7,11 @@ import sys
 import pytest
 
 from crypto_composite.stream_depth import (
+    PRUNE_ABSENT_MS,
     LifecycleTracker,
     StreamDependencyError,
     VenueBook,
+    _artifact_stem,
     parse_binance_frame,
     parse_bybit_frame,
     parse_okx_frame,
@@ -122,3 +124,40 @@ def test_lifecycle_tracker_bucket_edges_align_to_grid() -> None:
     assert lows == {76.44, 76.46}
     for item in report:
         assert item["price_high"] == pytest.approx(item["price_low"] + 0.02)
+
+
+def test_prune_drops_long_absent_buckets() -> None:
+    tracker = LifecycleTracker(reference_price=100.0, bucket_size=1.0)
+    tracker.sample([_book_with("binance", {100.4: 1.0}, {})], at_ms=0)
+    # It disappears, then a long time passes.
+    tracker.sample([_book_with("binance", {}, {})], at_ms=1000)
+    assert len(tracker.buckets) == 1
+    pruned = tracker.prune(now=1000 + PRUNE_ABSENT_MS + 1)
+    assert pruned == 1
+    assert tracker.buckets == {}
+
+
+def test_prune_caps_total_buckets_dropping_oldest_absent() -> None:
+    tracker = LifecycleTracker(reference_price=100.0, bucket_size=0.01)
+    # Three absent buckets with distinct last_seen; present one must survive.
+    for i, ts in enumerate((10, 20, 30)):
+        tracker.sample([_book_with("binance", {100.0 + i * 0.01: 1.0}, {})], at_ms=ts)
+        tracker.sample([_book_with("binance", {}, {})], at_ms=ts + 1)
+    tracker.sample([_book_with("binance", {100.5: 1.0}, {})], at_ms=100)  # present survivor
+    before = len(tracker.buckets)
+    pruned = tracker.prune(now=101, max_buckets=2, max_absent_ms=10_000_000)
+    assert pruned == before - 2
+    assert len(tracker.buckets) == 2
+    # The still-present bucket is never pruned.
+    assert any(life.present for life in tracker.buckets.values())
+
+
+def test_artifact_stem_sanitizes() -> None:
+    assert _artifact_stem("BTC-USDT") == "BTC-USDT"
+    assert _artifact_stem("BTC/USDT") == "BTC_USDT"
+
+
+def test_run_stream_depth_rejects_unsupported_venue_multi(tmp_path) -> None:
+    pytest.importorskip("websockets")
+    with pytest.raises(ValueError, match="STREAM_VENUE_UNSUPPORTED"):
+        run_stream_depth(assets=["BTC-USDT", "ETH-USDT"], venues=["binance", "kraken"], out_dir=tmp_path)

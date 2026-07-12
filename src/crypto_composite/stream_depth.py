@@ -35,6 +35,10 @@ STREAM_VENUES = ("binance", "okx", "bybit")
 REFERENCE_BAND_FRACTION = 0.025  # match the REST ladder's actionable band
 RECONNECT_BACKOFF_S = 2.0
 MAX_RECONNECTS_PER_VENUE = 5
+# Long-run memory bounds: a bucket absent this long is dropped, and the total
+# bucket count per asset is capped (oldest currently-absent dropped first).
+MAX_BUCKETS_PER_ASSET = 4000
+PRUNE_ABSENT_MS = 600_000
 
 NO_SIGNAL_BOUNDARY = (
     "Observed public depth lifecycle only; no trading signal, prediction, execution "
@@ -218,6 +222,34 @@ class LifecycleTracker:
                 life.last_sample_ms = now
         self.samples += 1
 
+    def prune(self, now: int, max_buckets: int = MAX_BUCKETS_PER_ASSET,
+              max_absent_ms: int = PRUNE_ABSENT_MS) -> int:
+        """Bound memory for long runs: drop long-absent buckets, then cap total.
+
+        A pruned bucket that reappears later is counted fresh; over an
+        hours-long window a bucket absent for max_absent_ms is effectively
+        dead, so this trades tail history for bounded memory.
+        """
+        dead = [
+            key for key, life in self.buckets.items()
+            if not life.present and life.absent_since_ms is not None
+            and now - life.absent_since_ms > max_absent_ms
+        ]
+        for key in dead:
+            del self.buckets[key]
+        pruned = len(dead)
+        if len(self.buckets) > max_buckets:
+            absent = sorted(
+                (key for key, life in self.buckets.items() if not life.present),
+                key=lambda key: self.buckets[key].last_seen_ms,
+            )
+            for key in absent:
+                if len(self.buckets) <= max_buckets:
+                    break
+                del self.buckets[key]
+                pruned += 1
+        return pruned
+
     def report(self, window_ms: int) -> list[dict[str, Any]]:
         out = []
         for life in self.buckets.values():
@@ -304,97 +336,161 @@ async def _venue_worker(
         notes.append(f"{venue}: gave up after {MAX_RECONNECTS_PER_VENUE} reconnects")
 
 
-async def _run_stream(
+def _artifact_stem(asset: str) -> str:
+    return asset.replace("/", "_").replace(" ", "_")
+
+
+class _AssetStream:
+    """Per-asset stream state: venue books, symbols, contract scaling, tracker."""
+
+    def __init__(self, asset: str, venues: list[str]) -> None:
+        self.asset = asset
+        self.venues = venues
+        self.notes: list[str] = []
+        self.pruned = 0
+        self.started_ms = now_ms()
+        self.books: dict[str, VenueBook] = {}
+        self.symbols: dict[str, str] = {}
+        self.contract_values: dict[str, float] = {}
+        self.tracker: LifecycleTracker | None = None
+        for venue in venues:
+            self.symbols[venue] = resolve_symbol(asset, venue, STREAM_MARKET_TYPE)
+            self.books[venue] = VenueBook(venue)
+            self.contract_values[venue] = (
+                OKXConnector()._contract_value(self.symbols[venue]) if venue == "okx" else 1.0
+            )
+
+    def try_start_tracker(self) -> bool:
+        if self.tracker is not None:
+            return True
+        mids = [m for m in (self.books[v].mid() for v in self.venues) if m]
+        if not mids:
+            return False
+        reference = sum(mids) / len(mids)
+        self.tracker = LifecycleTracker(reference, _default_bucket_size(reference))
+        return True
+
+    def sample(self, now: int) -> None:
+        if self.tracker is None:
+            return
+        self.tracker.sample(list(self.books.values()), at_ms=now)
+        self.pruned += self.tracker.prune(now)
+
+    def result(self) -> dict[str, Any]:
+        window_ms = now_ms() - self.started_ms
+        frames = {venue: self.books[venue].frames for venue in self.venues}
+        silent = [venue for venue, count in frames.items() if count == 0]
+        notes = list(self.notes)
+        if silent:
+            notes.append(f"no frames received from: {', '.join(silent)}")
+        if self.pruned:
+            notes.append(f"pruned {self.pruned} long-absent/overflow buckets during the run")
+        return {
+            "asset": self.asset,
+            "market_type": STREAM_MARKET_TYPE,
+            "started_at_ms": self.started_ms,
+            "window_ms": window_ms,
+            "venues": self.venues,
+            "frames_per_venue": frames,
+            "samples": self.tracker.samples if self.tracker else 0,
+            "reference_price": round(self.tracker.reference_price, 8) if self.tracker else None,
+            "bucket_size": self.tracker.bucket_size if self.tracker else None,
+            "buckets": self.tracker.report(window_ms) if self.tracker else [],
+            "notes": notes,
+            "boundaries": [NO_SIGNAL_BOUNDARY],
+        }
+
+
+async def _run_streams(
     websockets_module,
-    asset: str,
+    assets: list[str],
     venues: list[str],
     duration_s: float,
     sample_interval_s: float,
-) -> dict[str, Any]:
-    notes: list[str] = []
-    books: dict[str, VenueBook] = {}
-    symbols: dict[str, str] = {}
-    contract_values: dict[str, float] = {}
-    for venue in venues:
-        symbols[venue] = resolve_symbol(asset, venue, STREAM_MARKET_TYPE)
-        books[venue] = VenueBook(venue)
-        contract_values[venue] = (
-            OKXConnector()._contract_value(symbols[venue]) if venue == "okx" else 1.0
-        )
-
-    started_ms = now_ms()
+    flush_interval_s: float | None,
+    flush_cb=None,
+) -> dict[str, dict[str, Any]]:
+    streams = {asset: _AssetStream(asset, venues) for asset in assets}
     stop_at = time.monotonic() + duration_s
     workers = [
         asyncio.create_task(
             _venue_worker(
-                websockets_module, venue, symbols[venue], books[venue], stop_at, notes,
-                contract_values[venue],
+                websockets_module, venue, stream.symbols[venue], stream.books[venue],
+                stop_at, stream.notes, stream.contract_values[venue],
             )
         )
+        for stream in streams.values()
         for venue in venues
     ]
 
-    # Wait for the first usable mid so the reference price is stream-derived.
-    tracker: LifecycleTracker | None = None
-    while time.monotonic() < stop_at and tracker is None:
-        await asyncio.sleep(min(sample_interval_s, 0.5))
-        mids = [m for m in (books[v].mid() for v in venues) if m]
-        if mids:
-            reference = sum(mids) / len(mids)
-            tracker = LifecycleTracker(reference, _default_bucket_size(reference))
+    last_flush = time.monotonic()
+    try:
+        while time.monotonic() < stop_at:
+            await asyncio.sleep(sample_interval_s)
+            now = now_ms()
+            for stream in streams.values():
+                if stream.try_start_tracker():
+                    stream.sample(now)
+            if flush_interval_s and flush_cb and time.monotonic() - last_flush >= flush_interval_s:
+                flush_cb({asset: s.result() for asset, s in streams.items() if s.tracker})
+                last_flush = time.monotonic()
+    finally:
+        await asyncio.gather(*workers, return_exceptions=True)
 
-    if tracker is None:
-        for worker in workers:
-            worker.cancel()
+    results = {asset: stream.result() for asset, stream in streams.items()}
+    if not any(streams[a].tracker for a in assets):
         raise RuntimeError("STREAM_NO_DATA: no venue produced a book mid within the window")
-
-    while time.monotonic() < stop_at:
-        await asyncio.sleep(sample_interval_s)
-        tracker.sample(list(books.values()))
-
-    await asyncio.gather(*workers, return_exceptions=True)
-    window_ms = now_ms() - started_ms
-    frames = {venue: books[venue].frames for venue in venues}
-    silent = [venue for venue, count in frames.items() if count == 0]
-    if silent:
-        notes.append(f"no frames received from: {', '.join(silent)}")
-
-    return {
-        "asset": asset,
-        "market_type": STREAM_MARKET_TYPE,
-        "started_at_ms": started_ms,
-        "window_ms": window_ms,
-        "duration_s": duration_s,
-        "venues": venues,
-        "frames_per_venue": frames,
-        "samples": tracker.samples,
-        "reference_price": round(tracker.reference_price, 8),
-        "bucket_size": tracker.bucket_size,
-        "buckets": tracker.report(window_ms),
-        "notes": notes,
-        "boundaries": [NO_SIGNAL_BOUNDARY],
-    }
+    return results
 
 
 def run_stream_depth(
-    asset: str = "BTC-USDT",
+    asset: str | None = None,
     venues: list[str] | None = None,
     duration_s: float = 120.0,
     sample_interval_s: float = 1.0,
     out_dir: str | Path = "artifacts",
+    assets: list[str] | None = None,
+    flush_interval_s: float | None = None,
 ) -> dict[str, Any]:
-    """Watch perp book streams for duration_s and write zone_lifecycle.json."""
+    """Watch perp book streams and write zone_lifecycle artifacts.
+
+    Single asset writes zone_lifecycle.json (backward compatible); multiple
+    assets write zone_lifecycle_{ASSET}.json each. With flush_interval_s the
+    per-asset artifacts are (re)written periodically so a long run is not lost
+    if interrupted.
+    """
     websockets_module = _load_websockets()
+    asset_list = list(assets) if assets else [asset or "BTC-USDT"]
+    asset_list = [a.strip() for a in asset_list if a.strip()]
     venue_list = [v.strip().lower() for v in (venues or list(STREAM_VENUES)) if v.strip()]
     unsupported = [v for v in venue_list if v not in STREAM_VENUES]
     if unsupported:
         raise ValueError(
             f"STREAM_VENUE_UNSUPPORTED venues={unsupported!r} supported={','.join(STREAM_VENUES)}"
         )
-    result = asyncio.run(
-        _run_stream(websockets_module, asset, venue_list, float(duration_s), float(sample_interval_s))
-    )
+
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    write_json(out / "zone_lifecycle.json", result)
-    return result
+    multi = len(asset_list) > 1
+
+    def _write(results: dict[str, dict[str, Any]]) -> None:
+        for asset_name, result in results.items():
+            name = f"zone_lifecycle_{_artifact_stem(asset_name)}.json" if multi else "zone_lifecycle.json"
+            write_json(out / name, result)
+
+    results = asyncio.run(
+        _run_streams(
+            websockets_module, asset_list, venue_list, float(duration_s),
+            float(sample_interval_s), float(flush_interval_s) if flush_interval_s else None, _write,
+        )
+    )
+    _write(results)
+    if not multi:
+        return results[asset_list[0]]
+    return {
+        "assets": asset_list,
+        "market_type": STREAM_MARKET_TYPE,
+        "venues": venue_list,
+        "results": results,
+        "boundaries": [NO_SIGNAL_BOUNDARY],
+    }
