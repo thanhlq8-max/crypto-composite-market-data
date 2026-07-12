@@ -28,6 +28,10 @@ The command emits a compact JSON object containing:
 
 The checked-in fixture currently validates as a two-asset universe with no validation errors. CI tests this contract so missing files or incompatible sample changes fail visibly.
 
+## Query with DuckDB or pandas
+
+For SQL-style inspection of the flat CSV/Parquet exports and the JSON artifacts, see [DUCKDB_EXAMPLES.md](DUCKDB_EXAMPLES.md).
+
 ## Use the library API directly
 
 ```python
