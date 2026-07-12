@@ -65,6 +65,9 @@ class KrakenConnector(ExchangeConnector):
             hi = float(x[2])
             lo = float(x[3])
             cl = float(x[4])
+            # OHLC rows are [time, open, high, low, close, vwap, volume, count];
+            # vwap*volume is the faithful quote volume from the same payload.
+            vwap = float(x[5]) if len(x) > 5 and x[5] else 0.0
             vol = float(x[6])
             if min(op, hi, lo, cl) <= 0 or vol < 0:
                 raise ValueError("invalid bar record")
@@ -80,7 +83,7 @@ class KrakenConnector(ExchangeConnector):
                 lo,
                 cl,
                 vol,
-                quote_volume(cl, vol),
+                quote_volume(vwap, vol) if vwap > 0 else quote_volume(cl, vol),
                 trades,
                 0.82,
             )

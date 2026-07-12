@@ -25,7 +25,7 @@ class BinanceConnector(ExchangeConnector):
             supported = ",".join(sorted(_INTERVAL))
             raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
         interval = _INTERVAL[timeframe]
-        data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":interval, "limit":limit})
+        data = self._get(self._base(market_type)+path, {"symbol":symbol, "interval":interval, "limit":min(limit, 1000)})
         def _bar(x):
             op, hi, lo, cl, vol = map(float, [x[1], x[2], x[3], x[4], x[5]])
             if min(op, hi, lo, cl) <= 0 or vol < 0:
@@ -49,9 +49,18 @@ class BinanceConnector(ExchangeConnector):
             return TradePrint(self.venue, market_type, symbol, int(x["T"]), price, qty, quote_volume(price, qty), side, True, str(x.get("a")), 0.9)
         return parse_records(data, _trade)
 
+    # Futures depth accepts only these limits; other values return HTTP 400.
+    _FAPI_DEPTH_LIMITS = (5, 10, 20, 50, 100, 500, 1000)
+
     def fetch_orderbook(self, symbol, market_type, depth):
         path = "/fapi/v1/depth" if market_type == "perp_usdt" else "/api/v3/depth"
-        data = self._get(self._base(market_type)+path, {"symbol":symbol, "limit":min(depth,1000)})
+        if market_type == "perp_usdt":
+            # Snap up to the next legal limit so callers get at least the
+            # depth they asked for instead of a whole-venue HTTP 400.
+            limit = next((n for n in self._FAPI_DEPTH_LIMITS if n >= depth), 1000)
+        else:
+            limit = min(depth, 1000)
+        data = self._get(self._base(market_type)+path, {"symbol":symbol, "limit":limit})
         bids = parse_book_levels(data.get("bids", []))
         asks = parse_book_levels(data.get("asks", []))
         require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
@@ -69,4 +78,7 @@ class BinanceConnector(ExchangeConnector):
             return None
         data = self._get("https://fapi.binance.com/fapi/v1/openInterest", {"symbol":symbol})
         oi=float(data["openInterest"])
-        return OpenInterestSnapshot(self.venue, market_type, symbol, now_ms(), oi, None, 0.9)
+        # The payload carries the exchange measurement time; stamping fetch
+        # time would drift under retry/backoff and break reproducibility.
+        ts = int(data.get("time") or now_ms())
+        return OpenInterestSnapshot(self.venue, market_type, symbol, ts, oi, None, 0.9)
