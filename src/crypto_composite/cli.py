@@ -6,6 +6,7 @@ from typing import Iterable
 
 from crypto_composite.artifact_csv import write_composite_ohlcv_csv
 from crypto_composite.artifact_parquet import ParquetDependencyError, write_composite_ohlcv_parquet
+from crypto_composite.stream_depth import StreamDependencyError, run_stream_depth
 from crypto_composite.artifact_quality import score_artifact_root, write_quality_score
 from crypto_composite.artifact_report import write_static_report
 from crypto_composite.sample_workflow import run_sample_report
@@ -135,6 +136,16 @@ def main() -> None:
     research_report.add_argument("--out-file", required=True, help="HTML research report file to write.")
     research_report.add_argument("--summary-file", required=True, help="Machine-readable research summary JSON file to write.")
 
+    stream_depth = sub.add_parser(
+        "stream-depth",
+        help="Watch perp book WebSocket streams and write a zone_lifecycle.json artifact (requires the [stream] extra).",
+    )
+    stream_depth.add_argument("--asset", default="BTC-USDT", help="BASE-USDT asset, for example BTC-USDT.")
+    stream_depth.add_argument("--venues", default="binance,okx,bybit", help="Comma-separated perp venues to stream.")
+    stream_depth.add_argument("--duration", type=float, default=120.0, help="Watch window in seconds.")
+    stream_depth.add_argument("--sample-interval", type=float, default=1.0, help="Lifecycle sampling interval in seconds.")
+    stream_depth.add_argument("--out-dir", default="artifacts", help="Directory for zone_lifecycle.json.")
+
     sample_report = sub.add_parser("sample-report", help="Validate sample artifacts and write offline HTML inspection files.")
     sample_report.add_argument("--artifact-root", default="examples/sample_artifacts", help="Existing artifact root to inspect.")
     sample_report.add_argument("--out-dir", default="sample-report", help="Directory for generated sample inspection HTML.")
@@ -248,6 +259,18 @@ def main() -> None:
         print(json.dumps(export_result, indent=2, sort_keys=True))
         if export_result["status"] == "ERROR":
             parser.exit(1)
+    elif args.cmd == "stream-depth":
+        try:
+            stream_result = run_stream_depth(
+                asset=args.asset,
+                venues=parse_csv(args.venues),
+                duration_s=args.duration,
+                sample_interval_s=args.sample_interval,
+                out_dir=args.out_dir,
+            )
+        except StreamDependencyError as exc:
+            parser.exit(1, f"{exc}\n")
+        print(json.dumps(stream_result, indent=2, sort_keys=True))
     elif args.cmd == "export-ohlcv-parquet":
         try:
             export_result = write_composite_ohlcv_parquet(args.artifact_root, args.out_file)
