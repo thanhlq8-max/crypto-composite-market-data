@@ -58,7 +58,7 @@ class OKXConnector(ExchangeConnector):
             supported = ",".join(sorted(_BAR))
             raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
         bar = _BAR[timeframe]
-        data = self._data(self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":limit}))
+        data = self._data(self._get(self.base+"/api/v5/market/candles", {"instId":symbol,"bar":bar,"limit":min(limit, 300)}))
         perp = market_type == "perp_usdt"
         ct_val = self._contract_value(symbol) if perp else None
         def _bar_record(x):

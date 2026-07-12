@@ -205,7 +205,7 @@ def test_kraken_connector_parses_public_payloads(monkeypatch) -> None:
     book = connector.fetch_orderbook("XBTUSDT", "spot_usdt", 10)
 
     assert bars[0].timestamp_ms == 1700000000000
-    assert bars[0].volume_quote == 210.0
+    assert bars[0].volume_quote == 208.0  # payload vwap 104 x volume 2
     assert bars[0].trade_count == 12
     assert trades[0].timestamp_ms == 1700000001250
     assert trades[0].side == "buy"

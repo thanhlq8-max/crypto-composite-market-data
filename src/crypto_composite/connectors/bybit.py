@@ -34,7 +34,7 @@ class BybitConnector(ExchangeConnector):
             supported = ",".join(sorted(_INTERVAL))
             raise UnsupportedTimeframeError(f"TIMEFRAME_UNSUPPORTED venue={self.venue} timeframe={timeframe!r} supported={supported}")
         interval = _INTERVAL[timeframe]
-        data=self._result(self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":limit})).get("list",[])
+        data=self._result(self._get(self.base+"/v5/market/kline", {"category":self._cat(market_type),"symbol":symbol,"interval":interval,"limit":min(limit, 1000)})).get("list",[])
         def _bar(x):
             ts, op, hi, lo, cl, vol = int(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])
             if min(op, hi, lo, cl) <= 0 or vol < 0:
@@ -55,7 +55,7 @@ class BybitConnector(ExchangeConnector):
         return parse_records(data, _trade)
 
     def fetch_orderbook(self, symbol, market_type, depth):
-        data=self._result(self._get(self.base+"/v5/market/orderbook", {"category":self._cat(market_type),"symbol":symbol,"limit":min(depth,500)}))
+        data=self._result(self._get(self.base+"/v5/market/orderbook", {"category":self._cat(market_type),"symbol":symbol,"limit":min(depth, 200 if self._cat(market_type) == "spot" else 500)}))
         bids = parse_book_levels(data.get("b", []))
         asks = parse_book_levels(data.get("a", []))
         require_non_empty_orderbook(venue=self.venue, market_type=market_type, symbol=symbol, bids=bids, asks=asks)
