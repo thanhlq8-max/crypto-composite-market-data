@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from crypto_composite.engines.scan import scan
+from crypto_composite.engines.scan import normalize_venues, scan
 from crypto_composite.engines.composite_ohlcv import build_composite_ohlcv, context_to_dict
 from crypto_composite.engines.composite_orderbook_ladder import build_composite_orderbook_ladder, ladders_to_dict
 from crypto_composite.utils import dataclass_to_dict, read_json, write_json
@@ -43,7 +43,9 @@ def run_composite(
     The output is data infrastructure only. It does not emit trading signals,
     orders, position sizing, or financial advice.
     """
-    venues = list(venues or DEFAULT_VENUES)
+    # Normalize once so the engines' expected-venue denominators see the same
+    # deduplicated, lowercased list the scan fetches.
+    venues = normalize_venues(list(venues or DEFAULT_VENUES))
     market_types = list(market_types or DEFAULT_MARKET_TYPES)
     timeframes = list(timeframes or DEFAULT_TIMEFRAMES)
     out = Path(out_dir)

@@ -134,6 +134,18 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
         else:
             notes.append(f"{mt}: COMPOSITE_DATA_WEAK no bars")
 
+    # A requested market_type with zero records must surface a WEAK verdict
+    # instead of vanishing from the artifact entirely.
+    for mt in raw.get("market_types") or []:
+        mt = str(mt)
+        if mt in bars_by_market:
+            continue
+        bars_by_market[mt] = []
+        latest_by_market[mt] = None
+        coverage_by_market[mt] = 0.0
+        status_by_market[mt] = "COMPOSITE_DATA_WEAK"
+        notes.append(f"{mt}: COMPOSITE_DATA_WEAK no bars")
+
     return CompositeOHLCVContext(asset, timeframe, now_ms(), expected, bars_by_market, latest_by_market, status_by_market, coverage_by_market, notes)
 
 
