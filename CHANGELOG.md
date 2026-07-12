@@ -2,6 +2,19 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
+## v0.21.0 - Depth-zone lifecycle streaming
+
+### Added
+
+- `crypto-composite stream-depth`: watches the public perp book WebSocket streams (Binance USD-M partial depth 20 @ 500ms, OKX `books5`, Bybit `orderbook.50` with snapshot/delta handling) for a bounded window and writes `zone_lifecycle.json` — per price bucket the first/last sighting, accumulated uptime, `uptime_ratio`, `refill_count` (disappear-then-reappear transitions), depth peaks/averages, and the maximum number of venues corroborating the bucket in one sample. REST snapshots could only proxy persistence; the lifecycle artifact measures it.
+- Buckets use the same price-scaled grid as the composite ladder; OKX stream sizes convert from contracts through the instrument `ctVal`, consistent with the REST connector.
+- `websockets>=12` ships as the optional `[stream]` extra; the base install keeps its `requests`-only footprint. Bounded per-venue reconnects are recorded in `notes`; silent venues degrade instead of failing the run.
+- `docs/STREAM_DEPTH.md` and an `ARTIFACT_SCHEMA.md` section document the artifact and its top-of-book coverage limits.
+
+### Boundary
+
+The lifecycle artifact describes observed public depth presence over the watch window only. It does not add trading signals, predictions, entry/exit instructions, position sizing, execution, hidden-liquidity or market-maker-intent claims, or financial advice.
+
 ## v0.20.0 - Correct venue units, verdict integrity, and request shaping
 
 ### Fixed
