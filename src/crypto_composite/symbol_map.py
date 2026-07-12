@@ -6,8 +6,8 @@ class SymbolMappingError(ValueError):
 
 
 SUPPORTED_MARKET_TYPES = {"spot_usdt", "perp_usdt"}
-SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase", "kraken"}
-PERP_VENUES = {"binance", "okx", "bybit"}
+SUPPORTED_VENUES = {"binance", "okx", "bybit", "coinbase", "kraken", "gate"}
+PERP_VENUES = {"binance", "okx", "bybit", "gate"}
 
 
 def venue_supports_market_type(venue: str, market_type: str) -> bool:
@@ -63,4 +63,8 @@ def resolve_symbol(asset: str, venue: str, market_type: str) -> str:
         return f"{base}-{quote}"
     if venue == "okx" and market_type == "perp_usdt":
         return f"{base}-{quote}-SWAP"
+    if venue == "gate":
+        # Gate.io spot currency_pair and USDT-settled futures contract share
+        # the underscore BASE_QUOTE form.
+        return f"{base}_{quote}"
     raise SymbolMappingError(f"SYMBOL_MAPPING_MISSING asset={asset} venue={venue} market_type={market_type}")

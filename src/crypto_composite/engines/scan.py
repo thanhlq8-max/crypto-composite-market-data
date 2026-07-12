@@ -8,10 +8,11 @@ from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.connectors.bybit import BybitConnector
 from crypto_composite.connectors.coinbase import CoinbaseConnector
 from crypto_composite.connectors.kraken import KrakenConnector
+from crypto_composite.connectors.gate import GateConnector
 from crypto_composite.schemas import DataQualityReport
 from crypto_composite.utils import now_ms
 
-CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector, "coinbase": CoinbaseConnector, "kraken": KrakenConnector}
+CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector, "coinbase": CoinbaseConnector, "kraken": KrakenConnector, "gate": GateConnector}
 
 
 class ScanInputError(ValueError):
