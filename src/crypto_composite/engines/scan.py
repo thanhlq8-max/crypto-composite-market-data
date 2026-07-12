@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 
-from crypto_composite.symbol_map import resolve_symbol
+from crypto_composite.symbol_map import resolve_symbol, venue_supports_market_type
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.connectors.bybit import BybitConnector
@@ -18,13 +18,27 @@ class ScanInputError(ValueError):
     pass
 
 
-def _normalize_venues(venues: list[str]) -> list[str]:
+def normalize_venues(venues: list[str]) -> list[str]:
+    """Lowercase, validate, and de-duplicate venues preserving first-seen order.
+
+    A duplicated venue used to be fetched twice: composite volume/depth
+    totals doubled while set-based venue counts halved coverage — silently.
+    """
     normalized = [v.strip().lower() for v in venues if v.strip()]
     unsupported = [v for v in normalized if v not in CONNECTORS]
     if unsupported:
         supported = ",".join(sorted(CONNECTORS))
         raise ScanInputError(f"VENUE_UNSUPPORTED venues={unsupported!r} supported={supported}")
-    return normalized
+    return list(dict.fromkeys(normalized))
+
+
+def _fetch_optional(fetch, symbol: str, mt: str):
+    """Funding/OI are enrichment: a failure degrades to missing, never to a
+    market_type error — the already-fetched bars/trades/book stay valid."""
+    try:
+        return fetch(symbol, mt)
+    except Exception:
+        return None
 
 
 def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str, limit: int, depth: int) -> dict:
@@ -34,7 +48,14 @@ def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str,
     errors: list[dict] = []
     missing: list[str] = []
     venue_had_ok = False
+    supported_any = False
     for mt in market_types:
+        # Structural incapability (spot-only venue asked for perp) is not a
+        # failure: record it as missing and keep the venue out of venues_failed.
+        if not venue_supports_market_type(venue, mt):
+            missing.append(f"{venue}:{mt}:unsupported_market_type")
+            continue
+        supported_any = True
         try:
             symbol = resolve_symbol(asset, venue, mt)
             bars = conn.fetch_ohlcv(symbol, mt, timeframe, limit)
@@ -43,9 +64,16 @@ def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str,
             data["ohlcv"].extend(bars)
             data["trades"].extend(trades)
             data["orderbooks"].append(book)
+            # An endpoint that answers with zero parseable records must be
+            # visible in the quality artifact, not silently "ok".
+            if not bars:
+                missing.append(f"{venue}:{mt}:ohlcv_empty")
+            if not trades:
+                missing.append(f"{venue}:{mt}:trades_empty")
+            venue_had_ok = True
             if mt == "perp_usdt":
-                f = conn.fetch_funding(symbol, mt)
-                oi = conn.fetch_open_interest(symbol, mt)
+                f = _fetch_optional(conn.fetch_funding, symbol, mt)
+                oi = _fetch_optional(conn.fetch_open_interest, symbol, mt)
                 if f:
                     data["funding"].append(f)
                 else:
@@ -54,14 +82,20 @@ def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str,
                     data["open_interest"].append(oi)
                 else:
                     missing.append(f"{venue}:{mt}:open_interest")
-            venue_had_ok = True
         except Exception as exc:
             errors.append({"venue": venue, "market_type": mt, "error": str(exc)})
-    return {"venue": venue, "data": data, "errors": errors, "missing": missing, "ok": venue_had_ok}
+    return {
+        "venue": venue,
+        "data": data,
+        "errors": errors,
+        "missing": missing,
+        "ok": venue_had_ok,
+        "supported": supported_any,
+    }
 
 
 def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str, limit: int, depth: int = 100) -> dict:
-    venues = _normalize_venues(venues)
+    venues = normalize_venues(venues)
     out = {"asset": asset, "generated_at_ms": now_ms(), "phase": "PHASE_1_DATA_FOUNDATION",
            "venues": venues, "timeframe": timeframe, "market_types": market_types,
            "data": {"ohlcv": [], "trades": [], "orderbooks": [], "funding": [], "open_interest": []},
@@ -85,8 +119,10 @@ def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str,
         missing.extend(res["missing"])
         if res["ok"]:
             venues_ok.add(res["venue"])
-        else:
+        elif res["supported"]:
             venues_failed.add(res["venue"])
+        # A venue with no supported market_type in this run belongs in
+        # neither list; its missing entries already record why.
     qualities = []
     for records in out["data"].values():
         for r in records:

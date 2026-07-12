@@ -40,6 +40,15 @@ Same coverage gates, no dispersion term:
 | `COMPOSITE_BOOK_PARTIAL` | >= 0.34  |
 | `COMPOSITE_BOOK_WEAK`    | < 0.34   |
 
+## Scan-level status note
+
+`engines.scan` also emits a coarse scan status gated on venue count and
+`overall_quality >= 0.65 / 0.40`. Because `overall_quality` averages the
+per-venue heuristic constants (all >= 0.78, see DATA_QUALITY_CONSTANTS.md),
+the quality half of that gate cannot bind while any record parses — scan
+status is effectively decided by how many venues responded. Recorded here so
+future threshold tuning does not assume the quality gate is active.
+
 ## Boundaries
 
 - Status describes **data corroboration only** — how many capable venues
