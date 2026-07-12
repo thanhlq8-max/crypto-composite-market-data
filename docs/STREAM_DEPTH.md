@@ -24,6 +24,24 @@ book once per `--sample-interval` (default 1s) into the same price-scaled
 bucket grid the composite ladder uses. OKX sizes convert from contracts
 through the instrument `ctVal`, exactly like the REST connector.
 
+## Multi-asset and long runs
+
+Stream several assets in parallel and (re)write partial artifacts on a fixed
+cadence so a long run is not lost if interrupted:
+
+```bash
+crypto-composite stream-depth   --assets BTC-USDT,ETH-USDT,SOL-USDT   --duration 3600   --flush-interval 300   --out-dir artifacts
+```
+
+- One asset writes `zone_lifecycle.json` (unchanged). Multiple assets write
+  `zone_lifecycle_{ASSET}.json` each.
+- `--flush-interval N` rewrites every asset's artifact every N seconds during
+  the run; without it artifacts are written once at the end.
+- Long-run memory is bounded per asset: buckets absent longer than 10 minutes
+  are dropped, and the total bucket count is capped (oldest currently-absent
+  dropped first). Pruning is recorded in the artifact `notes`; a pruned bucket
+  that reappears is counted fresh.
+
 ## Output
 
 `zone_lifecycle.json` (see `ARTIFACT_SCHEMA.md`): per bucket the first/last

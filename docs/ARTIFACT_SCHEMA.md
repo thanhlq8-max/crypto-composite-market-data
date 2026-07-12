@@ -90,8 +90,9 @@ The validator follows each successful `asset_results[*].artifact_dir` and valida
 
 ## Zone lifecycle file (optional, stream-generated)
 
-`zone_lifecycle.json` is written by `crypto-composite stream-depth` (requires
-the `[stream]` extra) and is independent of the scan pipeline:
+`zone_lifecycle.json` (single asset) or `zone_lifecycle_{ASSET}.json` (multi
+asset) is written by `crypto-composite stream-depth` (requires the `[stream]`
+extra) and is independent of the scan pipeline:
 
 - `asset`, `market_type` (always `perp_usdt`), `venues`;
 - `started_at_ms`, `window_ms`, `duration_s`, `samples`, `frames_per_venue`;

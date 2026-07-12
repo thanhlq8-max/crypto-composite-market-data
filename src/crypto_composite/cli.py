@@ -141,10 +141,12 @@ def main() -> None:
         help="Watch perp book WebSocket streams and write a zone_lifecycle.json artifact (requires the [stream] extra).",
     )
     stream_depth.add_argument("--asset", default="BTC-USDT", help="BASE-USDT asset, for example BTC-USDT.")
+    stream_depth.add_argument("--assets", help="Comma-separated BASE-USDT assets to stream in parallel (overrides --asset).")
     stream_depth.add_argument("--venues", default="binance,okx,bybit", help="Comma-separated perp venues to stream.")
     stream_depth.add_argument("--duration", type=float, default=120.0, help="Watch window in seconds.")
     stream_depth.add_argument("--sample-interval", type=float, default=1.0, help="Lifecycle sampling interval in seconds.")
-    stream_depth.add_argument("--out-dir", default="artifacts", help="Directory for zone_lifecycle.json.")
+    stream_depth.add_argument("--flush-interval", type=float, default=None, help="Write partial artifacts every N seconds during a long run.")
+    stream_depth.add_argument("--out-dir", default="artifacts", help="Directory for zone_lifecycle artifacts.")
 
     sample_report = sub.add_parser("sample-report", help="Validate sample artifacts and write offline HTML inspection files.")
     sample_report.add_argument("--artifact-root", default="examples/sample_artifacts", help="Existing artifact root to inspect.")
@@ -263,9 +265,11 @@ def main() -> None:
         try:
             stream_result = run_stream_depth(
                 asset=args.asset,
+                assets=parse_csv(args.assets) if args.assets else None,
                 venues=parse_csv(args.venues),
                 duration_s=args.duration,
                 sample_interval_s=args.sample_interval,
+                flush_interval_s=args.flush_interval,
                 out_dir=args.out_dir,
             )
         except StreamDependencyError as exc:
