@@ -2,6 +2,27 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
+## v0.20.0 - Correct venue units, verdict integrity, and request shaping
+
+### Fixed
+
+- **OKX derivative units**: OKX SWAP endpoints report candle volume, trade sizes, book sizes, and open interest in contracts, not base currency (live-verified: vol/volCcy ratio exactly 1/ctVal). OKX perpetual depth, trades, OI, and bar base volume were inflated ~100x for BTC-scale contracts and dominated perp depth zones. Sizes now convert through the instrument `ctVal` (fetched once per symbol and cached); candle base volume reads `volCcy`; open interest prefers `oiCcy`. Candle quote volume was already correct via `volCcyQuote`.
+- OKX `code != 0` and Bybit `retCode != 0` business errors (HTTP 200 body) now raise `OKX_API_ERROR` / `BYBIT_API_ERROR` with the venue code and message instead of being silently parsed as empty payloads and misreported as `EMPTY_ORDERBOOK`.
+- Default ladder bucket width scales with the reference price (~0.025%, one significant digit) instead of a fixed 25-USD floor that collapsed the whole ladder band into one bucket for anything below BTC-scale prices; bucket edges round to 10 decimals so sub-dollar grids cannot produce float-noise persistence keys.
+- Scan verdict integrity: spot-only venues asked for perp are recorded as `unsupported_market_type` (not failures); a funding/open-interest failure degrades to a missing entry instead of discrediting the already-fetched market data; a requested market type with zero bars surfaces a `COMPOSITE_DATA_WEAK` verdict instead of vanishing; venue lists deduplicate (a duplicated venue doubled composite volumes while halving coverage); endpoints answering with zero parseable records are recorded (`ohlcv_empty` / `trades_empty`).
+- Kraken quote volume uses the payload's per-bar `vwap` instead of the close-price approximation; Binance open-interest snapshots carry the exchange `time` instead of local fetch time.
+- Request parameters clamp to venue-legal values: Binance futures depth snaps up to the next legal limit (`{5,10,20,50,100,500,1000}`), Binance klines cap at 1000, Bybit spot orderbook at 200 (linear 500), OKX candles at 300 — previously legal-looking `--depth`/`--limit` values failed whole venue blocks with misleading errors.
+
+### Added
+
+- Per-venue token-bucket rate limiting (default 5 req/s, burst 10, shared across connector instances of a venue; `CRYPTO_COMPOSITE_RATE_LIMIT_PER_SEC` overrides, `0` disables). See `docs/RATE_LIMIT_AND_CACHE.md`.
+- Opt-in TTL response cache for repeated-scan loops (`CRYPTO_COMPOSITE_CACHE_TTL_S` or `cache_ttl_s=`); disabled by default so the tool never silently serves stale market data.
+- `docs/DUCKDB_EXAMPLES.md`: verified DuckDB and pandas queries over the CSV/Parquet exports and JSON artifacts.
+
+### Boundary
+
+This release remains public-data infrastructure. It does not add trading signals, predictions, entry/exit instructions, position sizing, execution, hidden-liquidity claims, or financial advice.
+
 ## v0.19.0 - Audit fixes, hardening, and the price zone map
 
 ### Fixed
