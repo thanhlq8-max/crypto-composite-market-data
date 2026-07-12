@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from typing import Any
 
@@ -47,6 +48,24 @@ def _level_from_bucket(side: str, price_low: float, bucket_size: float, venue_de
     )
 
 
+LEGACY_BUCKET_SIZE = 25.0
+BUCKET_REFERENCE_FRACTION = 0.00025
+
+
+def _default_bucket_size(reference_price: float) -> float:
+    """Bucket width ~0.025% of the reference price, rounded to one significant digit.
+
+    The former fixed 25-USD floor assumed BTC-scale prices: at SOL-scale
+    references (~76 USD) the whole +/-2.5% ladder band collapsed into a single
+    [75, 100] bucket, making per-asset depth zones meaningless (BUG_MEMORY B6).
+    """
+    if reference_price <= 0:
+        return LEGACY_BUCKET_SIZE
+    raw = reference_price * BUCKET_REFERENCE_FRACTION
+    step = 10.0 ** math.floor(math.log10(raw))
+    return max(round(raw / step) * step, step)
+
+
 def _previous_lookup(previous_ladder: dict | None, market_type: str) -> dict[tuple[str, float], dict]:
     if not previous_ladder:
         return {}
@@ -73,7 +92,7 @@ def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = 
         expected_for_mt = [v for v in expected if venue_supports_market_type(v, mt)]
         expected_n = max(len(expected_for_mt), 1)
         ref = float(reference_price or (sum(b.mid for b in xs) / max(len(xs), 1) if xs else 0.0))
-        bsize = float(bucket_size or max(25.0, round(ref * 0.00025 / 5.0) * 5.0 if ref else 25.0))
+        bsize = float(bucket_size or _default_bucket_size(ref))
         buckets: dict[tuple[str, float], dict[str, float]] = defaultdict(lambda: defaultdict(float))
         venue_set = set()
         for book in xs:
@@ -87,7 +106,10 @@ def build_composite_orderbook_ladder(raw: dict, reference_price: float | None = 
                     # Keep actionable near-book area; far levels remain raw connector data, not ladder context.
                     if ref > 0 and abs(px - ref) / ref > 0.025:
                         continue
-                    low = (px // bsize) * bsize
+                    # Round the bucket edge: sub-dollar bucket widths otherwise
+                    # produce float-noise keys (76.4400000000001) that break
+                    # persistence lookups between runs.
+                    low = round((px // bsize) * bsize, 10)
                     buckets[(side_name, low)][book.venue] += px * qty
         max_depth = max((sum(v.values()) for v in buckets.values()), default=1.0)
         prev_lookup = _previous_lookup(previous_ladder, mt)
