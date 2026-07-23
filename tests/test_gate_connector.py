@@ -128,6 +128,24 @@ def test_gate_perp_orderbook_skips_malformed_levels(monkeypatch) -> None:
     assert book.best_bid == 63860.6 and book.best_ask == 63870.0
 
 
+def test_gate_spot_orderbook_skips_malformed_levels(monkeypatch) -> None:
+    # Spot book is list-shaped and already goes through parse_book_levels; lock
+    # the invariant in alongside the perp (dict-shaped) case so both Gate book
+    # paths are covered.
+    connector = _gate(monkeypatch, {
+        "spot/order_book": {
+            "current": 1783852182004,
+            "bids": [["63886", "0.5"], ["boom", "1.0"], ["63885", "0.3"]],
+            "asks": [["63888", "0.4"]],
+        },
+    })
+
+    book = connector.fetch_orderbook("BTC_USDT", "spot_usdt", 5)
+
+    assert [price for price, _ in book.bids] == [63886.0, 63885.0]
+    assert book.best_bid == 63886.0 and book.best_ask == 63888.0
+
+
 def test_gate_perp_open_interest_scaled(monkeypatch) -> None:
     connector = _gate(monkeypatch, {
         "contracts/BTC_USDT": {"quanto_multiplier": str(MULT)},
