@@ -17,7 +17,7 @@ def quote_volume(price: float, base_volume: float) -> float:
     return price * base_volume
 
 def dataclass_to_dict(obj: Any) -> Any:
-    if is_dataclass(obj):
+    if is_dataclass(obj) and not isinstance(obj, type):
         return asdict(obj)
     if isinstance(obj, list):
         return [dataclass_to_dict(x) for x in obj]

@@ -64,5 +64,17 @@ where = ["src"]
 [tool.ruff]
 target-version = "py310"
 
+[tool.mypy]
+python_version = "3.10"
+files = ["src/crypto_composite"]
+# Baseline type checking: default (non-strict) mypy over the package source. It
+# already catches real defects (heterogeneous-dict misuse, Optional min/max).
+# Tightening toward strict is a later, separate step.
+
+[[tool.mypy.overrides]]
+# pyarrow ships no type stubs or py.typed marker; it is an optional [parquet] extra.
+module = ["pyarrow.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

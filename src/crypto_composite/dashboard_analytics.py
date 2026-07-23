@@ -139,7 +139,8 @@ def _lfx_zone_review(zone: dict[str, Any]) -> dict[str, Any]:
     role, role_label, refresh_check = _lfx_zone_role(zone.get("kind"))
     relation = zone.get("reference_relation")
     distance = _finite_number(zone.get("distance_to_reference_pct"))
-    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    evidence_grade = zone.get("evidence_grade")
+    grade = evidence_grade if isinstance(evidence_grade, str) else "LIMITED"
     return {
         "status": "PUBLIC_ARTIFACT_REVIEW_ONLY",
         "role": role,
@@ -263,9 +264,9 @@ def _swing_points(bars: list[dict[str, Any]], k: int = _SWING_WINDOW) -> list[di
         highs = [_finite_number(bar.get("high")) for bar in window]
         lows = [_finite_number(bar.get("low")) for bar in window]
         ts = bars[i].get("timestamp_ms")
-        if all(value is not None for value in highs) and highs[k] == max(highs):
+        if all(value is not None for value in highs) and highs[k] == max(v for v in highs if v is not None):
             points.append({"price": highs[k], "timestamp_ms": ts, "kind": "swing_high"})
-        if all(value is not None for value in lows) and lows[k] == min(lows):
+        if all(value is not None for value in lows) and lows[k] == min(v for v in lows if v is not None):
             points.append({"price": lows[k], "timestamp_ms": ts, "kind": "swing_low"})
     return points
 
@@ -437,10 +438,10 @@ def _price_zone_map(
     if (reference is None or reference <= 0) and latest is not None:
         reference = _finite_number(latest.get("close"))
     closed = _closed_bars(bars)
-    window_lows = [_finite_number(bar.get("low")) for bar in closed]
-    window_highs = [_finite_number(bar.get("high")) for bar in closed]
-    window_lows = [value for value in window_lows if value is not None]
-    window_highs = [value for value in window_highs if value is not None]
+    window_lows_raw = [_finite_number(bar.get("low")) for bar in closed]
+    window_highs_raw = [_finite_number(bar.get("high")) for bar in closed]
+    window_lows = [value for value in window_lows_raw if value is not None]
+    window_highs = [value for value in window_highs_raw if value is not None]
     reaction = _reaction_zones(bars, reference)
     delta = _previous_closed_bar_delta(bars)
     return {
@@ -508,7 +509,8 @@ def _zone_focus_text(zone: dict[str, Any] | None, label: str) -> str | None:
         return None
     distance = _finite_number(zone.get("distance_to_reference_pct"))
     distance_text = f"{distance:.3f}% " if distance is not None else ""
-    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    evidence_grade = zone.get("evidence_grade")
+    grade = evidence_grade if isinstance(evidence_grade, str) else "LIMITED"
     return f"{label} {distance_text}{_relation_text(zone.get('reference_relation'))} ({grade})."
 
 
@@ -534,9 +536,9 @@ def _zone_readout(zones: list[dict[str, Any]], monitoring_brief: dict[str, Any])
             _zone_focus_text(now.get("nearest_bid_concentration"), "Nearest bid concentration"),
             _zone_focus_text(now.get("nearest_ask_concentration"), "Nearest ask concentration"),
         ]
-        focus = [item for item in focus if item]
-        if focus:
-            detail = " ".join(focus)
+        focus_texts = [item for item in focus if item]
+        if focus_texts:
+            detail = " ".join(focus_texts)
         else:
             detail = "Observed zones exist, but no nearest bid/ask concentration range has enough context."
         if limited:
@@ -587,7 +589,8 @@ def _zone_range_text(zone: dict[str, Any] | None) -> str:
         if distance is not None
         else "distance unavailable"
     )
-    grade = zone.get("evidence_grade") if isinstance(zone.get("evidence_grade"), str) else "LIMITED"
+    evidence_grade = zone.get("evidence_grade")
+    grade = evidence_grade if isinstance(evidence_grade, str) else "LIMITED"
     return f"{price_text}; {distance_text}; {grade}"
 
 

@@ -7,6 +7,7 @@ All notable changes to this project. Release notes were previously kept as per-v
 ### Added
 
 - `scripts/live_smoke.py` gains `--evidence-out DIR`, which writes a dated `live_verification_<UTC>.json`/`.md` record of what a live run observed (per venue × market_type endpoint reachability and observed detail), giving the E3-mocked → E3+live connector promotion a committable artifact. The OHLCV check also asserts a `quote/(base*close)` unit-scale ratio near 1, so a contract-unit regression (perp size left in contracts — the historical OKX/Gate class of bug) fails the live check instead of silently reaching artifacts.
+- Static type checking: CI now runs `mypy` over `src/crypto_composite` with a non-strict `[tool.mypy]` baseline (`mypy` and `types-requests` added as dev dependencies; `pyarrow` — an optional extra without stubs — is ignored). The baseline surfaced and fixed real defects: heterogeneous-dict values in the scan engine were typed `object` (so `.extend`/indexing were unchecked), and several dashboard-analytics `min`/`max`/`join` sites operated over `float | None`. All fixes are annotation- or guard-only with no behavior change.
 
 ### Fixed
 
