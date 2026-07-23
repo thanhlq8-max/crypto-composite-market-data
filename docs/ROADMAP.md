@@ -188,9 +188,15 @@ execution, or financial advice.
 - Follow-ups: schematize the combined `composite_ohlcv.json` /
   `composite_orderbook_ladder.json` (timeframe-nested) and `zone_lifecycle*.json`.
 
-### v1.0.0 — Stable public data-infrastructure release
+### v1.0.0 — Stable public data-infrastructure release — in release
 
-- Frozen artifact schema, documented `data_quality` basis, live-verified connectors.
+- Version bumped to `1.0.0`; artifact schema contract is additive-only from here
+  (`docs/SCHEMA_STABILITY.md`); `data_quality` basis documented.
+- Connectors validated by the mocked test suite; the live-verification harness
+  (`scripts/live_smoke.py --evidence-out`) records dated live evidence out of band
+  (still pending a committed network run).
 - Reproducible sample and GitHub Pages demo verified per release.
 - Semantic-version guarantees; new venues and exports remain additive behind the
   same no-trading-semantics boundary.
+- Publish order: TestPyPI → PyPI (manual `workflow_dispatch`), then tag + release
+  (`docs/RELEASE_CHECKLIST.md`).

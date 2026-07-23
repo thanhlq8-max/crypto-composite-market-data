@@ -2,7 +2,20 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
-## Unreleased
+## v1.0.0
+
+Release date: 2026-07-23.
+
+First stable release. The public API, CLI, and artifact contract are now covered
+by semantic-version guarantees, and artifact fields are additive-only from here
+on (see `docs/SCHEMA_STABILITY.md`). This release consolidates the v0.23–v0.26
+hardening arc: order-book record-isolation across every venue, a live-verification
+evidence harness, a `mypy` type-check baseline in CI, and a committed JSON Schema
+contract for the core artifacts. Public exchange connectors remain validated by a
+mocked test suite; the live-verification harness (`scripts/live_smoke.py`) is the
+supported path to recording dated live evidence. The base install stays
+`requests`-only — Parquet, streaming, and JSON Schema validation are optional
+extras. No trading-semantics behavior is added.
 
 ### Added
 

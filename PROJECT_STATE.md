@@ -28,7 +28,7 @@ Public multi-exchange crypto market-data composite toolkit: normalized OHLCV / t
 
 ## CURRENT_STATE (2026-07-23)
 
-- Version 0.22.0 on `main` (#83, #85, #86 merged: Gate perp book fix, order-book record-isolation for every venue, live-verify evidence harness, mypy CI baseline). Branch `feat/v0.26-json-schema-contract` adds the committed JSON Schema artifact contract on top.
+- Releasing 1.0.0: branch `release/v1.0.0` bumps `pyproject.toml` + `__init__.__version__` to 1.0.0, sets the Production/Stable classifier, and consolidates the CHANGELOG. `main` at this point has #83, #85, #86, #87 merged (Gate perp book fix, order-book record-isolation for every venue, live-verify evidence harness, mypy CI baseline, committed JSON Schema contract). Publish is manual (`workflow_dispatch`): TestPyPI → PyPI, then tag + release per `docs/RELEASE_CHECKLIST.md`.
 - Since the 0.18.2 snapshot this file used to describe, v0.19.0–v0.22.0 shipped: B1–B4 fixes, OKX/Gate contract-unit corrections, coverage/closed-bar verdict integrity, per-venue token-bucket rate limiting + opt-in cache, WebSocket depth-lifecycle streaming, the Gate.io venue, CSV/Parquet export, and the `data_quality` constants traceability doc.
 - Tests: 229 passed, 5 skipped locally (pytest, full dev env). CI: 3.10–3.13 matrix, ruff + mypy + compileall + pytest + build.
 - Artifact contract now has committed JSON Schemas (`crypto_composite.artifact_schemas`), `validate-artifacts --json-schema` via the optional `[schema]` extra, a CI conformance test, and `docs/SCHEMA_STABILITY.md`.

@@ -53,8 +53,12 @@ requires, in order: release notes calling it out, an explicit artifact
 `schema_version` strategy (artifacts do not carry one today), and a major-version
 bump. Until then, no such change ships.
 
-## Pre-1.0 note
+## Effective from 1.0
 
-Before 1.0 the schemas track the current artifacts and may still gain required
-fields as gaps are closed; each such change is called out in the changelog. The
-additive-only guarantee becomes binding at 1.0.
+The additive-only guarantee is in effect as of v1.0.0. On the schematized
+artifacts, required fields will not be renamed or removed and existing field
+types will not change without a major-version bump and the process above. Adding
+a new *required* field to an existing artifact is a breaking change under this
+policy; adding a new *optional* field is not. Artifacts that are not yet
+schematized (the combined timeframe-nested files and `zone_lifecycle*.json`) are
+still described by prose in `ARTIFACT_SCHEMA.md` and may gain schemas additively.

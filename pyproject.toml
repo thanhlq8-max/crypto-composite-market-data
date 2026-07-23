@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crypto-composite-market-data"
-version = "0.22.0"
+version = "1.0.0"
 description = "Public multi-exchange crypto market-data composite toolkit."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,7 +23,7 @@ keywords = [
   "data-engineering"
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
