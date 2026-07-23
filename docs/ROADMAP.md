@@ -179,8 +179,14 @@ execution, or financial advice.
 ### v0.26 — Formal artifact schema and stability policy
 
 - Turn the `docs/ARTIFACT_SCHEMA.md` contract into committed JSON Schema files and
-  validate generated artifacts against them (as the sibling projects do).
-- Publish a schema-stability statement: additive-only artifact fields at 1.0.
+  validate generated artifacts against them — **delivered**: Draft 2020-12 schemas
+  for the core artifacts under `crypto_composite.artifact_schemas`,
+  `validate-artifacts --json-schema` (optional `[schema]` extra), and a CI
+  conformance test over the committed sample artifacts.
+- Publish a schema-stability statement: additive-only artifact fields at 1.0 —
+  **delivered** (`docs/SCHEMA_STABILITY.md`).
+- Follow-ups: schematize the combined `composite_ohlcv.json` /
+  `composite_orderbook_ladder.json` (timeframe-nested) and `zone_lifecycle*.json`.
 
 ### v1.0.0 — Stable public data-infrastructure release
 

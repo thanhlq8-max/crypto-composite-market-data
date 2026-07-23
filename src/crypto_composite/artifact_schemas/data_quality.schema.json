@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thanhlq8-max/crypto-composite-market-data/schemas/data_quality.schema.json",
+  "title": "Data-quality report map (per timeframe)",
+  "description": "Contract for a data_quality.json artifact: an object keyed by timeframe, each value a scan-quality report. Additional object fields are allowed (the contract is additive).",
+  "type": "object",
+  "minProperties": 1,
+  "additionalProperties": {"$ref": "#/$defs/report"},
+  "$defs": {
+    "report": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "asset",
+        "venues_requested",
+        "venues_ok",
+        "venues_failed",
+        "market_types",
+        "timeframe",
+        "missing_sources",
+        "overall_quality",
+        "status"
+      ],
+      "properties": {
+        "asset": {"type": "string"},
+        "venues_requested": {"type": "array", "items": {"type": "string"}},
+        "venues_ok": {"type": "array", "items": {"type": "string"}},
+        "venues_failed": {"type": "array", "items": {"type": "string"}},
+        "market_types": {"type": "array", "items": {"type": "string"}},
+        "timeframe": {"type": "string"},
+        "missing_sources": {"type": "array", "items": {"type": "string"}},
+        "overall_quality": {"type": "number"},
+        "status": {"type": "string"},
+        "note": {"type": "string"}
+      }
+    }
+  }
+}

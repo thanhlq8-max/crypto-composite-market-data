@@ -11,6 +11,10 @@ from crypto_composite.artifact_quality import score_artifact_root, write_quality
 from crypto_composite.artifact_report import write_static_report
 from crypto_composite.sample_workflow import run_sample_report
 from crypto_composite.artifact_validator import validate_artifact_root
+from crypto_composite.schema_validation import (
+    SchemaValidationUnavailable,
+    validate_artifact_root as validate_artifact_root_json_schema,
+)
 from crypto_composite.dashboard import (
     DEFAULT_DASHBOARD_HOST,
     DEFAULT_DASHBOARD_PORT,
@@ -111,6 +115,11 @@ def main() -> None:
 
     validate = sub.add_parser("validate-artifacts", help="Validate generated JSON artifact structure.")
     validate.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
+    validate.add_argument(
+        "--json-schema",
+        action="store_true",
+        help="Also validate artifacts against the committed JSON Schema contract (needs the [schema] extra).",
+    )
 
     score = sub.add_parser("score-artifacts", help="Score generated artifact data quality.")
     score.add_argument("--artifact-root", required=True, help="Directory containing generated JSON artifacts.")
@@ -248,8 +257,16 @@ def main() -> None:
             parser.exit(1)
     elif args.cmd == "validate-artifacts":
         validation = validate_artifact_root(args.artifact_root)
+        schema_failed = False
+        if args.json_schema:
+            try:
+                validation["json_schema"] = validate_artifact_root_json_schema(args.artifact_root)
+                schema_failed = validation["json_schema"]["status"] == "ERROR"
+            except SchemaValidationUnavailable as exc:
+                validation["json_schema"] = {"status": "UNAVAILABLE", "detail": str(exc)}
+                schema_failed = True
         print(json.dumps(validation, indent=2, sort_keys=True))
-        if validation["status"] == "ERROR":
+        if validation["status"] == "ERROR" or schema_failed:
             parser.exit(1)
     elif args.cmd == "score-artifacts":
         quality = write_quality_score(args.artifact_root) if args.write else score_artifact_root(args.artifact_root)

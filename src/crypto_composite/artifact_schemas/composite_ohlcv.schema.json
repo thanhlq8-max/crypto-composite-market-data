@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thanhlq8-max/crypto-composite-market-data/schemas/composite_ohlcv.schema.json",
+  "title": "Composite OHLCV context (per timeframe)",
+  "description": "Contract for a composite_ohlcv_<timeframe>.json artifact, and for each timeframe-keyed value of the combined composite_ohlcv.json. Additional object fields are allowed (the contract is additive); required fields must not be renamed or dropped.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "asset",
+    "timeframe",
+    "generated_at_ms",
+    "expected_venues",
+    "bars_by_market_type",
+    "latest_by_market_type",
+    "status_by_market_type",
+    "coverage_by_market_type",
+    "notes"
+  ],
+  "properties": {
+    "asset": {"type": "string"},
+    "timeframe": {"type": "string"},
+    "generated_at_ms": {"type": "integer"},
+    "expected_venues": {"type": "array", "items": {"type": "string"}},
+    "bars_by_market_type": {
+      "type": "object",
+      "additionalProperties": {"type": "array", "items": {"$ref": "#/$defs/bar"}}
+    },
+    "latest_by_market_type": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [{"$ref": "#/$defs/bar"}, {"type": "null"}]
+      }
+    },
+    "status_by_market_type": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "coverage_by_market_type": {
+      "type": "object",
+      "additionalProperties": {"type": "number"}
+    },
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "bar": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "asset",
+        "timeframe",
+        "market_type",
+        "timestamp_ms",
+        "open",
+        "high",
+        "low",
+        "close",
+        "median_close",
+        "vwap_close",
+        "volume_base_total",
+        "volume_quote_total",
+        "venue_count",
+        "venue_weights",
+        "coverage",
+        "price_dispersion_pct",
+        "data_quality"
+      ],
+      "properties": {
+        "asset": {"type": "string"},
+        "timeframe": {"type": "string"},
+        "market_type": {"type": "string"},
+        "timestamp_ms": {"type": "integer"},
+        "open": {"type": "number"},
+        "high": {"type": "number"},
+        "low": {"type": "number"},
+        "close": {"type": "number"},
+        "median_close": {"type": "number"},
+        "vwap_close": {"type": "number"},
+        "volume_base_total": {"type": "number"},
+        "volume_quote_total": {"type": "number"},
+        "venue_count": {"type": "integer"},
+        "venue_weights": {"type": "object", "additionalProperties": {"type": "number"}},
+        "coverage": {"type": "number"},
+        "price_dispersion_pct": {"type": "number"},
+        "data_quality": {"type": "number"}
+      }
+    }
+  }
+}

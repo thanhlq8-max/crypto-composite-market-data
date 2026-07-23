@@ -1,8 +1,13 @@
 # Artifact contract
 
-This document describes the artifact contract emitted by package version `0.11.1`.
+This document is the prose description of the artifact contract. Its
+machine-readable, testable form is the set of committed JSON Schema files in
+`src/crypto_composite/artifact_schemas/`; the stability policy for both is
+[`SCHEMA_STABILITY.md`](SCHEMA_STABILITY.md).
 
-Artifacts do not currently contain a `schema_version` field. Consumers should use the installed package version as the compatibility reference and run `validate-artifacts` before consuming a directory.
+Artifacts do not currently contain a `schema_version` field. Consumers should use
+the installed package version as the compatibility reference and run
+`validate-artifacts` before consuming a directory.
 
 ## Validate before use
 
@@ -11,6 +16,14 @@ crypto-composite validate-artifacts --artifact-root artifacts-universe
 ```
 
 The validator checks required files, JSON syntax, required top-level fields, timeframe coverage, raw-scan data groups when a raw scan is present, and universe asset-directory references. Missing required fields are reported in each error's `missing_fields` list. It does not certify market accuracy or interpret artifacts as trading signals.
+
+For strict structural validation against the committed JSON Schemas, install the
+optional `[schema]` extra and add `--json-schema`:
+
+```bash
+pip install "crypto-composite-market-data[schema]"
+crypto-composite validate-artifacts --artifact-root artifacts-universe --json-schema
+```
 
 ## Single-asset directory
 

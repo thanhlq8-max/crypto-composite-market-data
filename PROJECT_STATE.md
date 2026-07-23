@@ -28,9 +28,10 @@ Public multi-exchange crypto market-data composite toolkit: normalized OHLCV / t
 
 ## CURRENT_STATE (2026-07-23)
 
-- Version 0.22.0 on `main` (#83, #85 merged: Gate perp book fix, order-book record-isolation for every venue, live-verify evidence harness). Branch `chore/v0.25-type-style-baseline` adds the mypy CI baseline on top.
+- Version 0.22.0 on `main` (#83, #85, #86 merged: Gate perp book fix, order-book record-isolation for every venue, live-verify evidence harness, mypy CI baseline). Branch `feat/v0.26-json-schema-contract` adds the committed JSON Schema artifact contract on top.
 - Since the 0.18.2 snapshot this file used to describe, v0.19.0–v0.22.0 shipped: B1–B4 fixes, OKX/Gate contract-unit corrections, coverage/closed-bar verdict integrity, per-venue token-bucket rate limiting + opt-in cache, WebSocket depth-lifecycle streaming, the Gate.io venue, CSV/Parquet export, and the `data_quality` constants traceability doc.
-- Tests: 207 passed locally (pytest, full dev env). CI: 3.10–3.13 matrix, ruff + mypy + compileall + pytest + build.
+- Tests: 229 passed, 5 skipped locally (pytest, full dev env). CI: 3.10–3.13 matrix, ruff + mypy + compileall + pytest + build.
+- Artifact contract now has committed JSON Schemas (`crypto_composite.artifact_schemas`), `validate-artifacts --json-schema` via the optional `[schema]` extra, a CI conformance test, and `docs/SCHEMA_STABILITY.md`.
 - `requires-python >= 3.10` (validated by full suite on 3.10).
 
 ## EVIDENCE_LEVELS
@@ -49,9 +50,9 @@ Python 3.10+, public exchange REST APIs (Binance/OKX/Bybit/Coinbase/Kraken), dat
 ## NEXT_ALLOWED_WORK
 
 - Run `scripts/live_smoke.py --evidence-out docs/live-verification` on a network host and commit the dated record to complete the E3→live connector promotion (harness + unit-scale check now in place).
-- v0.26: turn `docs/ARTIFACT_SCHEMA.md` into committed JSON Schema files with validation, and publish a schema-stability statement.
+- Schematize the remaining artifacts: the combined `composite_ohlcv.json` / `composite_orderbook_ladder.json` (timeframe-nested) and `zone_lifecycle*.json`.
 - Tighten the mypy baseline toward `--strict` incrementally (per module) now that a clean baseline is enforced.
-- See `docs/ROADMAP.md` (v0.23 → v1.0) for the release-facing plan.
+- v1.0.0: freeze schemas, confirm live-verified connectors, semver guarantees. See `docs/ROADMAP.md`.
 
 ## NEXT_FORBIDDEN_WORK
 
