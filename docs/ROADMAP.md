@@ -139,3 +139,42 @@ Goal: grow the project as a credible open-source data-infrastructure utility.
 - Add DID / DOING / NEXT MONITOR / KEY LEVELS / RISK CONTEXT to the static report.
 - Derive the briefing only from existing composite OHLCV and public ladder artifacts.
 - Keep the report monitor-only with no execution guidance or prediction.
+
+## v0.23 → v1.0 — Stabilization and first stable release
+
+After the v0.16–v0.22 feature track (venue expansion through Gate.io, WebSocket
+depth-lifecycle streaming, CSV/Parquet export, dashboard exports), this track
+hardens what shipped and prepares a stable 1.0 artifact contract. It stays inside
+the locked boundary: public data only, no signals, predictions, ranking,
+execution, or financial advice.
+
+### v0.23 — Connector robustness parity
+
+- Extend per-record isolation to every order-book path, not only candles/trades:
+  one malformed public level must never discard a venue × market_type block.
+- Order-book record-isolation regression tests for all venues.
+- Gate USDT-perp book skip-and-scale fix (dict-shaped `{p,s}` levels).
+
+### v0.24 — Live connector verification evidence
+
+- Scripted, rate-limited live smoke test per venue against current exchange
+  schemas; record dated evidence (units, field presence, contract multipliers).
+- Promote connectors from E3-mocked to E3 + live-verified in `PROJECT_STATE.md`.
+
+### v0.25 — Type and style baseline
+
+- Add mypy to CI; remove the ruff E701/E702 exception in a style-only PR.
+- Extract the inline `dashboard_frontend` HTML into a template file.
+
+### v0.26 — Formal artifact schema and stability policy
+
+- Turn the `docs/ARTIFACT_SCHEMA.md` contract into committed JSON Schema files and
+  validate generated artifacts against them (as the sibling projects do).
+- Publish a schema-stability statement: additive-only artifact fields at 1.0.
+
+### v1.0.0 — Stable public data-infrastructure release
+
+- Frozen artifact schema, documented `data_quality` basis, live-verified connectors.
+- Reproducible sample and GitHub Pages demo verified per release.
+- Semantic-version guarantees; new venues and exports remain additive behind the
+  same no-trading-semantics boundary.
