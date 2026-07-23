@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thanhlq8-max/crypto-composite-market-data/schemas/composite_orderbook_ladder.schema.json",
+  "title": "Composite orderbook ladder (per timeframe)",
+  "description": "Contract for a composite_orderbook_ladder_<timeframe>.json artifact: an object keyed by market_type, each value a composite ladder. Additional object fields are allowed (the contract is additive). Levels are public snapshot diagnostics, not private orderflow or execution signals.",
+  "type": "object",
+  "minProperties": 1,
+  "additionalProperties": {"$ref": "#/$defs/ladder"},
+  "$defs": {
+    "ladder": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "asset",
+        "market_type",
+        "generated_at_ms",
+        "reference_price",
+        "bucket_size",
+        "expected_venues",
+        "venue_count",
+        "coverage",
+        "bid_levels",
+        "ask_levels",
+        "bid_depth_total",
+        "ask_depth_total",
+        "depth_imbalance",
+        "status",
+        "notes"
+      ],
+      "properties": {
+        "asset": {"type": "string"},
+        "market_type": {"type": "string"},
+        "generated_at_ms": {"type": "integer"},
+        "reference_price": {"type": "number"},
+        "bucket_size": {"type": "number"},
+        "expected_venues": {"type": "array", "items": {"type": "string"}},
+        "venue_count": {"type": "integer"},
+        "coverage": {"type": "number"},
+        "bid_levels": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+        "ask_levels": {"type": "array", "items": {"$ref": "#/$defs/level"}},
+        "top_bid_wall": {"oneOf": [{"$ref": "#/$defs/level"}, {"type": "null"}]},
+        "top_ask_wall": {"oneOf": [{"$ref": "#/$defs/level"}, {"type": "null"}]},
+        "bid_depth_total": {"type": "number"},
+        "ask_depth_total": {"type": "number"},
+        "depth_imbalance": {"type": "number"},
+        "status": {"type": "string"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "level": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "side",
+        "price_low",
+        "price_high",
+        "price_mid",
+        "depth_quote",
+        "venue_count",
+        "venue_depth_quote",
+        "hhi",
+        "persistence",
+        "spoof_risk_proxy",
+        "vacuum_score"
+      ],
+      "properties": {
+        "side": {"type": "string", "enum": ["bid", "ask"]},
+        "price_low": {"type": "number"},
+        "price_high": {"type": "number"},
+        "price_mid": {"type": "number"},
+        "depth_quote": {"type": "number"},
+        "venue_count": {"type": "integer"},
+        "venue_depth_quote": {"type": "object", "additionalProperties": {"type": "number"}},
+        "hhi": {"type": "number"},
+        "persistence": {"type": "number"},
+        "spoof_risk_proxy": {"type": "number"},
+        "vacuum_score": {"type": "number"}
+      }
+    }
+  }
+}

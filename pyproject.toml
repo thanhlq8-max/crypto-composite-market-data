@@ -46,6 +46,9 @@ parquet = [
 stream = [
   "websockets>=12"
 ]
+schema = [
+  "jsonschema>=4.18"
+]
 
 [project.urls]
 Homepage = "https://github.com/thanhlq8-max/crypto-composite-market-data"
@@ -60,6 +63,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "crypto_composite.templates" = ["*.html"]
+"crypto_composite.artifact_schemas" = ["*.schema.json"]
 
 [tool.ruff]
 target-version = "py310"
@@ -73,7 +77,8 @@ files = ["src/crypto_composite"]
 
 [[tool.mypy.overrides]]
 # pyarrow ships no type stubs or py.typed marker; it is an optional [parquet] extra.
-module = ["pyarrow.*"]
+# jsonschema is imported lazily and is an optional [schema] extra.
+module = ["pyarrow.*", "jsonschema.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
