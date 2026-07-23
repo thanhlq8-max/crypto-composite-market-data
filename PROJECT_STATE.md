@@ -36,7 +36,10 @@ Public multi-exchange crypto market-data composite toolkit: normalized OHLCV / t
 ## EVIDENCE_LEVELS
 
 - Engines/pipeline/CLI: E3 (local test suite).
-- Connector parsers: E3-mocked only. NOT validated against live 2026 exchange schemas this session.
+- Connector parsers: E3-mocked, including per-record isolation for candles, trades,
+  and every order book. A live-verification harness exists (`scripts/live_smoke.py
+  --evidence-out`) but the E3→live promotion still needs a real network run whose
+  dated `live_verification_<UTC>` record is committed.
 - GitHub Pages demo + CI on GitHub: not re-verified this session.
 
 ## REVIEW_LENS
@@ -45,8 +48,7 @@ Python 3.10+, public exchange REST APIs (Binance/OKX/Bybit/Coinbase/Kraken), dat
 
 ## NEXT_ALLOWED_WORK
 
-- Live smoke test of connectors against current exchange schemas (record evidence) — connectors remain E3-mocked.
-- Extend order-book record-isolation regression tests to the remaining venues: `test_connector_record_isolation.py` only covers candles/trades, and B6 shows the book paths need the same guard.
+- Run `scripts/live_smoke.py --evidence-out docs/live-verification` on a network host and commit the dated record to complete the E3→live connector promotion (harness + unit-scale check now in place).
 - Remove ruff E701/E702 exception via a dedicated style-only PR; add mypy.
 - Extract `dashboard_frontend` HTML into a template file.
 - See `docs/ROADMAP.md` (v0.23 → v1.0) for the release-facing plan.

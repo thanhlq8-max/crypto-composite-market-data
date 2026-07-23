@@ -4,10 +4,19 @@ All notable changes to this project. Release notes were previously kept as per-v
 
 ## Unreleased
 
+### Added
+
+- `scripts/live_smoke.py` gains `--evidence-out DIR`, which writes a dated `live_verification_<UTC>.json`/`.md` record of what a live run observed (per venue × market_type endpoint reachability and observed detail), giving the E3-mocked → E3+live connector promotion a committable artifact. The OHLCV check also asserts a `quote/(base*close)` unit-scale ratio near 1, so a contract-unit regression (perp size left in contracts — the historical OKX/Gate class of bug) fails the live check instead of silently reaching artifacts.
+
 ### Fixed
 
 - Gate.io USDT-perp order book: a single malformed public level (bad numeric cast or a missing `p`/`s` field) no longer discards the whole `gate` × `perp_usdt` block. The futures book — whose rows are dict-shaped `{p, s}` rather than the list shape the shared `parse_book_levels` helper handles — now skips malformed rows individually and scales the surviving levels from contracts to base, matching the per-record isolation invariant already applied to every candle, trade, and spot-book path. Regression test added.
 - Dev dependency: relax the unsatisfiable `build>=1.5.1` pin in `requirements-dev.txt` to `build>=1.2` (no `build` 1.5.1 is published; the latest is 1.5.0), which was breaking the `test` CI job at the install step for every branch.
+
+### Testing
+
+- Order-book record-isolation regression tests for every venue (`binance`, `okx`, `bybit`, `coinbase`, `kraken`, and both Gate book shapes): a malformed public level is skipped and the surrounding good levels survive. This locks the `parse_book_levels` invariant in on the book paths, which previously had record-isolation coverage only for candles and trades.
+- Offline coverage for the `live_smoke` evidence writer (no network).
 
 ### Boundary
 

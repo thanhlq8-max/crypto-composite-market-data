@@ -7,6 +7,8 @@ the same payload still parse.
 
 from __future__ import annotations
 
+import pytest
+
 from crypto_composite.connectors.base import parse_records
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.bybit import BybitConnector
@@ -178,3 +180,39 @@ def test_kraken_ohlcv_and_trades_skip_bad_records(monkeypatch) -> None:
 
     assert [b.timestamp_ms for b in bars] == [1700000000000, 1700000600000]
     assert [t.trade_id for t in trades] == ["1", "3"]
+
+
+# --- Order book paths (BUG_MEMORY B6) ----------------------------------------
+# The shared parse_book_levels helper already skips malformed list-shaped levels,
+# but only candles/trades had regression coverage. These lock the same invariant
+# in for every venue's order book, so a future connector change (or a new venue,
+# as happened with the dict-shaped Gate futures book in B6) cannot silently
+# reintroduce a whole-block loss on one bad public level. A bid whose price fails
+# to cast ("boom") must be dropped, and the surrounding good levels must survive.
+
+_BAD_LEVEL_BOOKS = {
+    "binance": {"bids": [["104", "1.0"], ["boom", "2.0"], ["103", "0.5"]], "asks": [["106", "1.5"]]},
+    "okx": {"data": [{"ts": "1020", "bids": [["104", "1.0"], ["boom", "2.0"], ["103", "0.5"]], "asks": [["106", "1.5"]]}]},
+    "bybit": {"result": {"ts": 1020, "b": [["104", "1.0"], ["boom", "2.0"], ["103", "0.5"]], "a": [["106", "1.5"]]}},
+    "coinbase": {"bids": [["104", "1.0", 2], ["boom", "2.0", 1], ["103", "0.5", 1]], "asks": [["106", "1.5", 1]], "time": "2023-11-14T22:13:21.000Z"},
+    "kraken": {"error": [], "result": {"XBTUSDT": {"bids": [["104", "1.0", 1700000001], ["boom", "2.0", 1700000001], ["103", "0.5", 1700000001]], "asks": [["106", "1.5", 1700000002]]}}},
+}
+
+
+@pytest.mark.parametrize(
+    "connector,symbol,payload",
+    [
+        (BinanceConnector(), "BTCUSDT", _BAD_LEVEL_BOOKS["binance"]),
+        (OKXConnector(), "BTC-USDT", _BAD_LEVEL_BOOKS["okx"]),
+        (BybitConnector(), "BTCUSDT", _BAD_LEVEL_BOOKS["bybit"]),
+        (CoinbaseConnector(), "BTC-USDT", _BAD_LEVEL_BOOKS["coinbase"]),
+        (KrakenConnector(), "XBTUSDT", _BAD_LEVEL_BOOKS["kraken"]),
+    ],
+)
+def test_orderbook_skips_bad_level_keeps_rest(monkeypatch, connector, symbol, payload) -> None:
+    monkeypatch.setattr(connector, "_get", lambda url, params=None: payload)
+
+    book = connector.fetch_orderbook(symbol, "spot_usdt", 10)
+
+    assert [price for price, _ in book.bids] == [104.0, 103.0]
+    assert book.best_bid == 104.0 and book.best_ask == 106.0
