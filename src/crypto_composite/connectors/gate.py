@@ -139,11 +139,30 @@ class GateConnector(ExchangeConnector):
 
         return parse_records(data, _trade)
 
+    @staticmethod
+    def _scaled_book_levels(levels, mult: float) -> list[tuple[float, float]]:
+        """Gate futures book rows are ``{'p': price, 's': size_in_contracts}``.
+
+        Skip any malformed row so one bad public level cannot discard the whole
+        market_type block (BUG_MEMORY B4 invariant, matched by ``parse_book_levels``
+        for the list-shaped spot book), then scale size from contracts to base.
+        """
+        out: list[tuple[float, float]] = []
+        for lvl in levels or []:
+            try:
+                price = float(lvl["p"])
+                size = float(lvl["s"]) * mult
+            except (TypeError, ValueError, KeyError, IndexError):
+                continue
+            if price > 0 and size > 0:
+                out.append((price, size))
+        return out
+
     def _fetch_perp_orderbook(self, symbol, depth):
         mult = self._multiplier(symbol)
         data = self._get(f"{self.base}/futures/usdt/order_book", {"contract": symbol, "limit": min(depth, 100)})
-        bids = [(float(lvl["p"]), float(lvl["s"]) * mult) for lvl in data.get("bids", []) if float(lvl.get("s", 0)) > 0]
-        asks = [(float(lvl["p"]), float(lvl["s"]) * mult) for lvl in data.get("asks", []) if float(lvl.get("s", 0)) > 0]
+        bids = self._scaled_book_levels(data.get("bids", []), mult)
+        asks = self._scaled_book_levels(data.get("asks", []), mult)
         require_non_empty_orderbook(venue=self.venue, market_type="perp_usdt", symbol=symbol, bids=bids, asks=asks)
         bb, ba = bids[0][0], asks[0][0]
         ts = self._time_ms(data.get("current")) if data.get("current") else now_ms()

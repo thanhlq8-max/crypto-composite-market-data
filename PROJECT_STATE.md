@@ -22,14 +22,15 @@ Public multi-exchange crypto market-data composite toolkit: normalized OHLCV / t
 - BM-1 (fixed 2026-07-11) Shape mismatch: `pipeline.run_composite` fed the combined `composite_orderbook_ladder.json` (keyed by timeframe) into `_previous_lookup` (expects market_type keys) → persistence carry-over silently never fired. Pattern to watch: artifact files with different top-level key shapes passed across module boundaries without a shape assert.
 - BM-2 (fixed 2026-07-11) Coverage penalized perp when spot-only venues (coinbase/kraken) were in `expected_venues` → status could never reach OK with 5 venues. Pattern: shared denominator across heterogeneous capabilities.
 - BM-3 (fixed 2026-07-11) Status computed from in-progress candle → dispersion inflated on exactly the bar deciding status. Pattern: fetch-time skew leaking into quality metrics.
-- BM-4 (open, MINOR) `utils.quote_volume` raises on `price<=0`; one bad record still drops the whole venue×market_type block in `_scan_venue`. Root-cause fix = per-record skip in connector parse loops.
-- BM-5 (open, semantic) Per-venue `data_quality` constants (0.78–0.95) are undocumented INFERENCE exported as data.
+- BM-4 (fixed v0.19.0) One bad record (non-positive price, missing field, cast failure) dropped the whole venue×market_type block. Root-cause fix shipped: per-record skip via `parse_records` (candles/trades) in every connector, with regression coverage in `tests/test_connector_record_isolation.py`.
+- BM-5 (documented v0.20.x) Per-venue `data_quality` constants are hand-set heuristic ordering priors, not measured accuracy. Traceability label recorded in `docs/DATA_QUALITY_CONSTANTS.md`; `connectors/base.py` points to it. Changing any value stays a scoped behavior change.
+- BM-6 (fixed 2026-07-23) The Gate futures order book (dict-shaped `{p,s}` levels) still used a raw comprehension, so one malformed level raised and discarded the whole gate×perp block — the exact B4 class, missed when the Gate connector landed in v0.22.0. Fixed with `GateConnector._scaled_book_levels` (skip-and-scale). Pattern to watch: a new venue whose payload shape differs from the shared `parse_book_levels` helper needs its own per-record skip.
 
-## CURRENT_STATE (2026-07-11)
+## CURRENT_STATE (2026-07-23)
 
-- Version 0.18.2 + audit branch (P0/P1 fixes, see CHANGELOG "Unreleased" once released).
-- Tests: 107 passed locally (pytest, Python 3.10). Ruff clean (E701/E702 ignored by config — see follow-ups).
-- CI: 3.10–3.13 matrix, ruff + compileall + pytest + build.
+- Version 0.22.0 on `main`; branch `fix/gate-perp-orderbook-record-isolation` adds the B6 Gate perp order-book record-isolation fix on top.
+- Since the 0.18.2 snapshot this file used to describe, v0.19.0–v0.22.0 shipped: B1–B4 fixes, OKX/Gate contract-unit corrections, coverage/closed-bar verdict integrity, per-venue token-bucket rate limiting + opt-in cache, WebSocket depth-lifecycle streaming, the Gate.io venue, CSV/Parquet export, and the `data_quality` constants traceability doc.
+- Tests: 196 passed, 4 skipped locally (pytest). CI: 3.10–3.13 matrix, ruff + compileall + pytest + build.
 - `requires-python >= 3.10` (validated by full suite on 3.10).
 
 ## EVIDENCE_LEVELS
@@ -44,11 +45,11 @@ Python 3.10+, public exchange REST APIs (Binance/OKX/Bybit/Coinbase/Kraken), dat
 
 ## NEXT_ALLOWED_WORK
 
-- Live smoke test of connectors against current exchange schemas (record evidence).
-- BM-4 root-cause fix (per-record skip) + tests.
-- Remove ruff E701/E702 exception via a dedicated style-only PR; consider mypy.
-- P2 backlog: 4h/1d timeframes, Parquet export, extract `dashboard_frontend` HTML to template file.
-- Document basis for per-venue `data_quality` constants or derive them.
+- Live smoke test of connectors against current exchange schemas (record evidence) — connectors remain E3-mocked.
+- Extend order-book record-isolation regression tests to the remaining venues: `test_connector_record_isolation.py` only covers candles/trades, and B6 shows the book paths need the same guard.
+- Remove ruff E701/E702 exception via a dedicated style-only PR; add mypy.
+- Extract `dashboard_frontend` HTML into a template file.
+- See `docs/ROADMAP.md` (v0.23 → v1.0) for the release-facing plan.
 
 ## NEXT_FORBIDDEN_WORK
 

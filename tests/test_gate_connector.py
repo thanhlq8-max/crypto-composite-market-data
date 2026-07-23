@@ -102,6 +102,32 @@ def test_gate_perp_scales_contracts_to_base(monkeypatch) -> None:
     assert book.bids[0] == (63860.6, pytest.approx(7490 * MULT))
 
 
+def test_gate_perp_orderbook_skips_malformed_levels(monkeypatch) -> None:
+    # BUG_MEMORY B4 invariant for the dict-shaped futures book: one malformed
+    # public level (bad cast, missing field) must be skipped individually, not
+    # discard the whole gate x perp block. Pre-fix the raw comprehension raised
+    # on the first bad row and lost every level.
+    connector = _gate(monkeypatch, {
+        "contracts/BTC_USDT": {"quanto_multiplier": str(MULT)},
+        "futures/usdt/order_book": {
+            "current": 1783852195359,
+            "bids": [
+                {"s": 7490, "p": "63860.6"},
+                {"s": 5000, "p": "oops"},   # cast failure
+                {"p": "63855.0"},           # missing size
+                {"s": 3000, "p": "63840.0"},
+            ],
+            "asks": [{"s": 5000, "p": "63870.0"}],
+        },
+    })
+
+    book = connector.fetch_orderbook("BTC_USDT", "perp_usdt", 5)
+
+    assert [level[0] for level in book.bids] == [63860.6, 63840.0]
+    assert book.bids[0] == (63860.6, pytest.approx(7490 * MULT))
+    assert book.best_bid == 63860.6 and book.best_ask == 63870.0
+
+
 def test_gate_perp_open_interest_scaled(monkeypatch) -> None:
     connector = _gate(monkeypatch, {
         "contracts/BTC_USDT": {"quanto_multiplier": str(MULT)},
