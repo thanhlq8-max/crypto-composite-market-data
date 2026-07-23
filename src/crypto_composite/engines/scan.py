@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 from crypto_composite.symbol_map import resolve_symbol, venue_supports_market_type
+from crypto_composite.connectors.base import ExchangeConnector
 from crypto_composite.connectors.binance import BinanceConnector
 from crypto_composite.connectors.okx import OKXConnector
 from crypto_composite.connectors.bybit import BybitConnector
@@ -12,7 +15,7 @@ from crypto_composite.connectors.gate import GateConnector
 from crypto_composite.schemas import DataQualityReport
 from crypto_composite.utils import now_ms
 
-CONNECTORS = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector, "coinbase": CoinbaseConnector, "kraken": KrakenConnector, "gate": GateConnector}
+CONNECTORS: dict[str, Callable[[], ExchangeConnector]] = {"binance": BinanceConnector, "okx": OKXConnector, "bybit": BybitConnector, "coinbase": CoinbaseConnector, "kraken": KrakenConnector, "gate": GateConnector}
 
 
 class ScanInputError(ValueError):
@@ -45,7 +48,7 @@ def _fetch_optional(fetch, symbol: str, mt: str):
 def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str, limit: int, depth: int) -> dict:
     """Fetch all market types for one venue sequentially (per-venue pacing)."""
     conn = CONNECTORS[venue]()
-    data = {"ohlcv": [], "trades": [], "orderbooks": [], "funding": [], "open_interest": []}
+    data: dict[str, list[Any]] = {"ohlcv": [], "trades": [], "orderbooks": [], "funding": [], "open_interest": []}
     errors: list[dict] = []
     missing: list[str] = []
     venue_had_ok = False
@@ -97,7 +100,7 @@ def _scan_venue(venue: str, asset: str, market_types: list[str], timeframe: str,
 
 def scan(asset: str, venues: list[str], market_types: list[str], timeframe: str, limit: int, depth: int = 100) -> dict:
     venues = normalize_venues(venues)
-    out = {"asset": asset, "generated_at_ms": now_ms(), "phase": "PHASE_1_DATA_FOUNDATION",
+    out: dict[str, Any] = {"asset": asset, "generated_at_ms": now_ms(), "phase": "PHASE_1_DATA_FOUNDATION",
            "venues": venues, "timeframe": timeframe, "market_types": market_types,
            "data": {"ohlcv": [], "trades": [], "orderbooks": [], "funding": [], "open_interest": []},
            "errors": []}

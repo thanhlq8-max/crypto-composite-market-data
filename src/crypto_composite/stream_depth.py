@@ -78,7 +78,7 @@ def _levels(raw: Any, scale: float = 1.0) -> list[tuple[float, float]]:
     return out
 
 
-def parse_binance_frame(payload: dict[str, Any]) -> dict[str, list[tuple[float, float]]] | None:
+def parse_binance_frame(payload: dict[str, Any]) -> dict[str, Any] | None:
     """fstream partial book depth: bids under 'b'/'bids', asks under 'a'/'asks'."""
     bids = payload.get("b") if payload.get("b") is not None else payload.get("bids")
     asks = payload.get("a") if payload.get("a") is not None else payload.get("asks")
@@ -87,7 +87,7 @@ def parse_binance_frame(payload: dict[str, Any]) -> dict[str, list[tuple[float, 
     return {"bids": _levels(bids), "asks": _levels(asks), "type": "snapshot"}
 
 
-def parse_okx_frame(payload: dict[str, Any], contract_value: float) -> dict[str, list[tuple[float, float]]] | None:
+def parse_okx_frame(payload: dict[str, Any], contract_value: float) -> dict[str, Any] | None:
     """OKX books5 channel: data[0] carries full 5-level snapshots in contracts."""
     data = payload.get("data")
     if not isinstance(data, list) or not data:

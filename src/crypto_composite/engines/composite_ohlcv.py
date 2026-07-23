@@ -82,7 +82,7 @@ def build_composite_ohlcv(raw: dict, expected_venues: list[str] | None = None) -
             open_w = _weighted([(float(b.open), _qvol(b)) for b in xs], float(xs[0].open))
             high = max(float(b.high) for b in xs)
             low = min(float(b.low) for b in xs)
-            venue_depth = defaultdict(float)
+            venue_depth: defaultdict[str, float] = defaultdict(float)
             for b in xs:
                 venue_depth[b.venue] += _qvol(b)
             weights = {v: round(q / max(total_q, 1e-9), 6) for v, q in sorted(venue_depth.items())}

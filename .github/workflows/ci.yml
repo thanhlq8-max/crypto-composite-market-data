@@ -43,6 +43,9 @@ jobs:
       - name: Lint
         run: python -m ruff check src tests
 
+      - name: Type check
+        run: python -m mypy
+
       - name: Compile source
         run: python -m compileall src
 

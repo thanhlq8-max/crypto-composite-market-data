@@ -168,8 +168,13 @@ execution, or financial advice.
 
 ### v0.25 — Type and style baseline
 
-- Add mypy to CI; remove the ruff E701/E702 exception in a style-only PR.
-- Extract the inline `dashboard_frontend` HTML into a template file.
+- Add mypy to CI — **delivered** (non-strict `[tool.mypy]` baseline over
+  `src/crypto_composite`; the 15 defects it surfaced are fixed).
+- Remove the ruff E701/E702 exception — **already done**: the config carries no
+  such ignore and `ruff check` is clean, so there is nothing left to remove.
+- Extract the inline `dashboard_frontend` HTML into a template file — **already
+  done**: `dashboard_frontend.py` loads `templates/dashboard.html` via
+  `importlib.resources`.
 
 ### v0.26 — Formal artifact schema and stability policy
 
