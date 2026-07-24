@@ -2,7 +2,12 @@
 
 All notable changes to this project. Release notes were previously kept as per-version `RELEASE_NOTES_v*.md` files at the repository root; they are consolidated here.
 
-## v1.0.0
+## Unreleased
+
+### Changed
+
+- CI/lint determinism: pin the ruff rule set explicitly (`[tool.ruff.lint] select = ["E4", "E7", "E9", "F"]`). `requirements-dev.txt` left ruff unpinned above the floor, so CI installed the latest ruff (0.16), whose broader default rules turned every job red at the lint step — on all open Dependabot PRs and any fresh run. Pinning the intended rule set makes lint deterministic across ruff versions.
+- Adopt the current dev-tool floors (dev/CI only, no runtime effect): `ruff>=0.16.0`, `mypy>=2.3.0`, `types-requests>=2.33.0.20260712`, `build>=1.5.0`, and `actions/setup-python@v7` across all workflows. Verified clean under the new versions (ruff, mypy, pytest, build).
 
 Release date: 2026-07-23.
 
