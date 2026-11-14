@@ -3,7 +3,7 @@
 pytest>=9.2.0
 ruff>=0.16.6
 mypy>=2.4.1
-types-requests>=2.33.0.20260906
+types-requests>=2.33.0.20261030
 build>=1.6.1
 jsonschema>=4.18
 pyarrow>=15
