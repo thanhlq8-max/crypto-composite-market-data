@@ -1,7 +1,7 @@
 -r requirements.txt
 
 pytest>=9.2.0
-ruff>=0.16.6
+ruff>=0.17.4
 mypy>=2.4.1
 types-requests>=2.33.0.20260906
 build>=1.6.1
